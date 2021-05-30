@@ -246,4 +246,13 @@ fun1 n =
 """
                     |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectNoErrors
+        , test "should not report an error when the function body contains the opt out comment" <|
+            \() ->
+                """module A exposing (..)
+fun x =
+  -- OPT OUT
+  fun x + 1
+"""
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
+                    |> Review.Test.expectNoErrors
         ]
