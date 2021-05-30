@@ -96,6 +96,17 @@ fun x =
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectNoErrors
+        , test "should not report an error when a function is properly TCO (let body)" <|
+            \() ->
+                """module A exposing (..)
+fun x =
+  let
+    y = x - 1
+  in
+  fun y
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
         , test "should not report an error when a function is referencing but not calling itself" <|
             -- TODO Check that this doesn't actually invalidate TCO
             \() ->
