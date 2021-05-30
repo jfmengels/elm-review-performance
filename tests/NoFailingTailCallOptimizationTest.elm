@@ -130,6 +130,45 @@ fun n =
                             }
                             |> Review.Test.atExactly { start = { row = 3, column = 12 }, end = { row = 3, column = 15 } }
                         ]
+        , test "should report an error when a function calls itself using |>" <|
+            \() ->
+                """module A exposing (..)
+fun x n =
+    if x <= 0 then
+        n
+
+    else
+        n
+            |> fun (x - 1)
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = "REPLACEME"
+                            , details = [ "REPLACEME" ]
+                            , under = "fun"
+                            }
+                            |> Review.Test.atExactly { start = { row = 8, column = 16 }, end = { row = 8, column = 19 } }
+                        ]
+        , test "should report an error when a function calls itself using <|" <|
+            \() ->
+                """module A exposing (..)
+fun x n =
+    if x <= 0 then
+        n
+
+    else
+        fun (x - 1) <| n
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = "REPLACEME"
+                            , details = [ "REPLACEME" ]
+                            , under = "fun"
+                            }
+                            |> Review.Test.atExactly { start = { row = 7, column = 9 }, end = { row = 7, column = 12 } }
+                        ]
         , test "should not report an error when a function is referencing but not calling itself" <|
             -- TODO Check that this doesn't actually invalidate TCO
             \() ->
