@@ -110,7 +110,31 @@ expressionVisitor node context =
 
         _ ->
             if isInTcoLocation context (Node.range node) then
-                ( [], context )
+                case Node.value node of
+                    Expression.IfBlock _ thenBranch elseBranch ->
+                        ( []
+                        , { context | tcoLocations = Node.range thenBranch :: Node.range elseBranch :: context.tcoLocations }
+                        )
+
+                    Expression.ParenthesizedExpression expr ->
+                        -- TODO Check
+                        ( [], context )
+
+                    Expression.LetExpression { expression } ->
+                        -- TODO Add expression
+                        -- TODO Check for recursive let declarations
+                        ( [], context )
+
+                    Expression.CaseExpression caseBlock ->
+                        -- TODO Add blocks
+                        ( [], context )
+
+                    Expression.LambdaExpression lambda ->
+                        -- TODO Check for recursive lambda functions?
+                        ( [], context )
+
+                    _ ->
+                        ( [], context )
 
             else
                 ( [], context )
