@@ -21,7 +21,7 @@ fun x = a + x
                 """module A exposing (..)
 fun x =
   if condition x then
-    fun x - 1
+    fun (x - 1)
   else
     x
 """
