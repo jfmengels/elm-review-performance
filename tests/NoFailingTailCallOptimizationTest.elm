@@ -1,6 +1,6 @@
 module NoFailingTailCallOptimizationTest exposing (all)
 
-import NoFailingTailCallOptimization exposing (rule)
+import NoFailingTailCallOptimization exposing (optOutWithComment, rule)
 import Review.Test
 import Test exposing (Test, describe, test)
 
@@ -14,7 +14,7 @@ all =
 a = 1
 fun x = a + x
 """
-                    |> Review.Test.run rule
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectNoErrors
         , test "should report an error when a function is recursive but applies operations on the result" <|
             \() ->
@@ -22,7 +22,7 @@ fun x = a + x
 fun x =
   fun x + 1
 """
-                    |> Review.Test.run rule
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = "Recursive function is not tail-call optimized"
@@ -40,7 +40,7 @@ fun x =
   else
     x
 """
-                    |> Review.Test.run rule
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectNoErrors
         , test "should not report an error when a function is properly TCO (if else branch)" <|
             \() ->
@@ -51,7 +51,7 @@ fun x =
   else
     fun (x - 1)
 """
-                    |> Review.Test.run rule
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectNoErrors
         , test "should report an error when a function calls itself in the condition of an if block" <|
             \() ->
@@ -62,7 +62,7 @@ fun x =
   else
     x
 """
-                    |> Review.Test.run rule
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = "Recursive function is not tail-call optimized"
@@ -78,7 +78,7 @@ fun x =
   case fun (x - 1) of
     _ -> 1
 """
-                    |> Review.Test.run rule
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = "Recursive function is not tail-call optimized"
@@ -94,7 +94,7 @@ fun x =
   case x of
     _ -> fun (x - 1)
 """
-                    |> Review.Test.run rule
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectNoErrors
         , test "should not report an error when a function is properly TCO (let body)" <|
             \() ->
@@ -105,7 +105,7 @@ fun x =
   in
   fun y
 """
-                    |> Review.Test.run rule
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectNoErrors
         , test "should report an error when a function is called recursively from inside one of its let functions" <|
             \() ->
@@ -117,7 +117,7 @@ fun x =
   in
   fun2 x
 """
-                    |> Review.Test.run rule
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = "Recursive function is not tail-call optimized"
@@ -132,7 +132,7 @@ fun x =
 fun x =
   (fun (x - 1))
 """
-                    |> Review.Test.run rule
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectNoErrors
         , test "should report an error when a function calls itself in a lambda" <|
             \() ->
@@ -140,7 +140,7 @@ fun x =
 fun n =
     \\x -> (fun n x)
 """
-                    |> Review.Test.run rule
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = "Recursive function is not tail-call optimized"
@@ -160,7 +160,7 @@ fun x n =
         n
             |> fun (x - 1)
 """
-                    |> Review.Test.run rule
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = "Recursive function is not tail-call optimized"
@@ -179,7 +179,7 @@ fun x n =
     else
         fun (x - 1) <| n
 """
-                    |> Review.Test.run rule
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = "Recursive function is not tail-call optimized"
@@ -198,7 +198,7 @@ fun x =
   else
     x
 """
-                    |> Review.Test.run rule
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectNoErrors
         , test "should report an error for non-TCO let functions" <|
             \() ->
@@ -210,7 +210,7 @@ a n =
   in
   fun 2
 """
-                    |> Review.Test.run rule
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = "Recursive function is not tail-call optimized"
@@ -229,7 +229,7 @@ a n =
   in
   fun 2
 """
-                    |> Review.Test.run rule
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectNoErrors
         , test "should not report an error for TCO let functions inside a recursive function" <|
             \() ->
@@ -244,6 +244,6 @@ fun1 n =
   else
     fun2 2
 """
-                    |> Review.Test.run rule
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectNoErrors
         ]

@@ -1,4 +1,7 @@
-module NoFailingTailCallOptimization exposing (rule)
+module NoFailingTailCallOptimization exposing
+    ( rule
+    , optOutWithComment
+    )
 
 {-|
 
@@ -48,13 +51,30 @@ elm-review --template jfmengels/elm-review-performance/example --rules NoFailing
 ```
 
 -}
-rule : Rule
-rule =
+rule : Configuration -> Rule
+rule configuration =
     Rule.newModuleRuleSchema "NoFailingTailCallOptimization" initialContext
         |> Rule.withDeclarationEnterVisitor declarationVisitor
         |> Rule.withExpressionEnterVisitor expressionEnterVisitor
         |> Rule.withExpressionExitVisitor expressionExitVisitor
         |> Rule.fromModuleRuleSchema
+
+
+
+-- CONFIGURATION
+
+
+type Configuration
+    = OptOut String
+
+
+optOutWithComment : String -> Configuration
+optOutWithComment comment =
+    OptOut comment
+
+
+
+-- CONTEXT
 
 
 type alias Context =
