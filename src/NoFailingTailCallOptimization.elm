@@ -11,6 +11,7 @@ import Elm.Syntax.Expression as Expression exposing (Expression)
 import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Range exposing (Range)
 import Review.Rule as Rule exposing (Rule)
+import Set exposing (Set)
 
 
 {-| Reports... REPLACEME
@@ -61,6 +62,7 @@ type alias Context =
     , tcoLocations : List Range
     , newScopes : List ( Range, String )
     , parentScopes : List ( Range, Scope )
+    , parentNames : Set String
     }
 
 
@@ -77,6 +79,7 @@ initialContext =
     , tcoLocations = []
     , newScopes = []
     , parentScopes = []
+    , parentNames = Set.empty
     }
 
 
@@ -98,6 +101,7 @@ declarationVisitor node context =
                     ]
               , newScopes = []
               , parentScopes = []
+              , parentNames = Set.empty
               }
             )
 
@@ -124,13 +128,14 @@ expressionEnterVisitor node context =
                             , { currentFunctionName = context.currentFunctionName, tcoLocations = context.tcoLocations, newScopes = restOfNewScopes }
                             )
                                 :: context.parentScopes
+                        , parentNames = Set.insert name context.parentNames
                         }
 
                     else
                         context
     in
     if isInTcoLocation newContext (Node.range node) then
-        ( [], addAllowedLocation node newContext )
+        ( reportReferencesToParentFunctions node newContext, addAllowedLocation node newContext )
 
     else
         ( reportRecursiveCallInNonAllowedLocation node newContext, newContext )
@@ -141,6 +146,25 @@ reportRecursiveCallInNonAllowedLocation node context =
     case Node.value node of
         Expression.Application ((Node funcRange (Expression.FunctionOrValue [] name)) :: _) ->
             if name == context.currentFunctionName then
+                [ Rule.error
+                    { message = "REPLACEME"
+                    , details = [ "REPLACEME" ]
+                    }
+                    funcRange
+                ]
+
+            else
+                []
+
+        _ ->
+            []
+
+
+reportReferencesToParentFunctions : Node Expression -> Context -> List (Rule.Error {})
+reportReferencesToParentFunctions node context =
+    case Node.value node of
+        Expression.Application ((Node funcRange (Expression.FunctionOrValue [] name)) :: _) ->
+            if Set.member name context.parentNames then
                 [ Rule.error
                     { message = "REPLACEME"
                     , details = [ "REPLACEME" ]
@@ -231,6 +255,7 @@ expressionExitVisitor node context =
                   , tcoLocations = headScope.tcoLocations
                   , newScopes = headScope.newScopes
                   , parentScopes = restOfParentScopes
+                  , parentNames = Set.remove headScope.currentFunctionName context.parentNames
                   }
                 )
 
