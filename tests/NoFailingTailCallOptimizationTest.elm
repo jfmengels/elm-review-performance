@@ -169,6 +169,22 @@ fun x n =
                             }
                             |> Review.Test.atExactly { start = { row = 8, column = 16 }, end = { row = 8, column = 19 } }
                         ]
+        , test "should report an error when a function calls itself using |> (simple reference)" <|
+            \() ->
+                """module A exposing (..)
+fun x =
+    n
+        |> fun
+"""
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = "Recursive function is not tail-call optimized"
+                            , details = [ "The way this function is called recursively here prevents the function from being tail-call optimized." ]
+                            , under = "fun"
+                            }
+                            |> Review.Test.atExactly { start = { row = 4, column = 12 }, end = { row = 4, column = 15 } }
+                        ]
         , test "should report an error when a function calls itself using <|" <|
             \() ->
                 """module A exposing (..)
@@ -188,18 +204,6 @@ fun x n =
                             }
                             |> Review.Test.atExactly { start = { row = 7, column = 9 }, end = { row = 7, column = 12 } }
                         ]
-        , test "should not report an error when a function is referencing but not calling itself" <|
-            -- TODO Check that this doesn't actually invalidate TCO
-            \() ->
-                """module A exposing (..)
-fun x =
-  if condition x then
-    \\_ -> fun
-  else
-    x
-"""
-                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
-                    |> Review.Test.expectNoErrors
         , test "should report an error for non-TCO let functions" <|
             \() ->
                 """module A exposing (..)

@@ -226,13 +226,13 @@ expressionEnterVisitor node context =
 reportRecursiveCallInNonAllowedLocation : Node Expression -> Context -> List (Rule.Error {})
 reportRecursiveCallInNonAllowedLocation node context =
     case Node.value node of
-        Expression.Application ((Node funcRange (Expression.FunctionOrValue [] name)) :: _) ->
+        Expression.FunctionOrValue [] name ->
             if name == context.currentFunctionName then
                 [ Rule.error
                     { message = "Recursive function is not tail-call optimized"
                     , details = [ "The way this function is called recursively here prevents the function from being tail-call optimized." ]
                     }
-                    funcRange
+                    (Node.range node)
                 ]
 
             else
@@ -264,6 +264,9 @@ reportReferencesToParentFunctions node context =
 addAllowedLocation : Node Expression -> Context -> Context
 addAllowedLocation node context =
     case Node.value node of
+        Expression.Application (function :: _) ->
+            { context | tcoLocations = Node.range function :: context.tcoLocations }
+
         Expression.IfBlock _ thenBranch elseBranch ->
             { context | tcoLocations = Node.range thenBranch :: Node.range elseBranch :: context.tcoLocations }
 
