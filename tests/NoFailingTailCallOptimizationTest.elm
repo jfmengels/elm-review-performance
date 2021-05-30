@@ -1,6 +1,6 @@
 module NoFailingTailCallOptimizationTest exposing (all)
 
-import NoFailingTailCallOptimization exposing (optOutWithComment, rule)
+import NoFailingTailCallOptimization exposing (optInWithComment, optOutWithComment, rule)
 import Review.Test
 import Test exposing (Test, describe, test)
 
@@ -254,5 +254,29 @@ fun x =
   fun x + 1
 """
                     |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
+                    |> Review.Test.expectNoErrors
+        , test "should report an error when the function body contains the opt in comment" <|
+            \() ->
+                """module A exposing (..)
+fun x =
+  -- OPT IN
+  fun x + 1
+"""
+                    |> Review.Test.run (rule (optInWithComment "OPT IN"))
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = "Recursive function is not tail-call optimized"
+                            , details = [ "The way this function is called recursively here prevents the function from being tail-call optimized." ]
+                            , under = "fun"
+                            }
+                            |> Review.Test.atExactly { start = { row = 3, column = 3 }, end = { row = 3, column = 6 } }
+                        ]
+        , test "should not report an error when the function body does not contain the opt in comment" <|
+            \() ->
+                """module A exposing (..)
+fun x =
+  fun x + 1
+"""
+                    |> Review.Test.run (rule (optInWithComment "OPT IN"))
                     |> Review.Test.expectNoErrors
         ]

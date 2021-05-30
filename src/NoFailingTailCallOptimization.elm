@@ -1,6 +1,6 @@
 module NoFailingTailCallOptimization exposing
     ( rule
-    , optOutWithComment
+    , optInWithComment, optOutWithComment
     )
 
 {-|
@@ -67,11 +67,17 @@ rule configuration =
 
 type Configuration
     = OptOut String
+    | OptIn String
 
 
 optOutWithComment : String -> Configuration
 optOutWithComment comment =
     OptOut comment
+
+
+optInWithComment : String -> Configuration
+optInWithComment comment =
+    OptIn comment
 
 
 shouldReportFunction : Context -> Range -> Bool
@@ -129,6 +135,9 @@ commentsVisitor configuration comments context =
             "-- "
                 ++ (case configuration of
                         OptOut commentTag_ ->
+                            commentTag_
+
+                        OptIn commentTag_ ->
                             commentTag_
                    )
     in
