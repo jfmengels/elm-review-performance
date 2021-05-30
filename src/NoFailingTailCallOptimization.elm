@@ -139,17 +139,42 @@ addAllowedLocation node context =
         Expression.IfBlock _ thenBranch elseBranch ->
             { context | tcoLocations = Node.range thenBranch :: Node.range elseBranch :: context.tcoLocations }
 
-        Expression.LetExpression { expression } ->
-            -- TODO
-            {- The following translates to TCO code
+        Expression.LetExpression { declarations, expression } ->
+            let
+                newScopes : List ( Range, String )
+                newScopes =
+                    List.filterMap
+                        (\decl ->
+                            case Node.value decl of
+                                Expression.LetFunction function ->
+                                    let
+                                        functionDeclaration : Expression.FunctionImplementation
+                                        functionDeclaration =
+                                            Node.value function.declaration
+                                    in
+                                    Just
+                                        ( Node.range functionDeclaration.expression
+                                        , Node.value functionDeclaration.name
+                                        )
 
-               let
-                   fun x =
-                      fun x
-               in
-               fun 1
-            -}
-            { context | tcoLocations = Node.range expression :: context.tcoLocations }
+                                Expression.LetDestructuring _ _ ->
+                                    Nothing
+                        )
+                        declarations
+            in
+            { context
+                | newScopes = newScopes
+
+                {- The following translates to TCO code
+
+                   let
+                       fun x =
+                          fun x
+                   in
+                   fun 1
+                -}
+                , tcoLocations = Node.range expression :: context.tcoLocations
+            }
 
         Expression.ParenthesizedExpression expr ->
             {- The following translates to TCO code
