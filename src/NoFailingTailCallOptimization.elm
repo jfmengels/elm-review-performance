@@ -83,13 +83,9 @@ optInWithComment comment =
 shouldReportFunction : Configuration -> Context -> Range -> Bool
 shouldReportFunction configuration context range =
     let
-        startRow : Int
-        startRow =
-            range.start.row
-
         foundComment : Bool
         foundComment =
-            List.any (\row -> startRow + 1 == row) context.comments
+            Set.member (range.start.row + 1) context.comments
     in
     case configuration of
         OptOut _ ->
@@ -109,7 +105,7 @@ type alias Context =
     , newScopesForLet : List ( Range, String )
     , parentScopes : List ( Range, Scope )
     , parentNames : Set String
-    , comments : List Int
+    , comments : Set Int
     }
 
 
@@ -127,7 +123,7 @@ initialContext =
     , newScopesForLet = []
     , parentScopes = []
     , parentNames = Set.empty
-    , comments = []
+    , comments = Set.empty
     }
 
 
@@ -149,6 +145,7 @@ commentsVisitor configuration comments context =
             comments
                 |> List.filter (Node.value >> String.contains commentTag)
                 |> List.map (Node.range >> .start >> .row)
+                |> Set.fromList
       }
     )
 
