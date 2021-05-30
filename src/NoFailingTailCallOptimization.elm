@@ -95,7 +95,7 @@ expressionVisitor : Node Expression -> Context -> ( List (Rule.Error {}), Contex
 expressionVisitor node context =
     case Node.value node of
         Expression.Application ((Node funcRange (Expression.FunctionOrValue [] name)) :: _) ->
-            if name == context.currentFunctionName && isNotInTcoLocation context (Node.range node) then
+            if name == context.currentFunctionName && not (isInTcoLocation context (Node.range node)) then
                 ( [ Rule.error
                         { message = "REPLACEME"
                         , details = [ "REPLACEME" ]
@@ -112,6 +112,6 @@ expressionVisitor node context =
             ( [], context )
 
 
-isNotInTcoLocation : Context -> Range -> Bool
-isNotInTcoLocation context range =
-    False
+isInTcoLocation : Context -> Range -> Bool
+isInTcoLocation context range =
+    True
