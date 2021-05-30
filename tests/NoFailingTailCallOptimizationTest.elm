@@ -199,4 +199,23 @@ fun x =
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectNoErrors
+        , test "should report an error for non-TCO let functions" <|
+            \() ->
+                """module A exposing (..)
+a n =
+  let
+    fun x =
+      fun x + 1
+  in
+  fun 2
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = "REPLACEME"
+                            , details = [ "REPLACEME" ]
+                            , under = "fun"
+                            }
+                            |> Review.Test.atExactly { start = { row = 3, column = 3 }, end = { row = 3, column = 6 } }
+                        ]
         ]
