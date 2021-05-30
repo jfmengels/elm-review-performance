@@ -108,7 +108,21 @@ initialContext =
 
 commentsVisitor : Configuration -> List (Node String) -> Context -> ( List nothing, Context )
 commentsVisitor configuration comments context =
-    ( [], context )
+    let
+        commentTag : String
+        commentTag =
+            case configuration of
+                OptOut commentTag_ ->
+                    commentTag_
+    in
+    ( []
+    , { context
+        | comments =
+            comments
+                |> List.filter (Node.value >> String.startsWith commentTag)
+                |> List.map Node.range
+      }
+    )
 
 
 declarationVisitor : Node Declaration -> Context -> ( List nothing, Context )
