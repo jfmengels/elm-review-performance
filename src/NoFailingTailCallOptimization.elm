@@ -67,7 +67,14 @@ declarationVisitor : Node Declaration -> Context -> ( List nothing, Context )
 declarationVisitor node context =
     case Node.value node of
         Declaration.FunctionDeclaration function ->
-            ( [], context )
+            ( []
+            , { currentFunction =
+                    function.declaration
+                        |> Node.value
+                        |> .name
+                        |> Node.value
+              }
+            )
 
         _ ->
             ( [], context )
