@@ -224,13 +224,13 @@ expressionExitVisitor (Node range _) context =
         [] ->
             ( [], context )
 
-        ( headRange, headScope ) :: restOfScopes ->
+        ( headRange, headScope ) :: restOfParentScopes ->
             if headRange == range then
                 ( []
                 , { currentFunctionName = headScope.currentFunctionName
                   , tcoLocations = headScope.tcoLocations
                   , newScopes = headScope.newScopes
-                  , parentScopes = restOfScopes
+                  , parentScopes = restOfParentScopes
                   }
                 )
 
