@@ -259,6 +259,16 @@ fun x =
 """
                     |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectNoErrors
+        , test "should not report an error when the function body contains the opt out comment when it has a signature" <|
+            \() ->
+                """module A exposing (..)
+fun : Int -> Int
+fun x =
+  -- OPT OUT
+  fun x + 1
+"""
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
+                    |> Review.Test.expectNoErrors
         , test "should report an error when the function body contains the opt in comment" <|
             \() ->
                 """module A exposing (..)
