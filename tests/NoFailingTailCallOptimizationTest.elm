@@ -218,4 +218,31 @@ a n =
                             }
                             |> Review.Test.atExactly { start = { row = 5, column = 7 }, end = { row = 5, column = 10 } }
                         ]
+        , test "should not report an error for TCO let functions" <|
+            \() ->
+                """module A exposing (..)
+a n =
+  let
+    fun x =
+      fun x
+  in
+  fun 2
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
+        , test "should not report an error for TCO let functions inside a recursive function" <|
+            \() ->
+                """module A exposing (..)
+fun1 n =
+  let
+    fun2 x =
+      fun2 x
+  in
+  if cond then
+    fun1 n
+  else
+    fun2 2
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
         ]
