@@ -116,9 +116,11 @@ commentsVisitor configuration comments context =
     let
         commentTag : String
         commentTag =
-            case configuration of
-                OptOut commentTag_ ->
-                    commentTag_
+            "-- "
+                ++ (case configuration of
+                        OptOut commentTag_ ->
+                            commentTag_
+                   )
     in
     ( []
     , { context
