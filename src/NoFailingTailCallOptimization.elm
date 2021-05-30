@@ -89,7 +89,7 @@ type alias Context =
     , newScopesForLet : List ( Range, String )
     , parentScopes : List ( Range, Scope )
     , parentNames : Set String
-    , comments : List Range
+    , comments : List Int
     }
 
 
@@ -127,7 +127,7 @@ commentsVisitor configuration comments context =
         | comments =
             comments
                 |> List.filter (Node.value >> String.startsWith commentTag)
-                |> List.map Node.range
+                |> List.map (Node.range >> .start >> .row)
       }
     )
 
