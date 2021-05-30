@@ -83,6 +83,7 @@ type alias Context =
     , newScopesForLet : List ( Range, String )
     , parentScopes : List ( Range, Scope )
     , parentNames : Set String
+    , comments : List Range
     }
 
 
@@ -100,6 +101,7 @@ initialContext =
     , newScopesForLet = []
     , parentScopes = []
     , parentNames = Set.empty
+    , comments = []
     }
 
 
@@ -122,6 +124,7 @@ declarationVisitor node context =
               , newScopesForLet = []
               , parentScopes = []
               , parentNames = Set.empty
+              , comments = context.comments
               }
             )
 
@@ -149,6 +152,7 @@ expressionEnterVisitor node context =
                             )
                                 :: context.parentScopes
                         , parentNames = Set.insert context.currentFunctionName context.parentNames
+                        , comments = context.comments
                         }
 
                     else
@@ -276,6 +280,7 @@ expressionExitVisitor node context =
                   , newScopesForLet = headScope.newScopes
                   , parentScopes = restOfParentScopes
                   , parentNames = Set.remove headScope.currentFunctionName context.parentNames
+                  , comments = context.comments
                   }
                 )
 
