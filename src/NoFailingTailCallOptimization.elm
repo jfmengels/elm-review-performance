@@ -126,7 +126,15 @@ addAllowedLocation node context =
             { context | tcoLocations = Node.range thenBranch :: Node.range elseBranch :: context.tcoLocations }
 
         Expression.LetExpression { expression } ->
-            -- TODO Check for recursive let declarations
+            -- TODO
+            {- The following translates to TCO code
+
+               let
+                   fun x =
+                      fun x
+               in
+               fun 1
+            -}
             { context | tcoLocations = Node.range expression :: context.tcoLocations }
 
         Expression.ParenthesizedExpression expr ->
