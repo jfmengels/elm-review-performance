@@ -147,8 +147,8 @@ reportRecursiveCallInNonAllowedLocation node context =
         Expression.Application ((Node funcRange (Expression.FunctionOrValue [] name)) :: _) ->
             if name == context.currentFunctionName then
                 [ Rule.error
-                    { message = "REPLACEME"
-                    , details = [ "REPLACEME" ]
+                    { message = "Recursive function is not tail-call optimized"
+                    , details = [ "The way this function is called recursively here prevents the function from being tail-call optimized." ]
                     }
                     funcRange
                 ]
@@ -166,8 +166,8 @@ reportReferencesToParentFunctions node context =
         Expression.Application ((Node funcRange (Expression.FunctionOrValue [] name)) :: _) ->
             if Set.member name context.parentNames then
                 [ Rule.error
-                    { message = "REPLACEME"
-                    , details = [ "REPLACEME" ]
+                    { message = "Recursive function is not tail-call optimized"
+                    , details = [ "The way this function is called recursively here prevents the function from being tail-call optimized." ]
                     }
                     funcRange
                 ]

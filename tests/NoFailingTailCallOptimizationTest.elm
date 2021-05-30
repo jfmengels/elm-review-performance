@@ -25,8 +25,8 @@ fun x =
                     |> Review.Test.run rule
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = "REPLACEME"
-                            , details = [ "REPLACEME" ]
+                            { message = "Recursive function is not tail-call optimized"
+                            , details = [ "The way this function is called recursively here prevents the function from being tail-call optimized." ]
                             , under = "fun"
                             }
                             |> Review.Test.atExactly { start = { row = 3, column = 3 }, end = { row = 3, column = 6 } }
@@ -65,8 +65,8 @@ fun x =
                     |> Review.Test.run rule
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = "REPLACEME"
-                            , details = [ "REPLACEME" ]
+                            { message = "Recursive function is not tail-call optimized"
+                            , details = [ "The way this function is called recursively here prevents the function from being tail-call optimized." ]
                             , under = "fun"
                             }
                             |> Review.Test.atExactly { start = { row = 3, column = 6 }, end = { row = 3, column = 9 } }
@@ -81,8 +81,8 @@ fun x =
                     |> Review.Test.run rule
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = "REPLACEME"
-                            , details = [ "REPLACEME" ]
+                            { message = "Recursive function is not tail-call optimized"
+                            , details = [ "The way this function is called recursively here prevents the function from being tail-call optimized." ]
                             , under = "fun"
                             }
                             |> Review.Test.atExactly { start = { row = 3, column = 8 }, end = { row = 3, column = 11 } }
@@ -120,8 +120,8 @@ fun x =
                     |> Review.Test.run rule
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = "REPLACEME"
-                            , details = [ "REPLACEME" ]
+                            { message = "Recursive function is not tail-call optimized"
+                            , details = [ "The way this function is called recursively here prevents the function from being tail-call optimized." ]
                             , under = "fun"
                             }
                             |> Review.Test.atExactly { start = { row = 5, column = 7 }, end = { row = 5, column = 10 } }
@@ -143,8 +143,8 @@ fun n =
                     |> Review.Test.run rule
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = "REPLACEME"
-                            , details = [ "REPLACEME" ]
+                            { message = "Recursive function is not tail-call optimized"
+                            , details = [ "The way this function is called recursively here prevents the function from being tail-call optimized." ]
                             , under = "fun"
                             }
                             |> Review.Test.atExactly { start = { row = 3, column = 12 }, end = { row = 3, column = 15 } }
@@ -163,8 +163,8 @@ fun x n =
                     |> Review.Test.run rule
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = "REPLACEME"
-                            , details = [ "REPLACEME" ]
+                            { message = "Recursive function is not tail-call optimized"
+                            , details = [ "The way this function is called recursively here prevents the function from being tail-call optimized." ]
                             , under = "fun"
                             }
                             |> Review.Test.atExactly { start = { row = 8, column = 16 }, end = { row = 8, column = 19 } }
@@ -182,8 +182,8 @@ fun x n =
                     |> Review.Test.run rule
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = "REPLACEME"
-                            , details = [ "REPLACEME" ]
+                            { message = "Recursive function is not tail-call optimized"
+                            , details = [ "The way this function is called recursively here prevents the function from being tail-call optimized." ]
                             , under = "fun"
                             }
                             |> Review.Test.atExactly { start = { row = 7, column = 9 }, end = { row = 7, column = 12 } }
@@ -213,8 +213,8 @@ a n =
                     |> Review.Test.run rule
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = "REPLACEME"
-                            , details = [ "REPLACEME" ]
+                            { message = "Recursive function is not tail-call optimized"
+                            , details = [ "The way this function is called recursively here prevents the function from being tail-call optimized." ]
                             , under = "fun"
                             }
                             |> Review.Test.atExactly { start = { row = 5, column = 7 }, end = { row = 5, column = 10 } }
