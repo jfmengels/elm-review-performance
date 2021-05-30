@@ -117,8 +117,8 @@ expressionEnterVisitor node context =
                 ( range, name ) :: rest ->
                     if range == Node.range node then
                         { currentFunctionName = name
-                        , tcoLocations = []
-                        , newScopes = []
+                        , tcoLocations = [ range ]
+                        , newScopes = rest
                         , parentScopes =
                             ( range
                             , { currentFunctionName = context.currentFunctionName, tcoLocations = context.tcoLocations, newScopes = rest }
