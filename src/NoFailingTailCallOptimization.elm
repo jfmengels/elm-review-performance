@@ -114,4 +114,4 @@ expressionVisitor node context =
 
 isInTcoLocation : Context -> Range -> Bool
 isInTcoLocation context range =
-    True
+    List.member range context.tcoLocations
