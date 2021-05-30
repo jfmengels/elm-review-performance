@@ -107,6 +107,14 @@ fun x =
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectNoErrors
+        , test "should not report an error when a function is properly TCO (parentheses)" <|
+            \() ->
+                """module A exposing (..)
+fun x =
+  (fun (x - 1))
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
         , test "should not report an error when a function is referencing but not calling itself" <|
             -- TODO Check that this doesn't actually invalidate TCO
             \() ->

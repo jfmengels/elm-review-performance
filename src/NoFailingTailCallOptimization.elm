@@ -130,8 +130,12 @@ addAllowedLocation node context =
             { context | tcoLocations = Node.range expression :: context.tcoLocations }
 
         Expression.ParenthesizedExpression expr ->
-            -- TODO Check
-            context
+            {- The following translates to TCO code
+
+               fun x =
+                 (fun x)
+            -}
+            { context | tcoLocations = Node.range expr :: context.tcoLocations }
 
         Expression.CaseExpression { cases } ->
             let
