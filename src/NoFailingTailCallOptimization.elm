@@ -6,6 +6,8 @@ module NoFailingTailCallOptimization exposing (rule)
 
 -}
 
+import Elm.Syntax.Declaration as Declaration exposing (Declaration)
+import Elm.Syntax.Node as Node exposing (Node)
 import Review.Rule as Rule exposing (Rule)
 
 
@@ -45,6 +47,27 @@ elm-review --template jfmengels/elm-review-performance/example --rules NoFailing
 -}
 rule : Rule
 rule =
-    Rule.newModuleRuleSchema "NoFailingTailCallOptimization" ()
-        |> Rule.withDeclarationListVisitor (\_ _ -> ( [], () ))
+    Rule.newModuleRuleSchema "NoFailingTailCallOptimization" initialContext
+        |> Rule.withDeclarationEnterVisitor declarationVisitor
         |> Rule.fromModuleRuleSchema
+
+
+type alias Context =
+    { currentFunction : String
+    }
+
+
+initialContext : { currentFunction : String }
+initialContext =
+    { currentFunction = ""
+    }
+
+
+declarationVisitor : Node Declaration -> Context -> ( List nothing, Context )
+declarationVisitor node context =
+    case Node.value node of
+        Declaration.FunctionDeclaration function ->
+            ( [], context )
+
+        _ ->
+            ( [], context )
