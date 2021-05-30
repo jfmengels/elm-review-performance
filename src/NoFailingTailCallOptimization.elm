@@ -107,11 +107,33 @@ declarationVisitor node context =
 
 expressionEnterVisitor : Node Expression -> Context -> ( List (Rule.Error {}), Context )
 expressionEnterVisitor node context =
+    let
+        newContext : Context
+        newContext =
+            case context.newScopes of
+                [] ->
+                    context
+
+                ( range, name ) :: rest ->
+                    if range == Node.range node then
+                        { currentFunctionName = name
+                        , tcoLocations = []
+                        , newScopes = []
+                        , parentScopes =
+                            ( range
+                            , { currentFunctionName = context.currentFunctionName, tcoLocations = context.tcoLocations, newScopes = rest }
+                            )
+                                :: context.parentScopes
+                        }
+
+                    else
+                        context
+    in
     if isInTcoLocation context (Node.range node) then
-        ( [], addAllowedLocation node context )
+        ( [], addAllowedLocation node newContext )
 
     else
-        ( reportRecursiveCallInNonAllowedLocation node context, context )
+        ( reportRecursiveCallInNonAllowedLocation node newContext, newContext )
 
 
 reportRecursiveCallInNonAllowedLocation : Node Expression -> Context -> List (Rule.Error {})
@@ -205,10 +227,10 @@ expressionExitVisitor (Node range _) context =
         ( headRange, headScope ) :: restOfScopes ->
             if headRange == range then
                 ( []
-                , { context
-                    | currentFunctionName = headScope.currentFunctionName
-                    , tcoLocations = headScope.tcoLocations
-                    , parentScopes = restOfScopes
+                , { currentFunctionName = headScope.currentFunctionName
+                  , tcoLocations = headScope.tcoLocations
+                  , newScopes = headScope.newScopes
+                  , parentScopes = restOfScopes
                   }
                 )
 
