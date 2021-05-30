@@ -27,7 +27,8 @@ fun x =
                         [ Review.Test.error
                             { message = "REPLACEME"
                             , details = [ "REPLACEME" ]
-                            , under = "REPLACEME"
+                            , under = "fun"
                             }
+                            |> Review.Test.atExactly { start = { row = 3, column = 3 }, end = { row = 3, column = 6 } }
                         ]
         ]

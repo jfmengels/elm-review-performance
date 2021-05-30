@@ -87,7 +87,14 @@ expressionVisitor node context =
     case Node.value node of
         Expression.FunctionOrValue [] name ->
             if name == context.currentFunction then
-                ( [], context )
+                ( [ Rule.error
+                        { message = "REPLACEME"
+                        , details = [ "REPLACEME" ]
+                        }
+                        (Node.range node)
+                  ]
+                , context
+                )
 
             else
                 ( [], context )
