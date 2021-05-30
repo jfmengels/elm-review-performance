@@ -46,5 +46,5 @@ elm-review --template jfmengels/elm-review-performance/example --rules NoFailing
 rule : Rule
 rule =
     Rule.newModuleRuleSchema "NoFailingTailCallOptimization" ()
-        -- Add your visitors
+        |> Rule.withDeclarationListVisitor (\_ _ -> ( [], () ))
         |> Rule.fromModuleRuleSchema
