@@ -115,6 +115,21 @@ fun x =
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectNoErrors
+        , test "should report an error when a function calls itself in a lambda" <|
+            \() ->
+                """module A exposing (..)
+fun n =
+    \\x -> (fun n x)
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = "REPLACEME"
+                            , details = [ "REPLACEME" ]
+                            , under = "fun"
+                            }
+                            |> Review.Test.atExactly { start = { row = 3, column = 12 }, end = { row = 3, column = 15 } }
+                        ]
         , test "should not report an error when a function is referencing but not calling itself" <|
             -- TODO Check that this doesn't actually invalidate TCO
             \() ->
