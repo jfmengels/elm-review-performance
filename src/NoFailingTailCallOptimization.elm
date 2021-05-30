@@ -76,7 +76,17 @@ optOutWithComment comment =
 
 shouldReportFunction : Context -> Range -> Bool
 shouldReportFunction context range =
-    True
+    let
+        startRow : Int
+        startRow =
+            range.start.row
+
+        endRow : Int
+        endRow =
+            range.end.row
+    in
+    List.any (\row -> startRow <= row && row < endRow) context.comments
+        |> not
 
 
 
