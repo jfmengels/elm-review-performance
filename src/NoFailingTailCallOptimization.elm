@@ -55,13 +55,13 @@ rule =
 
 
 type alias Context =
-    { currentFunction : String
+    { currentFunctionName : String
     }
 
 
-initialContext : { currentFunction : String }
+initialContext : Context
 initialContext =
-    { currentFunction = ""
+    { currentFunctionName = ""
     }
 
 
@@ -70,7 +70,7 @@ declarationVisitor node context =
     case Node.value node of
         Declaration.FunctionDeclaration function ->
             ( []
-            , { currentFunction =
+            , { currentFunctionName =
                     function.declaration
                         |> Node.value
                         |> .name
@@ -86,7 +86,7 @@ expressionVisitor : Node Expression -> Context -> ( List (Rule.Error {}), Contex
 expressionVisitor node context =
     case Node.value node of
         Expression.FunctionOrValue [] name ->
-            if name == context.currentFunction then
+            if name == context.currentFunctionName then
                 ( [ Rule.error
                         { message = "REPLACEME"
                         , details = [ "REPLACEME" ]
