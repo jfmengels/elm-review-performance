@@ -56,7 +56,7 @@ rule configuration =
     Rule.newModuleRuleSchema "NoFailingTailCallOptimization" initialContext
         |> Rule.withCommentsVisitor (commentsVisitor configuration)
         |> Rule.withDeclarationEnterVisitor (declarationVisitor configuration)
-        |> Rule.withExpressionEnterVisitor expressionEnterVisitor
+        |> Rule.withExpressionEnterVisitor (expressionEnterVisitor configuration)
         |> Rule.withExpressionExitVisitor expressionExitVisitor
         |> Rule.fromModuleRuleSchema
 
@@ -184,8 +184,8 @@ declarationVisitor configuration node context =
             ( [], context )
 
 
-expressionEnterVisitor : Node Expression -> Context -> ( List (Rule.Error {}), Context )
-expressionEnterVisitor node context =
+expressionEnterVisitor : Configuration -> Node Expression -> Context -> ( List (Rule.Error {}), Context )
+expressionEnterVisitor configuration node context =
     let
         newContext : Context
         newContext =
@@ -211,7 +211,7 @@ expressionEnterVisitor node context =
                         context
     in
     if isInTcoLocation newContext (Node.range node) then
-        ( reportReferencesToParentFunctions node newContext, addAllowedLocation node newContext )
+        ( reportReferencesToParentFunctions node newContext, addAllowedLocation configuration node newContext )
 
     else
         ( reportRecursiveCallInNonAllowedLocation node newContext, newContext )
@@ -255,8 +255,8 @@ reportReferencesToParentFunctions node context =
             []
 
 
-addAllowedLocation : Node Expression -> Context -> Context
-addAllowedLocation node context =
+addAllowedLocation : Configuration -> Node Expression -> Context -> Context
+addAllowedLocation configuration node context =
     case Node.value node of
         Expression.Application (function :: _) ->
             { context | tcoLocations = Node.range function :: context.tcoLocations }
@@ -279,7 +279,11 @@ addAllowedLocation node context =
                                     in
                                     Just
                                         ( Node.range functionDeclaration.expression
-                                        , Node.value functionDeclaration.name
+                                        , if shouldReportFunction configuration context (Node.range function.declaration) then
+                                            Node.value functionDeclaration.name
+
+                                          else
+                                            ""
                                         )
 
                                 Expression.LetDestructuring _ _ ->
