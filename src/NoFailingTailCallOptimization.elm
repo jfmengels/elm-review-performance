@@ -136,20 +136,18 @@ commentsVisitor configuration comments context =
     let
         commentTag : String
         commentTag =
-            "-- "
-                ++ (case configuration of
-                        OptOut commentTag_ ->
-                            commentTag_
+            case configuration of
+                OptOut commentTag_ ->
+                    commentTag_
 
-                        OptIn commentTag_ ->
-                            commentTag_
-                   )
+                OptIn commentTag_ ->
+                    commentTag_
     in
     ( []
     , { context
         | comments =
             comments
-                |> List.filter (Node.value >> String.startsWith commentTag)
+                |> List.filter (Node.value >> String.contains commentTag)
                 |> List.map (Node.range >> .start >> .row)
       }
     )
