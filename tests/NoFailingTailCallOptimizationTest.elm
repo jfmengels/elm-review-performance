@@ -125,7 +125,7 @@ fun x =
                                 , details = [ "REPLACEME" ]
                                 , under = "fun"
                                 }
-                                |> Review.Test.atExactly { start = { row = 4, column = 14 }, end = { row = 4, column = 17 } }
+                                |> Review.Test.atExactly { start = { row = 5, column = 7 }, end = { row = 5, column = 10 } }
                             ]
         , test "should not report an error when a function is properly TCO (parentheses)" <|
             \() ->

@@ -128,7 +128,7 @@ expressionEnterVisitor node context =
                             , { currentFunctionName = context.currentFunctionName, tcoLocations = context.tcoLocations, newScopes = restOfNewScopes }
                             )
                                 :: context.parentScopes
-                        , parentNames = Set.insert name context.parentNames
+                        , parentNames = Set.insert context.currentFunctionName context.parentNames
                         }
 
                     else
