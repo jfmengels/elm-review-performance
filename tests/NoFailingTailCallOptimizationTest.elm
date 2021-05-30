@@ -269,7 +269,7 @@ fun x =
                             , details = [ "The way this function is called recursively here prevents the function from being tail-call optimized." ]
                             , under = "fun"
                             }
-                            |> Review.Test.atExactly { start = { row = 3, column = 3 }, end = { row = 3, column = 6 } }
+                            |> Review.Test.atExactly { start = { row = 4, column = 3 }, end = { row = 4, column = 6 } }
                         ]
         , test "should not report an error when the function body does not contain the opt in comment" <|
             \() ->

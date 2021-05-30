@@ -55,7 +55,7 @@ rule : Configuration -> Rule
 rule configuration =
     Rule.newModuleRuleSchema "NoFailingTailCallOptimization" initialContext
         |> Rule.withCommentsVisitor (commentsVisitor configuration)
-        |> Rule.withDeclarationEnterVisitor declarationVisitor
+        |> Rule.withDeclarationEnterVisitor (declarationVisitor configuration)
         |> Rule.withExpressionEnterVisitor expressionEnterVisitor
         |> Rule.withExpressionExitVisitor expressionExitVisitor
         |> Rule.fromModuleRuleSchema
@@ -80,8 +80,8 @@ optInWithComment comment =
     OptIn comment
 
 
-shouldReportFunction : Context -> Range -> Bool
-shouldReportFunction context range =
+shouldReportFunction : Configuration -> Context -> Range -> Bool
+shouldReportFunction configuration context range =
     let
         startRow : Int
         startRow =
@@ -90,9 +90,17 @@ shouldReportFunction context range =
         endRow : Int
         endRow =
             range.end.row
+
+        foundComment : Bool
+        foundComment =
+            List.any (\row -> startRow <= row && row < endRow) context.comments
     in
-    List.any (\row -> startRow <= row && row < endRow) context.comments
-        |> not
+    case configuration of
+        OptOut _ ->
+            not foundComment
+
+        OptIn _ ->
+            foundComment
 
 
 
@@ -151,13 +159,13 @@ commentsVisitor configuration comments context =
     )
 
 
-declarationVisitor : Node Declaration -> Context -> ( List nothing, Context )
-declarationVisitor node context =
+declarationVisitor : Configuration -> Node Declaration -> Context -> ( List nothing, Context )
+declarationVisitor configuration node context =
     case Node.value node of
         Declaration.FunctionDeclaration function ->
             ( []
             , { currentFunctionName =
-                    if shouldReportFunction context (Node.range node) then
+                    if shouldReportFunction configuration context (Node.range node) then
                         function.declaration
                             |> Node.value
                             |> .name
