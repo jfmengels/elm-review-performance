@@ -16,6 +16,17 @@ fun x = a + x
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectNoErrors
+        , test "should not report an error when a function is properly TCO" <|
+            \() ->
+                """module A exposing (..)
+fun x =
+  if condition x then
+    fun x - 1
+  else
+    x
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
         , test "should report an error when a function is recursive but applies operations on the result" <|
             \() ->
                 """module A exposing (..)
