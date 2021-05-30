@@ -16,29 +16,6 @@ fun x = a + x
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectNoErrors
-        , test "should not report an error when a function is properly TCO" <|
-            \() ->
-                """module A exposing (..)
-fun x =
-  if condition x then
-    fun (x - 1)
-  else
-    x
-"""
-                    |> Review.Test.run rule
-                    |> Review.Test.expectNoErrors
-        , test "should not report an error when a function is referencing but not calling itself" <|
-            -- TODO Check that this doesn't actually invalidate TCO
-            \() ->
-                """module A exposing (..)
-fun x =
-  if condition x then
-    \\_ -> fun
-  else
-    x
-"""
-                    |> Review.Test.run rule
-                    |> Review.Test.expectNoErrors
         , test "should report an error when a function is recursive but applies operations on the result" <|
             \() ->
                 """module A exposing (..)
@@ -54,4 +31,38 @@ fun x =
                             }
                             |> Review.Test.atExactly { start = { row = 3, column = 3 }, end = { row = 3, column = 6 } }
                         ]
+        , test "should not report an error when a function is properly TCO (if then branch)" <|
+            \() ->
+                """module A exposing (..)
+fun x =
+  if condition x then
+    fun (x - 1)
+  else
+    x
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
+        , test "should not report an error when a function is properly TCO (if else branch)" <|
+            \() ->
+                """module A exposing (..)
+fun x =
+  if condition x then
+    x
+  else
+    fun (x - 1)
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
+        , test "should not report an error when a function is referencing but not calling itself" <|
+            -- TODO Check that this doesn't actually invalidate TCO
+            \() ->
+                """module A exposing (..)
+fun x =
+  if condition x then
+    \\_ -> fun
+  else
+    x
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
         ]
