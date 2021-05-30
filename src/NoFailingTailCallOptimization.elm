@@ -153,10 +153,6 @@ addAllowedLocation node context =
             in
             { context | tcoLocations = caseBodies ++ context.tcoLocations }
 
-        Expression.LambdaExpression lambda ->
-            -- TODO Check for recursive lambda functions?
-            context
-
         _ ->
             context
 
