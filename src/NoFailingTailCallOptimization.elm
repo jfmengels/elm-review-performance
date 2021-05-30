@@ -60,7 +60,7 @@ rule =
 type alias Context =
     { currentFunctionName : String
     , tcoLocations : List Range
-    , newScopes : List ( Range, String )
+    , newScopesForLet : List ( Range, String )
     , parentScopes : List ( Range, Scope )
     , parentNames : Set String
     }
@@ -77,7 +77,7 @@ initialContext : Context
 initialContext =
     { currentFunctionName = ""
     , tcoLocations = []
-    , newScopes = []
+    , newScopesForLet = []
     , parentScopes = []
     , parentNames = Set.empty
     }
@@ -99,7 +99,7 @@ declarationVisitor node context =
                         |> .expression
                         |> Node.range
                     ]
-              , newScopes = []
+              , newScopesForLet = []
               , parentScopes = []
               , parentNames = Set.empty
               }
@@ -114,7 +114,7 @@ expressionEnterVisitor node context =
     let
         newContext : Context
         newContext =
-            case context.newScopes of
+            case context.newScopesForLet of
                 [] ->
                     context
 
@@ -122,7 +122,7 @@ expressionEnterVisitor node context =
                     if range == Node.range node then
                         { currentFunctionName = name
                         , tcoLocations = [ range ]
-                        , newScopes = restOfNewScopes
+                        , newScopesForLet = restOfNewScopes
                         , parentScopes =
                             ( range
                             , { currentFunctionName = context.currentFunctionName, tcoLocations = context.tcoLocations, newScopes = restOfNewScopes }
@@ -209,7 +209,7 @@ addAllowedLocation node context =
                         declarations
             in
             { context
-                | newScopes = newScopes
+                | newScopesForLet = newScopes
 
                 {- The following translates to TCO code
 
@@ -253,7 +253,7 @@ expressionExitVisitor node context =
                 ( []
                 , { currentFunctionName = headScope.currentFunctionName
                   , tcoLocations = headScope.tcoLocations
-                  , newScopes = headScope.newScopes
+                  , newScopesForLet = headScope.newScopes
                   , parentScopes = restOfParentScopes
                   , parentNames = Set.remove headScope.currentFunctionName context.parentNames
                   }
