@@ -107,10 +107,9 @@ fun x =
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectNoErrors
-        , Test.only <|
-            test "should report an error when a function is called recursively from inside one of its let functions" <|
-                \() ->
-                    """module A exposing (..)
+        , test "should report an error when a function is called recursively from inside one of its let functions" <|
+            \() ->
+                """module A exposing (..)
 fun x =
   let
     fun2 y =
@@ -118,15 +117,15 @@ fun x =
   in
   fun2 x
 """
-                        |> Review.Test.run rule
-                        |> Review.Test.expectErrors
-                            [ Review.Test.error
-                                { message = "REPLACEME"
-                                , details = [ "REPLACEME" ]
-                                , under = "fun"
-                                }
-                                |> Review.Test.atExactly { start = { row = 5, column = 7 }, end = { row = 5, column = 10 } }
-                            ]
+                    |> Review.Test.run rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = "REPLACEME"
+                            , details = [ "REPLACEME" ]
+                            , under = "fun"
+                            }
+                            |> Review.Test.atExactly { start = { row = 5, column = 7 }, end = { row = 5, column = 10 } }
+                        ]
         , test "should not report an error when a function is properly TCO (parentheses)" <|
             \() ->
                 """module A exposing (..)
