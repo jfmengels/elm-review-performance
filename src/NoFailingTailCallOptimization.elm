@@ -125,18 +125,22 @@ addAllowedLocation node context =
         Expression.IfBlock _ thenBranch elseBranch ->
             { context | tcoLocations = Node.range thenBranch :: Node.range elseBranch :: context.tcoLocations }
 
-        Expression.ParenthesizedExpression expr ->
-            -- TODO Check
-            context
-
         Expression.LetExpression { expression } ->
             -- TODO Add expression
             -- TODO Check for recursive let declarations
             context
 
-        Expression.CaseExpression caseBlock ->
-            -- TODO Add blocks
+        Expression.ParenthesizedExpression expr ->
+            -- TODO Check
             context
+
+        Expression.CaseExpression { cases } ->
+            let
+                caseBodies : List Range
+                caseBodies =
+                    List.map (Tuple.second >> Node.range) cases
+            in
+            { context | tcoLocations = caseBodies ++ context.tcoLocations }
 
         Expression.LambdaExpression lambda ->
             -- TODO Check for recursive lambda functions?
