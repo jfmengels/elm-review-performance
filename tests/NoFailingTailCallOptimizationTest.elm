@@ -113,7 +113,8 @@ fun x =
                     """module A exposing (..)
 fun x =
   let
-    fun2 y = fun x
+    fun2 y =
+      fun x
   in
   fun2 x
 """
