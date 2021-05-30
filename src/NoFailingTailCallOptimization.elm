@@ -87,13 +87,9 @@ shouldReportFunction configuration context range =
         startRow =
             range.start.row
 
-        endRow : Int
-        endRow =
-            range.end.row
-
         foundComment : Bool
         foundComment =
-            List.any (\row -> startRow <= row && row < endRow) context.comments
+            List.any (\row -> startRow + 1 == row) context.comments
     in
     case configuration of
         OptOut _ ->
@@ -165,7 +161,7 @@ declarationVisitor configuration node context =
         Declaration.FunctionDeclaration function ->
             ( []
             , { currentFunctionName =
-                    if shouldReportFunction configuration context (Node.range node) then
+                    if shouldReportFunction configuration context (Node.range function.declaration) then
                         function.declaration
                             |> Node.value
                             |> .name
