@@ -51,7 +51,8 @@ rule : Rule
 rule =
     Rule.newModuleRuleSchema "NoFailingTailCallOptimization" initialContext
         |> Rule.withDeclarationEnterVisitor declarationVisitor
-        |> Rule.withExpressionEnterVisitor expressionVisitor
+        |> Rule.withExpressionEnterVisitor expressionEnterVisitor
+        |> Rule.withExpressionExitVisitor expressionExitVisitor
         |> Rule.fromModuleRuleSchema
 
 
@@ -100,8 +101,8 @@ declarationVisitor node context =
             ( [], context )
 
 
-expressionVisitor : Node Expression -> Context -> ( List (Rule.Error {}), Context )
-expressionVisitor node context =
+expressionEnterVisitor : Node Expression -> Context -> ( List (Rule.Error {}), Context )
+expressionEnterVisitor node context =
     if isInTcoLocation context (Node.range node) then
         ( [], addAllowedLocation node context )
 
@@ -164,6 +165,26 @@ addAllowedLocation node context =
 
         _ ->
             context
+
+
+expressionExitVisitor : Node Expression -> Context -> ( List nothing, Context )
+expressionExitVisitor (Node range _) context =
+    case context.parentScopes of
+        [] ->
+            ( [], context )
+
+        ( headRange, headScope ) :: restOfScopes ->
+            if headRange == range then
+                ( []
+                , { context
+                    | currentFunctionName = headScope.currentFunctionName
+                    , tcoLocations = headScope.tcoLocations
+                    , parentScopes = restOfScopes
+                  }
+                )
+
+            else
+                ( [], context )
 
 
 isInTcoLocation : Context -> Range -> Bool
