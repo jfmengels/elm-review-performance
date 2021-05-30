@@ -7,6 +7,7 @@ module NoFailingTailCallOptimization exposing (rule)
 -}
 
 import Elm.Syntax.Declaration as Declaration exposing (Declaration)
+import Elm.Syntax.Expression as Expression exposing (Expression)
 import Elm.Syntax.Node as Node exposing (Node)
 import Review.Rule as Rule exposing (Rule)
 
@@ -49,6 +50,7 @@ rule : Rule
 rule =
     Rule.newModuleRuleSchema "NoFailingTailCallOptimization" initialContext
         |> Rule.withDeclarationEnterVisitor declarationVisitor
+        |> Rule.withExpressionEnterVisitor expressionVisitor
         |> Rule.fromModuleRuleSchema
 
 
@@ -75,6 +77,20 @@ declarationVisitor node context =
                         |> Node.value
               }
             )
+
+        _ ->
+            ( [], context )
+
+
+expressionVisitor : Node Expression -> Context -> ( List (Rule.Error {}), Context )
+expressionVisitor node context =
+    case Node.value node of
+        Expression.FunctionOrValue [] name ->
+            if name == context.currentFunction then
+                ( [], context )
+
+            else
+                ( [], context )
 
         _ ->
             ( [], context )
