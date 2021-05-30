@@ -219,13 +219,13 @@ addAllowedLocation node context =
 
 
 expressionExitVisitor : Node Expression -> Context -> ( List nothing, Context )
-expressionExitVisitor (Node range _) context =
+expressionExitVisitor node context =
     case context.parentScopes of
         [] ->
             ( [], context )
 
         ( headRange, headScope ) :: restOfParentScopes ->
-            if headRange == range then
+            if headRange == Node.range node then
                 ( []
                 , { currentFunctionName = headScope.currentFunctionName
                   , tcoLocations = headScope.tcoLocations
