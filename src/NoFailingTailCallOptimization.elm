@@ -54,6 +54,7 @@ elm-review --template jfmengels/elm-review-performance/example --rules NoFailing
 rule : Configuration -> Rule
 rule configuration =
     Rule.newModuleRuleSchema "NoFailingTailCallOptimization" initialContext
+        |> Rule.withCommentsVisitor (commentsVisitor configuration)
         |> Rule.withDeclarationEnterVisitor declarationVisitor
         |> Rule.withExpressionEnterVisitor expressionEnterVisitor
         |> Rule.withExpressionExitVisitor expressionExitVisitor
@@ -103,6 +104,11 @@ initialContext =
     , parentNames = Set.empty
     , comments = []
     }
+
+
+commentsVisitor : Configuration -> List (Node String) -> Context -> ( List nothing, Context )
+commentsVisitor configuration comments context =
+    ( [], context )
 
 
 declarationVisitor : Node Declaration -> Context -> ( List nothing, Context )
