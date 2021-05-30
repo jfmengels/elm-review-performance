@@ -42,6 +42,24 @@ fun x =
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectNoErrors
+        , test "should report an error when a function calls itself in the condition of an if block" <|
+            \() ->
+                """module A exposing (..)
+fun x =
+  if fun (x - 1) then
+    1
+  else
+    x
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = "REPLACEME"
+                            , details = [ "REPLACEME" ]
+                            , under = "fun"
+                            }
+                            |> Review.Test.atExactly { start = { row = 3, column = 6 }, end = { row = 3, column = 9 } }
+                        ]
         , test "should not report an error when a function is properly TCO (if else branch)" <|
             \() ->
                 """module A exposing (..)
