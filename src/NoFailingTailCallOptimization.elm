@@ -74,6 +74,11 @@ optOutWithComment comment =
     OptOut comment
 
 
+shouldReportFunction : Context -> Range -> Bool
+shouldReportFunction context range =
+    True
+
+
 
 -- CONTEXT
 
@@ -131,10 +136,14 @@ declarationVisitor node context =
         Declaration.FunctionDeclaration function ->
             ( []
             , { currentFunctionName =
-                    function.declaration
-                        |> Node.value
-                        |> .name
-                        |> Node.value
+                    if shouldReportFunction context (Node.range node) then
+                        function.declaration
+                            |> Node.value
+                            |> .name
+                            |> Node.value
+
+                    else
+                        ""
               , tcoLocations =
                     [ function.declaration
                         |> Node.value
