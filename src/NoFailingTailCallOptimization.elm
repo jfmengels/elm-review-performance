@@ -94,50 +94,56 @@ declarationVisitor node context =
 expressionVisitor : Node Expression -> Context -> ( List (Rule.Error {}), Context )
 expressionVisitor node context =
     if isInTcoLocation context (Node.range node) then
-        case Node.value node of
-            Expression.IfBlock _ thenBranch elseBranch ->
-                ( []
-                , { context | tcoLocations = Node.range thenBranch :: Node.range elseBranch :: context.tcoLocations }
-                )
-
-            Expression.ParenthesizedExpression expr ->
-                -- TODO Check
-                ( [], context )
-
-            Expression.LetExpression { expression } ->
-                -- TODO Add expression
-                -- TODO Check for recursive let declarations
-                ( [], context )
-
-            Expression.CaseExpression caseBlock ->
-                -- TODO Add blocks
-                ( [], context )
-
-            Expression.LambdaExpression lambda ->
-                -- TODO Check for recursive lambda functions?
-                ( [], context )
-
-            _ ->
-                ( [], context )
+        ( [], addAllowedLocation node context )
 
     else
-        case Node.value node of
-            Expression.Application ((Node funcRange (Expression.FunctionOrValue [] name)) :: _) ->
-                if name == context.currentFunctionName && not (isInTcoLocation context (Node.range node)) then
-                    ( [ Rule.error
-                            { message = "REPLACEME"
-                            , details = [ "REPLACEME" ]
-                            }
-                            funcRange
-                      ]
-                    , context
-                    )
+        ( reportRecursiveCallInNonAllowedLocation node context, context )
 
-                else
-                    ( [], context )
 
-            _ ->
-                ( [], context )
+reportRecursiveCallInNonAllowedLocation : Node Expression -> Context -> List (Rule.Error {})
+reportRecursiveCallInNonAllowedLocation node context =
+    case Node.value node of
+        Expression.Application ((Node funcRange (Expression.FunctionOrValue [] name)) :: _) ->
+            if name == context.currentFunctionName then
+                [ Rule.error
+                    { message = "REPLACEME"
+                    , details = [ "REPLACEME" ]
+                    }
+                    funcRange
+                ]
+
+            else
+                []
+
+        _ ->
+            []
+
+
+addAllowedLocation : Node Expression -> Context -> Context
+addAllowedLocation node context =
+    case Node.value node of
+        Expression.IfBlock _ thenBranch elseBranch ->
+            { context | tcoLocations = Node.range thenBranch :: Node.range elseBranch :: context.tcoLocations }
+
+        Expression.ParenthesizedExpression expr ->
+            -- TODO Check
+            context
+
+        Expression.LetExpression { expression } ->
+            -- TODO Add expression
+            -- TODO Check for recursive let declarations
+            context
+
+        Expression.CaseExpression caseBlock ->
+            -- TODO Add blocks
+            context
+
+        Expression.LambdaExpression lambda ->
+            -- TODO Check for recursive lambda functions?
+            context
+
+        _ ->
+            context
 
 
 isInTcoLocation : Context -> Range -> Bool
