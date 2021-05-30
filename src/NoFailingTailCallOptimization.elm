@@ -59,6 +59,7 @@ rule =
 type alias Context =
     { currentFunctionName : String
     , tcoLocations : List Range
+    , newScopes : List ( Range, String )
     , parentScopes : List ( Range, Scope )
     }
 
@@ -66,6 +67,7 @@ type alias Context =
 type alias Scope =
     { currentFunctionName : String
     , tcoLocations : List Range
+    , newScopes : List ( Range, String )
     }
 
 
@@ -73,6 +75,7 @@ initialContext : Context
 initialContext =
     { currentFunctionName = ""
     , tcoLocations = []
+    , newScopes = []
     , parentScopes = []
     }
 
@@ -93,6 +96,7 @@ declarationVisitor node context =
                         |> .expression
                         |> Node.range
                     ]
+              , newScopes = []
               , parentScopes = []
               }
             )
