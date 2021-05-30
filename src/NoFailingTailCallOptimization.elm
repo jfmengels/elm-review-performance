@@ -57,12 +57,14 @@ rule =
 
 type alias Context =
     { currentFunctionName : String
+    , tcoLocations : List Range
     }
 
 
 initialContext : Context
 initialContext =
     { currentFunctionName = ""
+    , tcoLocations = []
     }
 
 
@@ -76,6 +78,12 @@ declarationVisitor node context =
                         |> Node.value
                         |> .name
                         |> Node.value
+              , tcoLocations =
+                    [ function.declaration
+                        |> Node.value
+                        |> .expression
+                        |> Node.range
+                    ]
               }
             )
 
