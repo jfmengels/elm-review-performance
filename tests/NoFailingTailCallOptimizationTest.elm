@@ -27,6 +27,18 @@ fun x =
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectNoErrors
+        , test "should not report an error when a function is referencing but not calling itself" <|
+            -- TODO Check that this doesn't actually invalidate TCO
+            \() ->
+                """module A exposing (..)
+fun x =
+  if condition x then
+    \\_ -> fun
+  else
+    x
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
         , test "should report an error when a function is recursive but applies operations on the result" <|
             \() ->
                 """module A exposing (..)

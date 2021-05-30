@@ -8,7 +8,7 @@ module NoFailingTailCallOptimization exposing (rule)
 
 import Elm.Syntax.Declaration as Declaration exposing (Declaration)
 import Elm.Syntax.Expression as Expression exposing (Expression)
-import Elm.Syntax.Node as Node exposing (Node)
+import Elm.Syntax.Node as Node exposing (Node(..))
 import Review.Rule as Rule exposing (Rule)
 
 
@@ -85,13 +85,13 @@ declarationVisitor node context =
 expressionVisitor : Node Expression -> Context -> ( List (Rule.Error {}), Context )
 expressionVisitor node context =
     case Node.value node of
-        Expression.FunctionOrValue [] name ->
+        Expression.Application ((Node funcRange (Expression.FunctionOrValue [] name)) :: _) ->
             if name == context.currentFunctionName then
                 ( [ Rule.error
                         { message = "REPLACEME"
                         , details = [ "REPLACEME" ]
                         }
-                        (Node.range node)
+                        funcRange
                   ]
                 , context
                 )
