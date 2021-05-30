@@ -109,7 +109,11 @@ expressionVisitor node context =
                 ( [], context )
 
         _ ->
-            ( [], context )
+            if isInTcoLocation context (Node.range node) then
+                ( [], context )
+
+            else
+                ( [], context )
 
 
 isInTcoLocation : Context -> Range -> Bool
