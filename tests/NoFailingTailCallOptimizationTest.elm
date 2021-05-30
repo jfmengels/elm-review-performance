@@ -60,6 +60,22 @@ fun x =
                             }
                             |> Review.Test.atExactly { start = { row = 3, column = 6 }, end = { row = 3, column = 9 } }
                         ]
+        , test "should report an error when a function calls itself in the case of pattern to evaluate" <|
+            \() ->
+                """module A exposing (..)
+fun x =
+  case fun (x - 1) of
+    _ -> 1
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = "REPLACEME"
+                            , details = [ "REPLACEME" ]
+                            , under = "fun"
+                            }
+                            |> Review.Test.atExactly { start = { row = 3, column = 8 }, end = { row = 3, column = 11 } }
+                        ]
         , test "should not report an error when a function is properly TCO (if else branch)" <|
             \() ->
                 """module A exposing (..)
