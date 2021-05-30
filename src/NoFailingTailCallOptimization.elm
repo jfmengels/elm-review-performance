@@ -129,7 +129,7 @@ expressionEnterVisitor node context =
                     else
                         context
     in
-    if isInTcoLocation context (Node.range node) then
+    if isInTcoLocation newContext (Node.range node) then
         ( [], addAllowedLocation node newContext )
 
     else
