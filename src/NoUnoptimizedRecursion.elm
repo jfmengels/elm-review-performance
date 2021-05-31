@@ -39,14 +39,33 @@ The rule uses `optOutWithComment "IGNORE TCO"` as its configuration.
 
 ## Success
 
-    -- With opt-out configuration: NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optOutWithComment "IGNORE TCO")
-    -- The following is not reported because it has been tagged as ignored
+Not reported because it is tail-call optimized.
+
+    fun n =
+        if condition n then
+            fun (n - 1)
+
+        else
+            n
+
+Not reported because the function has been tagged as ignored.
+
+    -- With opt-out configuration
+    config =
+        [ NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optOutWithComment "IGNORE TCO")
+        ]
+
     fun n =
         -- elm-review: IGNORE TCO
         fun n * n
 
-    -- With opt-in configuration: NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optInWithComment "CHECK TCO")
-    -- The following is not reported because it has not been tagged
+Not reported because the function has not been tagged.
+
+    -- With opt-in configuration
+    config =
+        [ NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optInWithComment "CHECK TCO")
+        ]
+
     fun n =
         fun n * n
 
