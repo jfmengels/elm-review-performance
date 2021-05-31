@@ -72,17 +72,45 @@ Not reported because the function has not been tagged.
 
 ## Fail
 
-To understand
-This function is not tail-call optimized. [Read more](#REPLACE) about the patterns
-that cause this optimization to not be applied.
+To understand when a function would not get tail-call optimized, it is important to understand when it would be optimized.
 
-    -- With opt-out configuration: NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optOutWithComment "IGNORE TCO")
-    fun n =
-        if condition n then
-            fun n * n
+The Elm compiler is able to do tail-call elimination **only** when all the recursive calls are the last operation that the function would do in that branch. Any recursive calls not happening in those locations de-optimizes the function.
+
+Following is a list of likely situations that will be reported.
+
+
+### An operation is applied on the result of a function call
+
+The result of this function gets multiplied by `n`.
+
+    factorial : Int -> Int
+    factorial n =
+        if n <= 1 then
+            1
 
         else
-            n
+            factorial (n - 1) * n
+
+Hint: When you need to apply a function on the result of a recursive call, what you can often do is to add an argument holding the result value and apply the operations on it instead.
+
+    factorialHelp : Int -> Int -> Int
+    factorialHelp n result =
+        if n <= 1 then
+            result
+
+        else
+            factorial (result * n) * n
+
+And split the function into the one that will do recursive calls (above) and a "public-facing" function which will set the initial result value (below).
+
+    factorial : Int -> Int
+    factorial n =
+        factorialHelp n 1
+
+TODO let functions
+TODO in let function
+TODO pipeline
+TODO binary operator
 
 -}
 
