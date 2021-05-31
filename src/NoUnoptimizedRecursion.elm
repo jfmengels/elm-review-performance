@@ -17,7 +17,7 @@ import Review.Rule as Rule exposing (Rule)
 import Set exposing (Set)
 
 
-{-| Reports... REPLACEME
+{-| Reports recursive functions that are not tail-call optimized.
 
     config =
         [ NoUnoptimizedRecursion.rule

@@ -1,11 +1,11 @@
 # elm-review-performance
 
-Provides [`elm-review`](https://package.elm-lang.org/packages/jfmengels/elm-review/latest/) rules to REPLACEME.
+Provides [`elm-review`](https://package.elm-lang.org/packages/jfmengels/elm-review/latest/) rules to report performance problems.
 
 
 ## Provided rules
 
-- [`NoUnoptimizedRecursion`](https://package.elm-lang.org/packages/jfmengels/elm-review-performance/1.0.0/NoUnoptimizedRecursion) - Reports REPLACEME.
+- [`NoUnoptimizedRecursion`](https://package.elm-lang.org/packages/jfmengels/elm-review-performance/1.0.0/NoUnoptimizedRecursion) - Reports recursive functions that are not tail-call optimized.
 
 
 ## Configuration
