@@ -17,9 +17,7 @@ import Review.Rule as Rule exposing (Rule)
 import Set exposing (Set)
 
 
-{-| Reports recursive functions that are not tail-call optimized.
-
-TODO Give good resource for TCO
+{-| Reports recursive functions that are not [tail-call optimized](https://functional-programming-in-elm.netlify.app/recursion/tail-call-elimination.html).
 
     -- Reports recursive functions by default, opt out with a comment containing "IGNORE TCO"
     config =
