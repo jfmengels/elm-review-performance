@@ -1,6 +1,6 @@
 module NoUnoptimizedRecursion exposing
     ( rule
-    , optInWithComment, optOutWithComment
+    , Configuration, optInWithComment, optOutWithComment
     )
 
 {-|
