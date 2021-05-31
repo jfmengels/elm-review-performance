@@ -1,6 +1,6 @@
 module NoUnoptimizedRecursion exposing
     ( rule
-    , Configuration, optInWithComment, optOutWithComment
+    , Configuration, optOutWithComment, optInWithComment
     )
 
 {-|
@@ -15,39 +15,15 @@ to not notice when the optimization has not been applied. You can find the [reas
 
 ## Configuration
 
-    -- Reports recursive functions by default, opt out with a comment containing "IGNORE TCO"
-    config =
-        [ NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optOutWithComment "IGNORE TCO")
-        ]
-
-    -- Reports only the functions with a comment containing "CHECK TCO"
-    config =
-        [ NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optInWithComment "CHECK TCO")
-        ]
-
-You can use comments to say that a function should or should not be checked, depending on the configuration method you chose.
-This comment has to appear on the line after the `=` that follows the declaration of your function, and will not report the function.
-The same will apply for functions defined in a let expression.
-
-    fun n =
-        -- elm-review: IGNORE TCO
-        if condition n then
-            fun n * n
-
-        else
-            n
-
-I recommend toggling between the two configuration options while you're fixing/ignoring the existing issues, and to use the
-opt-out configuration afterwards.
-
-I recommend to **not** default to ignoring a reported issue, and to discuss with your colleagues how to best solve the
-problem when you encounter the issue or when you see them ignore an error.
+@docs Configuration, optOutWithComment, optInWithComment
 
 
 ## When (not) to enable this rule
 
 This rule is useful for both application maintainers and package authors to detect locations where
 performance could be improved and where stack overflows can happen.
+
+You should not enable this rule if you do not care about performance at this point in time.
 
 
 ## Try it out
@@ -115,16 +91,66 @@ rule configuration =
 -- CONFIGURATION
 
 
+{-| Configuration for `NoUnoptimizedRecursion`.
+
+Use [`optOutWithComment`](#optOutWithComment) or [`optInWithComment`](#optInWithComment) to configure this rule.
+
+You can use comments to say that a function should or should not be checked, depending on the configuration method you chose.
+This comment has to appear on the line after the `=` that follows the declaration of your function, and will not report the function.
+The same will apply for functions defined in a let expression.
+
+I recommend toggling between the two configuration options while you're fixing/ignoring the existing issues, and to use the
+opt-out configuration afterwards.
+
+-}
 type Configuration
     = OptOut String
     | OptIn String
 
 
+{-| Reports recursive functions by default, opt out functions tagged with a comment.
+
+I recommend to **not** default to ignoring a reported issue when something gets reported,
+and to discuss with your colleagues how to best solve the problem when you encounter the
+issue or when you see them ignore an error.
+
+    config =
+        [ NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optOutWithComment "IGNORE TCO")
+        ]
+
+With the configuration above, the following function would **not** be reported.
+
+    fun n =
+        -- elm-review: IGNORE TCO
+        if condition n then
+            fun n * n
+
+        else
+            n
+
+-}
 optOutWithComment : String -> Configuration
 optOutWithComment comment =
     OptOut comment
 
 
+{-| Reports only the functions tagged with a comment.
+
+    config =
+        [ NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optInWithComment "CHECK TCO")
+        ]
+
+With the configuration above, the following function would be reported.
+
+    fun n =
+        -- CHECK TCO
+        if condition n then
+            fun n * n
+
+        else
+            n
+
+-}
 optInWithComment : String -> Configuration
 optInWithComment comment =
     OptIn comment
