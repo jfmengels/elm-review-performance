@@ -7,17 +7,13 @@ module NoUnoptimizedRecursion exposing
 
 @docs rule
 
--}
+Tail-call optimization makes Elm code more performant and helps prevent stack overflows.
 
-import Elm.Syntax.Declaration as Declaration exposing (Declaration)
-import Elm.Syntax.Expression as Expression exposing (Expression)
-import Elm.Syntax.Node as Node exposing (Node(..))
-import Elm.Syntax.Range exposing (Range)
-import Review.Rule as Rule exposing (Rule)
-import Set exposing (Set)
+Since this optimization is done silently and under specific circumstances, it is unfortunately relatively easy
+to not notice when the optimization has not been applied. You can find the [reasons why a function would not be optimized below](#fail).
 
 
-{-| Reports recursive functions that are not [tail-call optimized](https://functional-programming-in-elm.netlify.app/recursion/tail-call-elimination.html).
+## Configuration
 
     -- Reports recursive functions by default, opt out with a comment containing "IGNORE TCO"
     config =
@@ -48,18 +44,6 @@ I recommend to **not** default to ignoring a reported issue, and to discuss with
 problem when you encounter the issue or when you see them ignore an error.
 
 
-## Fail
-
-    a =
-        "REPLACEME example to replace"
-
-
-## Success
-
-    a =
-        "REPLACEME example to replace"
-
-
 ## When (not) to enable this rule
 
 This rule is useful for both application maintainers and package authors to detect locations where
@@ -76,6 +60,46 @@ elm-review --template jfmengels/elm-review-performance/example --rules NoUnoptim
 
 The rule uses `optOutWithComment "IGNORE TCO"` as its configuration.
 
+
+## Success
+
+    -- With opt-out configuration: NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optOutWithComment "IGNORE TCO")
+    -- The following is not reported because it has been tagged as ignored
+    fun n =
+        -- elm-review: IGNORE TCO
+        fun n * n
+
+    -- With opt-in configuration: NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optInWithComment "CHECK TCO")
+    -- The following is not reported because it has not been tagged
+    fun n =
+        fun n * n
+
+
+## Fail
+
+To understand
+This function is not tail-call optimized. [Read more](#REPLACE) about the patterns
+that cause this optimization to not be applied.
+
+    -- With opt-out configuration: NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optOutWithComment "IGNORE TCO")
+    fun n =
+        if condition n then
+            fun n * n
+
+        else
+            n
+
+-}
+
+import Elm.Syntax.Declaration as Declaration exposing (Declaration)
+import Elm.Syntax.Expression as Expression exposing (Expression)
+import Elm.Syntax.Node as Node exposing (Node(..))
+import Elm.Syntax.Range exposing (Range)
+import Review.Rule as Rule exposing (Rule)
+import Set exposing (Set)
+
+
+{-| Reports recursive functions that are not [tail-call optimized](https://functional-programming-in-elm.netlify.app/recursion/tail-call-elimination.html).
 -}
 rule : Configuration -> Rule
 rule configuration =
