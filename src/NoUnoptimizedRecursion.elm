@@ -19,8 +19,14 @@ import Set exposing (Set)
 
 {-| Reports recursive functions that are not tail-call optimized.
 
+    -- Reports recursive functions by default, opt out with a comment containing "IGNORE TCO"
     config =
-        [ NoUnoptimizedRecursion.rule
+        [ NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optOutWithComment "IGNORE TCO")
+        ]
+
+    -- Reports only the functions with a comment containing "CHECK TCO"
+    config =
+        [ NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optInWithComment "CHECK TCO")
         ]
 
 
