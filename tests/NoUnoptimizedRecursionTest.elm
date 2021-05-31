@@ -1,13 +1,13 @@
-module NoFailingTailCallOptimizationTest exposing (all)
+module NoUnoptimizedRecursionTest exposing (all)
 
-import NoFailingTailCallOptimization exposing (optInWithComment, optOutWithComment, rule)
+import NoUnoptimizedRecursion exposing (optInWithComment, optOutWithComment, rule)
 import Review.Test
 import Test exposing (Test, describe, test)
 
 
 all : Test
 all =
-    describe "NoFailingTailCallOptimization"
+    describe "NoUnoptimizedRecursion"
         [ test "should not report non-recursive functions" <|
             \() ->
                 """module A exposing (..)

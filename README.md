@@ -5,7 +5,7 @@ Provides [`elm-review`](https://package.elm-lang.org/packages/jfmengels/elm-revi
 
 ## Provided rules
 
-- [`NoFailingTailCallOptimization`](https://package.elm-lang.org/packages/jfmengels/elm-review-performance/1.0.0/NoFailingTailCallOptimization) - Reports REPLACEME.
+- [`NoUnoptimizedRecursion`](https://package.elm-lang.org/packages/jfmengels/elm-review-performance/1.0.0/NoUnoptimizedRecursion) - Reports REPLACEME.
 
 
 ## Configuration
@@ -13,12 +13,12 @@ Provides [`elm-review`](https://package.elm-lang.org/packages/jfmengels/elm-revi
 ```elm
 module ReviewConfig exposing (config)
 
-import NoFailingTailCallOptimization
+import NoUnoptimizedRecursion
 import Review.Rule exposing (Rule)
 
 config : List Rule
 config =
-    [ NoFailingTailCallOptimization.rule
+    [ NoUnoptimizedRecursion.rule
     ]
 ```
 

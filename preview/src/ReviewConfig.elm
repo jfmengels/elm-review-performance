@@ -11,11 +11,11 @@ when inside the directory containing this file.
 
 -}
 
-import NoFailingTailCallOptimization
+import NoUnoptimizedRecursion
 import Review.Rule exposing (Rule)
 
 
 config : List Rule
 config =
-    [ NoFailingTailCallOptimization.rule
+    [ NoUnoptimizedRecursion.rule
     ]

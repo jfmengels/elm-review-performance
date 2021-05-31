@@ -1,4 +1,4 @@
-module NoFailingTailCallOptimization exposing
+module NoUnoptimizedRecursion exposing
     ( rule
     , optInWithComment, optOutWithComment
     )
@@ -20,7 +20,7 @@ import Set exposing (Set)
 {-| Reports... REPLACEME
 
     config =
-        [ NoFailingTailCallOptimization.rule
+        [ NoUnoptimizedRecursion.rule
         ]
 
 
@@ -47,13 +47,13 @@ This rule is not useful when REPLACEME.
 You can try this rule out by running the following command:
 
 ```bash
-elm-review --template jfmengels/elm-review-performance/example --rules NoFailingTailCallOptimization
+elm-review --template jfmengels/elm-review-performance/example --rules NoUnoptimizedRecursion
 ```
 
 -}
 rule : Configuration -> Rule
 rule configuration =
-    Rule.newModuleRuleSchema "NoFailingTailCallOptimization" initialContext
+    Rule.newModuleRuleSchema "NoUnoptimizedRecursion" initialContext
         |> Rule.withCommentsVisitor (commentsVisitor configuration)
         |> Rule.withDeclarationEnterVisitor (declarationVisitor configuration)
         |> Rule.withExpressionEnterVisitor (expressionEnterVisitor configuration)
