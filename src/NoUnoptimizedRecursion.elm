@@ -76,12 +76,22 @@ To understand when a function would not get tail-call optimized, it is important
 
 The Elm compiler is able to do tail-call elimination **only** when all the recursive calls are the last operation that the function would do in that branch. Any recursive calls not happening in those locations de-optimizes the function.
 
+Here are the locations when a recursive call may happen in:
+
+  - branches of an if expression
+  - branches of a case expression
+  - in the body of a let expression (but not the functions)
+
+only if each of the above appeared at the root of the function or in one of the above locations themselves.
+
+Also to note: functions declared in a let function can be tail-call optimized.
+
 Following is a list of likely situations that will be reported.
 
 
 ### An operation is applied on the result of a function call
 
-The result of this function gets multiplied by `n`.
+The result of this function gets multiplied by `n`, making the recursive call not the last thing to happen in this branch.
 
     factorial : Int -> Int
     factorial n =
@@ -107,10 +117,69 @@ And split the function into the one that will do recursive calls (above) and a "
     factorial n =
         factorialHelp n 1
 
-TODO let functions
-TODO in let function
-TODO pipeline
-TODO binary operator
+
+### Calls using the |> or <| operators
+
+The following won't be optimized. The fix here is very easy, as you only need to remove the operator and use parentheses instead.
+
+    fun n =
+        if condition n then
+            fun <| n - 1
+
+        else
+            n
+    fun n =
+        if condition n then
+            (n - 1)
+                |> fun
+
+        else
+            n
+
+
+### Calls appearing in || or && conditions
+
+The following won't be optimized.
+
+    isPrefixOf : List a -> List a -> Bool
+    isPrefixOf prefix list =
+        case ( prefix, list ) of
+            ( [], _ ) ->
+                True
+
+            ( _ :: _, [] ) ->
+                False
+
+            ( p :: ps, x :: xs ) ->
+                p == x && isPrefixOf ps xs
+
+The fix here is very easy, as you only need to use if expressions instead.
+
+    isPrefixOf : List a -> List a -> Bool
+    isPrefixOf prefix list =
+        case ( prefix, list ) of
+            ( [], _ ) ->
+                True
+
+            ( _ :: _, [] ) ->
+                False
+
+            ( p :: ps, x :: xs ) ->
+                if p == x then
+                    isPrefixOf ps xs
+
+                else
+                    False
+
+
+### Calls from let declarations
+
+    fun n =
+        let
+            funHelp y =
+                fun (y - 1)
+        in
+        funHelp n
 
 -}
 
