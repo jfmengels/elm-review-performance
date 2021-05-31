@@ -49,8 +49,6 @@ opt-out configuration afterwards.
 I recommend to **not** default to ignoring a reported issue, and to discuss with your colleagues how to best solve the
 problem when you encounter the issue or when you see them ignore an error.
 
-TODO Indicate in the error that you can opt out using the comment
-
 
 ## Fail
 
