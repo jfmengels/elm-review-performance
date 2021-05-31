@@ -19,6 +19,8 @@ import Set exposing (Set)
 
 {-| Reports recursive functions that are not tail-call optimized.
 
+TODO Give good resource for TCO
+
     -- Reports recursive functions by default, opt out with a comment containing "IGNORE TCO"
     config =
         [ NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optOutWithComment "IGNORE TCO")
@@ -28,6 +30,26 @@ import Set exposing (Set)
     config =
         [ NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optInWithComment "CHECK TCO")
         ]
+
+You can use comments to say that a function should or should not be checked, depending on the configuration method you chose.
+This comment has to appear on the line after the `=` that follows the declaration of your function, and will not report the function.
+The same will apply for functions defined in a let expression.
+
+    fun n =
+        -- elm-review: IGNORE TCO
+        if condition n then
+            fun n * n
+
+        else
+            n
+
+I recommend toggling between the two configuration options while you're fixing/ignoring the existing issues, and to use the
+opt-out configuration afterwards.
+
+I recommend to **not** default to ignoring a reported issue, and to discuss with your colleagues how to best solve the
+problem when you encounter the issue or when you see them ignore an error.
+
+TODO Indicate in the error that you can opt out using the comment
 
 
 ## Fail
@@ -44,8 +66,8 @@ import Set exposing (Set)
 
 ## When (not) to enable this rule
 
-This rule is useful when REPLACEME.
-This rule is not useful when REPLACEME.
+This rule is useful for both application maintainers and package authors to detect locations where
+performance could be improved and where stack overflows can happen.
 
 
 ## Try it out
@@ -55,6 +77,8 @@ You can try this rule out by running the following command:
 ```bash
 elm-review --template jfmengels/elm-review-performance/example --rules NoUnoptimizedRecursion
 ```
+
+The rule uses `optOutWithComment "IGNORE TCO"` as its configuration.
 
 -}
 rule : Configuration -> Rule
