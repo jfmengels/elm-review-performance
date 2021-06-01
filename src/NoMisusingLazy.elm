@@ -186,6 +186,9 @@ isArgumentANewReference node =
         Expression.RecordUpdateExpression _ _ ->
             True
 
+        Expression.TupledExpression _ ->
+            True
+
         Expression.ParenthesizedExpression expr ->
             isArgumentANewReference expr
 

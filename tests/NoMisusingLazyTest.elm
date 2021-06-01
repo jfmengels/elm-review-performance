@@ -451,4 +451,24 @@ view model =
                             }
                             |> Review.Test.atExactly { start = { row = 8, column = 5 }, end = { row = 8, column = 13 } }
                         ]
+        , test "should report errors when arguments to lazy function is a tuple" <|
+            \() ->
+                """module A exposing (..)
+import Html.Lazy
+lazyView =
+    Html.Lazy.lazy helper
+helper _ = text ""
+
+view model =
+    lazyView ( 1, 2 )
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = "FOO"
+                            , details = [ "BAR" ]
+                            , under = "lazyView"
+                            }
+                            |> Review.Test.atExactly { start = { row = 8, column = 5 }, end = { row = 8, column = 13 } }
+                        ]
         ]
