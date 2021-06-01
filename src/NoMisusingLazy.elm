@@ -162,12 +162,15 @@ reportUnstableFunctionReference context functionRange lazyFunctionArgument =
 
 reportUnstableArgumentReferences functionRange moduleName functionName arguments =
     if Set.member ( moduleName, functionName ) (Set.singleton ( [], "lazyView" )) then
-        [ Rule.error
-            { message = "FOO"
-            , details = [ "BAR" ]
-            }
-            functionRange
-        ]
+        arguments
+            |> List.map
+                (\_ ->
+                    Rule.error
+                        { message = "FOO"
+                        , details = [ "BAR" ]
+                        }
+                        functionRange
+                )
 
     else
         []
