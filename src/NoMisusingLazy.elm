@@ -130,7 +130,7 @@ expressionVisitor node context =
             if Set.member functionName lazyFunctionNames then
                 case ModuleNameLookupTable.moduleNameAt context.lookupTable lazyRange of
                     Just moduleName ->
-                        if Set.member moduleName (Set.fromList [ [ "Html", "Lazy" ], [ "Svg", "Lazy" ] ]) then
+                        if Set.member moduleName lazyModuleNames then
                             if context.functionHasNoArguments || isStableReference context lazifiedFunction then
                                 ( [], context )
 
@@ -155,6 +155,14 @@ expressionVisitor node context =
 
         _ ->
             ( [], context )
+
+
+lazyModuleNames : Set ModuleName
+lazyModuleNames =
+    Set.fromList
+        [ [ "Html", "Lazy" ]
+        , [ "Svg", "Lazy" ]
+        ]
 
 
 lazyFunctionNames : Set String
