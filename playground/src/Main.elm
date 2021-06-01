@@ -41,9 +41,10 @@ view model =
         , workingLazyWithLambda 1
         , workingLazyWithArgButStableReference 1
         , workingLazyWithLetFunction 1
+        , workingLazyUsingIf model 1
+        , workingLazyWithPreappliedArguments 1
         , failingLazyWithArgAndUnstableReference 1 2
         , failingLazyWithArgumentAndLetFunction 1 2
-        , workingLazyUsingIf model 1
         ]
 
 
@@ -112,6 +113,11 @@ workingLazyUsingIf n =
 
     else
         Html.Lazy.lazy viewNothing_ifLazy_After3
+
+
+workingLazyWithPreappliedArguments : a -> Html msg
+workingLazyWithPreappliedArguments =
+    Html.Lazy.lazy2 (\_ -> viewNothing "SHOULD NOT BE PRINTED: workingLazyWithPreappliedArguments") {}
 
 
 failingLazyWithArgAndUnstableReference : a -> b -> Html msg
