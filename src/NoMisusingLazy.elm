@@ -184,6 +184,9 @@ isArgumentANewReference node =
         Expression.RecordExpr _ ->
             True
 
+        Expression.RecordUpdateExpression _ _ ->
+            True
+
         _ ->
             False
 
