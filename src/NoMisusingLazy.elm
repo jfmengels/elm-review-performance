@@ -149,8 +149,8 @@ expressionVisitor node context =
 isStableReference : Context -> Node Expression -> Bool
 isStableReference context node =
     case Node.value node of
-        Expression.FunctionOrValue _ _ ->
-            True
+        Expression.FunctionOrValue moduleName name ->
+            Set.member name context.topLevelFunctionNames
 
         _ ->
             False
