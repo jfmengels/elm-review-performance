@@ -67,7 +67,7 @@ rule =
 type alias Context =
     { lookupTable : ModuleNameLookupTable
     , topLevelFunctionNames : Set String
-    , functionHasNoArguments : Bool
+    , currentFunctionHasNoArguments : Bool
     }
 
 
@@ -77,7 +77,7 @@ initialContext =
         (\lookupTable () ->
             { lookupTable = lookupTable
             , topLevelFunctionNames = Set.empty
-            , functionHasNoArguments = False
+            , currentFunctionHasNoArguments = False
             }
         )
         |> Rule.withModuleNameLookupTable
@@ -120,7 +120,7 @@ declarationVisitor node context =
                         |> List.isEmpty
             in
             ( []
-            , { context | functionHasNoArguments = hasNoArguments }
+            , { context | currentFunctionHasNoArguments = hasNoArguments }
             )
 
         _ ->
@@ -134,7 +134,7 @@ expressionVisitor node context =
             case ModuleNameLookupTable.moduleNameAt context.lookupTable lazyRange of
                 Just moduleName ->
                     if Set.member moduleName lazyModuleNames && Set.member functionName lazyFunctionNames then
-                        if context.functionHasNoArguments || isStableReference context lazifiedFunction then
+                        if context.currentFunctionHasNoArguments || isStableReference context lazifiedFunction then
                             ( [], context )
 
                         else
