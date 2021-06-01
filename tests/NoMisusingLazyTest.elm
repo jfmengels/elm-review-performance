@@ -19,6 +19,7 @@ all =
         [ test "should not report for lazy function without arguments and stable reference" <|
             \() ->
                 """module A exposing (..)
+import Html.Lazy
 a =
   Html.Lazy.lazy helper n
 
@@ -29,6 +30,7 @@ helper _ = text ""
         , test "should not report for lazy function without arguments and unstable reference" <|
             \() ->
                 """module A exposing (..)
+import Html.Lazy
 a =
   Html.Lazy.lazy helper n
 
@@ -39,6 +41,7 @@ helper _ = text ""
         , test "should not report for lazy function without arguments and lambda argument" <|
             \() ->
                 """module A exposing (..)
+import Html.Lazy
 a =
   Html.Lazy.lazy (\\_ -> helper) n
 
@@ -49,6 +52,7 @@ helper _ = text ""
         , test "should not report for lazy function without arguments and let in argument" <|
             \() ->
                 """module A exposing (..)
+import Html.Lazy
 a =
   let
     helper _ = text ""
@@ -61,6 +65,7 @@ a =
         , test "should report an error when encountering Html.lazy with arguments and an unstable reference" <|
             \() ->
                 """module A exposing (..)
+import Html.Lazy
 a n =
   Html.Lazy.lazy (helper x) n
 
@@ -77,6 +82,7 @@ helper _ _ = text ""
         , test "should not report for lazy function with arguments but stable reference" <|
             \() ->
                 """module A exposing (..)
+import Html.Lazy
 a n =
   Html.Lazy.lazy helper n
 
@@ -99,6 +105,7 @@ helper _ = text ""
         , test "should report an error when encountering Html.lazy with arguments and an let in reference" <|
             \() ->
                 """module A exposing (..)
+import Html.Lazy
 a n =
   let
     helper _ _ = text ""
