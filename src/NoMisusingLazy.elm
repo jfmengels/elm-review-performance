@@ -179,7 +179,13 @@ reportUnstableArgumentReferences functionRange moduleName functionName arguments
 
 isArgumentANewReference : Node Expression -> Bool
 isArgumentANewReference node =
-    True
+    case Node.value node of
+        -- TODO Handle parens
+        Expression.RecordExpr _ ->
+            True
+
+        _ ->
+            False
 
 
 lazyModuleNames : Set ModuleName
