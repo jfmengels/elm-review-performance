@@ -34,13 +34,22 @@ update msg model =
 view : Model -> Html Msg
 view model =
     Html.div []
+        [ header model
+
+        -- Lazy functions
+        , workingLazy 1
+        , workingLazyWithLambda 1
+        , failingLazy 1 2
+        ]
+
+
+header : Model -> Html Msg
+header model =
+    Html.div []
         [ Html.h1 [] [ Html.text "Open the console, click on the + button and see what messages are printed" ]
         , Html.div [] [ Html.text "(Ignore the first things to be printed)" ]
         , Html.button [ Events.onClick Increment, Attr.style "width" "400px", Attr.style "height" "400px" ] [ Html.text "+" ]
         , Html.div [] [ Html.text (String.fromInt model) ]
-        , workingLazy 1
-        , workingLazyWithLambda 1
-        , failingLazy 1 2
         ]
 
 
