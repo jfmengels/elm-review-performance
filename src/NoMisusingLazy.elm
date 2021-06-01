@@ -131,31 +131,27 @@ expressionVisitor : Node Expression -> Context -> ( List (Rule.Error {}), Contex
 expressionVisitor node context =
     case Node.value node of
         Expression.Application ((Node lazyRange (Expression.FunctionOrValue _ functionName)) :: lazifiedFunction :: _) ->
-            if Set.member functionName lazyFunctionNames then
-                case ModuleNameLookupTable.moduleNameAt context.lookupTable lazyRange of
-                    Just moduleName ->
-                        if Set.member moduleName lazyModuleNames then
-                            if context.functionHasNoArguments || isStableReference context lazifiedFunction then
-                                ( [], context )
-
-                            else
-                                ( [ Rule.error
-                                        { message = "Misuse of a lazy function"
-                                        , details = [ "The argument passed to the lazy function must be a stable reference, but a new reference will be created everytime this function is called." ]
-                                        }
-                                        lazyRange
-                                  ]
-                                , context
-                                )
-
-                        else
+            case ModuleNameLookupTable.moduleNameAt context.lookupTable lazyRange of
+                Just moduleName ->
+                    if Set.member moduleName lazyModuleNames && Set.member functionName lazyFunctionNames then
+                        if context.functionHasNoArguments || isStableReference context lazifiedFunction then
                             ( [], context )
 
-                    _ ->
+                        else
+                            ( [ Rule.error
+                                    { message = "Misuse of a lazy function"
+                                    , details = [ "The argument passed to the lazy function must be a stable reference, but a new reference will be created everytime this function is called." ]
+                                    }
+                                    lazyRange
+                              ]
+                            , context
+                            )
+
+                    else
                         ( [], context )
 
-            else
-                ( [], context )
+                _ ->
+                    ( [], context )
 
         _ ->
             ( [], context )
