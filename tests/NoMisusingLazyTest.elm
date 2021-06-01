@@ -284,4 +284,84 @@ helper _ _ _ = text ""
                             , under = "VirtualDom.lazy"
                             }
                         ]
+        , test "should report an error when encountering problematic Html.String.Lazy.lazy" <|
+            \() ->
+                """module A exposing (..)
+import VirtualDom
+a n =
+  Html.String.Lazy.lazy (helper x)
+helper _ _ _ = text ""
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = message
+                            , details = details
+                            , under = "Html.String.Lazy.lazy"
+                            }
+                        ]
+        , test "should report an error when encountering problematic Html.Styled.Lazy.lazy" <|
+            \() ->
+                """module A exposing (..)
+import VirtualDom
+a n =
+  Html.Styled.Lazy.lazy (helper x)
+helper _ _ _ = text ""
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = message
+                            , details = details
+                            , under = "Html.Styled.Lazy.lazy"
+                            }
+                        ]
+        , test "should report an error when encountering problematic Svg.Styled.Lazy.lazy" <|
+            \() ->
+                """module A exposing (..)
+import VirtualDom
+a n =
+  Svg.Styled.Lazy.lazy (helper x)
+helper _ _ _ = text ""
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = message
+                            , details = details
+                            , under = "Svg.Styled.Lazy.lazy"
+                            }
+                        ]
+        , test "should report an error when encountering problematic Element.Lazy.lazy" <|
+            \() ->
+                """module A exposing (..)
+import VirtualDom
+a n =
+  Element.Lazy.lazy (helper x)
+helper _ _ _ = text ""
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = message
+                            , details = details
+                            , under = "Element.Lazy.lazy"
+                            }
+                        ]
+        , test "should report an error when encountering problematic Element.WithContext.Lazy.lazy" <|
+            \() ->
+                """module A exposing (..)
+import VirtualDom
+a n =
+  Element.WithContext.Lazy.lazy (helper x)
+helper _ _ _ = text ""
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = message
+                            , details = details
+                            , under = "Element.WithContext.Lazy.lazy"
+                            }
+                        ]
         ]

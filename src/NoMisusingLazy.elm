@@ -19,7 +19,6 @@ import Set exposing (Set)
 
 -- TODO Report lazy being used on its own
 -- TODO Handle calls through operators
--- TODO Support Element.lazy and other known lazy functions (https://klaftertief.github.io/elm-search/?q=lazy)
 
 
 {-| Reports... REPLACEME
@@ -160,9 +159,24 @@ expressionVisitor node context =
 lazyModuleNames : Set ModuleName
 lazyModuleNames =
     Set.fromList
-        [ [ "Html", "Lazy" ]
-        , [ "Svg", "Lazy" ]
-        , [ "VirtualDom" ]
+        [ -- https://package.elm-lang.org/packages/elm/html/latest/Html.Lazy
+          [ "Html", "Lazy" ]
+        , -- https://package.elm-lang.org/packages/elm/svg/latest/Svg.Lazy
+          [ "Svg", "Lazy" ]
+        , -- https://package.elm-lang.org/packages/elm/virtual-dom/latest/VirtualDom
+          [ "VirtualDom" ]
+        , -- https://package.elm-lang.org/packages/rtfeldman/elm-css/latest/Html-Styled-Lazy
+          [ "Html", "Styled", "Lazy" ]
+        , -- https://package.elm-lang.org/packages/rtfeldman/elm-css/latest/Svg-Styled-Lazy
+          [ "Svg", "Styled", "Lazy" ]
+        , -- https://package.elm-lang.org/packages/mdgriffith/elm-ui/latest/Element-Lazy
+          [ "Element", "Lazy" ]
+        , -- https://package.elm-lang.org/packages/miniBill/elm-ui-with-context/latest/Element-WithContext-Lazy
+          [ "Element", "WithContext", "Lazy" ]
+        , -- https://package.elm-lang.org/packages/austinshenk/elm-w3/latest/W3-Html
+          [ "W3", "Html" ]
+        , -- https://package.elm-lang.org/packages/zwilias/elm-html-string/latest/Html-String-Lazy
+          [ "Html", "String", "Lazy" ]
         ]
 
 
