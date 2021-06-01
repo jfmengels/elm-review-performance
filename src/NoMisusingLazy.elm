@@ -137,7 +137,7 @@ expressionVisitor node context =
                         ( reportUnstableFunctionReference context functionRange lazyFunctionArgument, context )
 
                     else
-                        ( reportUnstableArgumentReferences functionRange moduleName functionName (lazyFunctionArgument :: restOfArguments), context )
+                        ( reportUnstableArgumentReferences context functionRange moduleName functionName (lazyFunctionArgument :: restOfArguments), context )
 
                 Nothing ->
                     ( [], context )
@@ -160,8 +160,8 @@ reportUnstableFunctionReference context functionRange lazyFunctionArgument =
         ]
 
 
-reportUnstableArgumentReferences functionRange moduleName functionName arguments =
-    if Set.member ( moduleName, functionName ) (Set.singleton ( [], "lazyView" )) then
+reportUnstableArgumentReferences context functionRange moduleName functionName arguments =
+    if not context.currentFunctionHasNoArguments && Set.member ( moduleName, functionName ) (Set.singleton ( [], "lazyView" )) then
         arguments
             |> List.filter isArgumentANewReference
             |> List.map

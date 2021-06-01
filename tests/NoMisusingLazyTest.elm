@@ -392,6 +392,19 @@ view model =
 """
                     |> Review.Test.runWithProjectData project rule
                     |> Review.Test.expectNoErrors
+        , test "should not report errors when arguments are unstable references but the function takes no arguments" <|
+            \() ->
+                """module A exposing (..)
+import Html.Lazy
+lazyView =
+    Html.Lazy.lazy helper
+helper _ = text ""
+
+view =
+    lazyView {}
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectNoErrors
         , test "should report errors when arguments to lazy function is a record literal inside parens" <|
             \() -> reportWhenArgumentIs "({})"
         , test "should report errors when arguments to lazy function is a record update function" <|
