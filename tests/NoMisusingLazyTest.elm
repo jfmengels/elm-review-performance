@@ -27,6 +27,7 @@ all : Test
 all =
     describe "NoMisusingLazy"
         [ lazyDefinitionTests
+        , argumentReferenceTests
         ]
 
 
@@ -369,6 +370,44 @@ helper _ _ _ = text ""
                             { message = message
                             , details = details
                             , under = "Element.WithContext.Lazy.lazy"
+                            }
+                        ]
+        ]
+
+
+argumentReferenceTests : Test
+argumentReferenceTests =
+    describe "Arguments passed to lazy functions"
+        [ test "should not report errors when arguments to lazy function is a function or value" <|
+            \() ->
+                """module A exposing (..)
+import Html.Lazy
+lazyView =
+    Html.Lazy.lazy helper
+helper _ = text ""
+
+view model =
+    lazyView model
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectNoErrors
+        , test "should report errors when arguments to lazy function is a record literal" <|
+            \() ->
+                """module A exposing (..)
+import Html.Lazy
+lazyView =
+    Html.Lazy.lazy helper
+helper _ = text ""
+
+view model =
+    lazyView {}
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = "FOO"
+                            , details = [ "BAR" ]
+                            , under = "lazyView"
                             }
                         ]
         ]
