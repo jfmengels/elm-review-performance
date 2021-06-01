@@ -163,6 +163,7 @@ reportUnstableFunctionReference context functionRange lazyFunctionArgument =
 reportUnstableArgumentReferences functionRange moduleName functionName arguments =
     if Set.member ( moduleName, functionName ) (Set.singleton ( [], "lazyView" )) then
         arguments
+            |> List.filter isArgumentANewReference
             |> List.map
                 (\_ ->
                     Rule.error
@@ -174,6 +175,11 @@ reportUnstableArgumentReferences functionRange moduleName functionName arguments
 
     else
         []
+
+
+isArgumentANewReference : Node Expression -> Bool
+isArgumentANewReference node =
+    True
 
 
 lazyModuleNames : Set ModuleName
