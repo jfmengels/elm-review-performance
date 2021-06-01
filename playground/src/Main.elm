@@ -39,6 +39,7 @@ view model =
         , Html.button [ Events.onClick Increment, Attr.style "width" "400px", Attr.style "height" "400px" ] [ Html.text "+" ]
         , Html.div [] [ Html.text (String.fromInt model) ]
         , workingLazy 1
+        , workingLazyWithLambda 1
         , failingLazy 1 2
         ]
 
@@ -54,7 +55,12 @@ viewNothing textToPrint _ =
 
 workingLazy : a -> Html msg
 workingLazy =
-    Html.Lazy.lazy (viewNothing "SHOULD NOT BE PRINTED")
+    Html.Lazy.lazy (viewNothing "SHOULD NOT BE PRINTED: workingLazy")
+
+
+workingLazyWithLambda : a -> Html msg
+workingLazyWithLambda =
+    Html.Lazy.lazy (\a -> viewNothing "SHOULD NOT BE PRINTED: workingLazyWithLambda" a)
 
 
 failingLazy : a -> b -> Html msg
