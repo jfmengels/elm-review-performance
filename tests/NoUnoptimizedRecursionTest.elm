@@ -13,6 +13,7 @@ message =
 details : List String
 details =
     [ "The way this function is called recursively here prevents the function from being tail-call optimized."
+    , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
     ]
 
 

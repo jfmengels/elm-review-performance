@@ -409,12 +409,7 @@ reportRecursiveCallInNonAllowedLocation node context =
     case Node.value node of
         Expression.FunctionOrValue [] name ->
             if name == context.currentFunctionName then
-                [ Rule.error
-                    { message = "Recursive function is not tail-call optimized"
-                    , details = [ "The way this function is called recursively here prevents the function from being tail-call optimized." ]
-                    }
-                    (Node.range node)
-                ]
+                [ error (Node.range node) ]
 
             else
                 []
@@ -428,18 +423,25 @@ reportReferencesToParentFunctions node context =
     case Node.value node of
         Expression.Application ((Node funcRange (Expression.FunctionOrValue [] name)) :: _) ->
             if Set.member name context.parentNames then
-                [ Rule.error
-                    { message = "Recursive function is not tail-call optimized"
-                    , details = [ "The way this function is called recursively here prevents the function from being tail-call optimized." ]
-                    }
-                    funcRange
-                ]
+                [ error funcRange ]
 
             else
                 []
 
         _ ->
             []
+
+
+error : Range -> Rule.Error {}
+error range =
+    Rule.error
+        { message = "Recursive function is not tail-call optimized"
+        , details =
+            [ "The way this function is called recursively here prevents the function from being tail-call optimized."
+            , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
+            ]
+        }
+        range
 
 
 addAllowedLocation : Configuration -> Node Expression -> Context -> Context
