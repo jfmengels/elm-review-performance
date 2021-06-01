@@ -143,4 +143,123 @@ a n =
                             , under = "Html.Lazy.lazy"
                             }
                         ]
+        , test "should report an error when encountering problematic Html.Lazy.lazy2" <|
+            \() ->
+                """module A exposing (..)
+import Html.Lazy
+a n =
+  Html.Lazy.lazy2 (helper x)
+
+helper _ _ _ = text ""
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = message
+                            , details = details
+                            , under = "Html.Lazy.lazy2"
+                            }
+                        ]
+        , test "should report an error when encountering problematic Html.Lazy.lazy3" <|
+            \() ->
+                """module A exposing (..)
+import Html.Lazy
+a n =
+  Html.Lazy.lazy3 (helper x)
+
+helper _ _ _ = text ""
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = message
+                            , details = details
+                            , under = "Html.Lazy.lazy3"
+                            }
+                        ]
+        , test "should report an error when encountering problematic Html.Lazy.lazy4" <|
+            \() ->
+                """module A exposing (..)
+import Html.Lazy
+a n =
+  Html.Lazy.lazy4 (helper x)
+
+helper _ _ _ = text ""
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = message
+                            , details = details
+                            , under = "Html.Lazy.lazy4"
+                            }
+                        ]
+        , test "should report an error when encountering problematic Html.Lazy.lazy5" <|
+            \() ->
+                """module A exposing (..)
+import Html.Lazy
+a n =
+  Html.Lazy.lazy5 (helper x)
+
+helper _ _ _ = text ""
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = message
+                            , details = details
+                            , under = "Html.Lazy.lazy5"
+                            }
+                        ]
+        , test "should report an error when encountering problematic Html.Lazy.lazy6" <|
+            \() ->
+                """module A exposing (..)
+import Html.Lazy
+a n =
+  Html.Lazy.lazy6 (helper x)
+
+helper _ _ _ = text ""
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = message
+                            , details = details
+                            , under = "Html.Lazy.lazy6"
+                            }
+                        ]
+        , test "should report an error when encountering problematic Html.Lazy.lazy7" <|
+            \() ->
+                """module A exposing (..)
+import Html.Lazy
+a n =
+  Html.Lazy.lazy7 (helper x)
+
+helper _ _ _ = text ""
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = message
+                            , details = details
+                            , under = "Html.Lazy.lazy7"
+                            }
+                        ]
+        , test "should report an error when encountering problematic Html.Lazy.lazy8" <|
+            \() ->
+                """module A exposing (..)
+import Html.Lazy
+a n =
+  Html.Lazy.lazy8 (helper x)
+
+helper _ _ _ = text ""
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = message
+                            , details = details
+                            , under = "Html.Lazy.lazy8"
+                            }
+                        ]
         ]

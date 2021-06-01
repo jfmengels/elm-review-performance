@@ -126,27 +126,36 @@ declarationVisitor node context =
 expressionVisitor : Node Expression -> Context -> ( List (Rule.Error {}), Context )
 expressionVisitor node context =
     case Node.value node of
-        Expression.Application ((Node lazyRange (Expression.FunctionOrValue _ "lazy")) :: lazifiedFunction :: _) ->
-            case ModuleNameLookupTable.moduleNameAt context.lookupTable lazyRange of
-                Just [ "Html", "Lazy" ] ->
-                    if context.functionHasNoArguments || isStableReference context lazifiedFunction then
+        Expression.Application ((Node lazyRange (Expression.FunctionOrValue _ functionName)) :: lazifiedFunction :: _) ->
+            if Set.member functionName lazyFunctionNames then
+                case ModuleNameLookupTable.moduleNameAt context.lookupTable lazyRange of
+                    Just [ "Html", "Lazy" ] ->
+                        if context.functionHasNoArguments || isStableReference context lazifiedFunction then
+                            ( [], context )
+
+                        else
+                            ( [ Rule.error
+                                    { message = "Misuse of a lazy function"
+                                    , details = [ "The argument passed to the lazy function must be a stable reference, but a new reference will be created everytime this function is called." ]
+                                    }
+                                    lazyRange
+                              ]
+                            , context
+                            )
+
+                    _ ->
                         ( [], context )
 
-                    else
-                        ( [ Rule.error
-                                { message = "Misuse of a lazy function"
-                                , details = [ "The argument passed to the lazy function must be a stable reference, but a new reference will be created everytime this function is called." ]
-                                }
-                                lazyRange
-                          ]
-                        , context
-                        )
-
-                _ ->
-                    ( [], context )
+            else
+                ( [], context )
 
         _ ->
             ( [], context )
+
+
+lazyFunctionNames : Set String
+lazyFunctionNames =
+    Set.fromList [ "lazy", "lazy2", "lazy3", "lazy4", "lazy5", "lazy6", "lazy7", "lazy8" ]
 
 
 isStableReference : Context -> Node Expression -> Bool
