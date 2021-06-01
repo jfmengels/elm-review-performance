@@ -57,6 +57,7 @@ elm-review --template jfmengels/elm-review-performance/example --rules NoMisusin
 rule : Rule
 rule =
     Rule.newModuleRuleSchemaUsingContextCreator "NoMisusingLazy" initialContext
+        |> Rule.withDeclarationListVisitor declarationListVisitor
         |> Rule.withDeclarationEnterVisitor declarationVisitor
         |> Rule.withExpressionEnterVisitor expressionVisitor
         |> Rule.fromModuleRuleSchema
