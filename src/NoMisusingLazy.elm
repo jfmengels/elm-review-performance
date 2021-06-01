@@ -130,14 +130,14 @@ declarationVisitor node context =
 expressionVisitor : Node Expression -> Context -> ( List (Rule.Error {}), Context )
 expressionVisitor node context =
     case Node.value node of
-        Expression.Application ((Node functionRange (Expression.FunctionOrValue _ functionName)) :: lazyFunctionArgument :: _) ->
+        Expression.Application ((Node functionRange (Expression.FunctionOrValue _ functionName)) :: lazyFunctionArgument :: restOfArguments) ->
             case ModuleNameLookupTable.moduleNameAt context.lookupTable functionRange of
                 Just moduleName ->
                     if Set.member moduleName lazyModuleNames && Set.member functionName lazyFunctionNames then
                         ( reportUnstableFunctionReference context functionRange lazyFunctionArgument, context )
 
                     else
-                        ( [], context )
+                        ( reportUnstableArgumentReferences functionRange moduleName functionName (lazyFunctionArgument :: restOfArguments), context )
 
                 Nothing ->
                     ( [], context )
@@ -158,6 +158,15 @@ reportUnstableFunctionReference context functionRange lazyFunctionArgument =
             }
             functionRange
         ]
+
+
+reportUnstableArgumentReferences functionRange moduleName functionName arguments =
+    [ Rule.error
+        { message = "FOO"
+        , details = [ "BAR" ]
+        }
+        functionRange
+    ]
 
 
 lazyModuleNames : Set ModuleName
