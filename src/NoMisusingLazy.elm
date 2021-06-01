@@ -85,7 +85,12 @@ initialContext =
 
 declarationListVisitor : List (Node Declaration) -> Context -> ( List nothing, Context )
 declarationListVisitor declarations context =
-    ( [], { context | topLevelFunctionNames = Set.fromList (List.filterMap topLevelFunctionNames declarations) } )
+    let
+        newContext : Context
+        newContext =
+            { context | topLevelFunctionNames = Set.fromList (List.filterMap topLevelFunctionNames declarations) }
+    in
+    ( [], newContext )
 
 
 topLevelFunctionNames : Node Declaration -> Maybe String
