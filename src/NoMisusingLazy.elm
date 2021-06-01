@@ -19,6 +19,7 @@ import Set exposing (Set)
 
 -- TODO Report lazy being used on its own?
 -- TODO Support lazy used with <| and |>
+-- TODO Report Application as argument if `Type args` (don't care about custom type or type alias)
 
 
 {-| Reports... REPLACEME
