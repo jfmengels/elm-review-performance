@@ -8,7 +8,7 @@ module NoMisusingLazy exposing (rule)
 
 import Elm.Syntax.Expression as Expression exposing (Expression)
 import Elm.Syntax.Node as Node exposing (Node(..))
-import Review.ModuleNameLookupTable exposing (ModuleNameLookupTable)
+import Review.ModuleNameLookupTable as ModuleNameLookupTable exposing (ModuleNameLookupTable)
 import Review.Rule as Rule exposing (Rule)
 
 
@@ -78,14 +78,19 @@ expressionVisitor : Node Expression -> Context -> ( List (Rule.Error {}), Contex
 expressionVisitor node context =
     case Node.value node of
         Expression.Application ((Node functionRange (Expression.FunctionOrValue _ "lazy")) :: _) ->
-            ( [ Rule.error
-                    { message = "Misuse of a lazy function"
-                    , details = [ "REPLACEME" ]
-                    }
-                    functionRange
-              ]
-            , context
-            )
+            case ModuleNameLookupTable.moduleNameAt context.lookupTable functionRange of
+                Just [ "Html", "Lazy" ] ->
+                    ( [ Rule.error
+                            { message = "Misuse of a lazy function"
+                            , details = [ "REPLACEME" ]
+                            }
+                            functionRange
+                      ]
+                    , context
+                    )
+
+                _ ->
+                    ( [], context )
 
         _ ->
             ( [], context )
