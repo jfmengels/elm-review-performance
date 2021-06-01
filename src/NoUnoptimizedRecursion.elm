@@ -10,7 +10,7 @@ module NoUnoptimizedRecursion exposing
 Tail-call optimization makes Elm code more performant and helps prevent stack overflows.
 
 Since this optimization is done silently and under specific circumstances, it is unfortunately relatively easy
-to not notice when the optimization has not been applied. You can find the [reasons why a function would not be optimized below](#fail).
+to not notice when the optimization is not being applied. You can find the [reasons why a function would not be optimized below](#fail).
 
 
 ## Configuration
@@ -23,7 +23,7 @@ to not notice when the optimization has not been applied. You can find the [reas
 This rule is useful for both application maintainers and package authors to detect locations where
 performance could be improved and where stack overflows can happen.
 
-You should not enable this rule if you do not care about performance at this point in time.
+You should not enable this rule if you currently do not want to invest your time into thinking about performance.
 
 
 ## Try it out
@@ -83,8 +83,6 @@ Here are the locations when a recursive call may happen in:
   - in the body of a let expression (but not the functions)
 
 only if each of the above appeared at the root of the function or in one of the above locations themselves.
-
-Also to note: functions declared in a let function can be tail-call optimized.
 
 Following is a list of likely situations that will be reported.
 
@@ -211,9 +209,10 @@ rule configuration =
 
 Use [`optOutWithComment`](#optOutWithComment) or [`optInWithComment`](#optInWithComment) to configure this rule.
 
-You can use comments to say that a function should or should not be checked, depending on the configuration method you chose.
-This comment has to appear on the line after the `=` that follows the declaration of your function, and will not report the function.
-The same will apply for functions defined in a let expression.
+You can use comments to tag functions as to be checked or ignored, depending on the configuration option you chose.
+This comment has to appear on the line after the `=` that follows the declaration of your function. Note that this
+comment only needs to contain the tag that you're choosing and that it is case-sensitive.
+The same will apply for functions defined in a let expression, since they can be tail-call optimized as well.
 
 I recommend toggling between the two configuration options while you're fixing/ignoring the existing issues, and to use the
 opt-out configuration afterwards.
@@ -226,15 +225,11 @@ type Configuration
 
 {-| Reports recursive functions by default, opt out functions tagged with a comment.
 
-I recommend to **not** default to ignoring a reported issue when something gets reported,
-and to discuss with your colleagues how to best solve the problem when you encounter the
-issue or when you see them ignore an error.
-
     config =
         [ NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optOutWithComment "IGNORE TCO")
         ]
 
-With the configuration above, the following function would **not** be reported.
+With the configuration above, the following function would not be reported.
 
     fun n =
         -- elm-review: IGNORE TCO
@@ -243,6 +238,9 @@ With the configuration above, the following function would **not** be reported.
 
         else
             n
+
+I recommend to **not** default to ignoring a reported issue, and instead to discuss with your colleagues how to best
+solve the error when you encounter it or when you see them ignore an error.
 
 -}
 optOutWithComment : String -> Configuration
