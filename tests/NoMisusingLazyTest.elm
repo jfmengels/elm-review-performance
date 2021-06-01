@@ -96,4 +96,22 @@ helper _ = text ""
 """
                     |> Review.Test.runWithProjectData project rule
                     |> Review.Test.expectNoErrors
+        , test "should report an error when encountering Html.lazy with arguments and an let in reference" <|
+            \() ->
+                """module A exposing (..)
+a n =
+  let
+    helper _ _ = text ""
+  in
+  Html.Lazy.lazy helper n
+
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = "Misuse of a lazy function"
+                            , details = [ "REPLACEME" ]
+                            , under = "Html.Lazy.lazy"
+                            }
+                        ]
         ]
