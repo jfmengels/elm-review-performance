@@ -104,7 +104,7 @@ workingLazyWithLetFunction =
     let
         helper : b -> Html msg
         helper =
-            viewNothing "workingLazyWithLetFunction"
+            viewNothing "SHOULD NOT BE PRINTED: workingLazyWithLetFunction"
     in
     Html.Lazy.lazy helper
 
