@@ -17,8 +17,8 @@ import Set exposing (Set)
 
 
 
--- TODO Report lazy being used on its own
--- TODO Handle calls through operators
+-- TODO Report lazy being used on its own?
+-- TODO Support lazy used with <| and |>
 
 
 {-| Reports... REPLACEME
