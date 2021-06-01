@@ -26,6 +26,13 @@ project =
 all : Test
 all =
     describe "NoMisusingLazy"
+        [ lazyDefinitionTests
+        ]
+
+
+lazyDefinitionTests : Test
+lazyDefinitionTests =
+    describe "Lazy definitions"
         [ test "should not report for lazy function without arguments and stable reference" <|
             \() ->
                 """module A exposing (..)
