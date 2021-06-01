@@ -105,14 +105,18 @@ expressionVisitor node context =
         Expression.Application ((Node functionRange (Expression.FunctionOrValue _ "lazy")) :: _) ->
             case ModuleNameLookupTable.moduleNameAt context.lookupTable functionRange of
                 Just [ "Html", "Lazy" ] ->
-                    ( [ Rule.error
-                            { message = "Misuse of a lazy function"
-                            , details = [ "REPLACEME" ]
-                            }
-                            functionRange
-                      ]
-                    , context
-                    )
+                    if context.functionHasArguments then
+                        ( [ Rule.error
+                                { message = "Misuse of a lazy function"
+                                , details = [ "REPLACEME" ]
+                                }
+                                functionRange
+                          ]
+                        , context
+                        )
+
+                    else
+                        ( [], context )
 
                 _ ->
                     ( [], context )
