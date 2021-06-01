@@ -192,6 +192,9 @@ isArgumentANewReference node =
         Expression.ListExpr _ ->
             True
 
+        Expression.RecordAccessFunction _ ->
+            True
+
         Expression.ParenthesizedExpression expr ->
             isArgumentANewReference expr
 

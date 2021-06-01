@@ -45,6 +45,7 @@ view model =
         , workingLazyWithPreappliedArguments 1
         , failingLazyWithArgAndUnstableReference 1 2
         , failingLazyWithArgumentAndLetFunction 1 2
+        , workingLazy .foo
         ]
 
 
