@@ -8,7 +8,7 @@ import Test exposing (Test, describe, test)
 all : Test
 all =
     describe "NoMisusingLazy"
-        [ test "should report an error when REPLACEME" <|
+        [ test "should report an error when encountering Html.lazy with arguments and an unstable reference" <|
             \() ->
                 """module A exposing (..)
 a = 1
