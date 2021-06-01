@@ -409,5 +409,6 @@ view model =
                             , details = [ "BAR" ]
                             , under = "lazyView"
                             }
+                            |> Review.Test.atExactly { start = { row = 8, column = 5 }, end = { row = 8, column = 13 } }
                         ]
         ]
