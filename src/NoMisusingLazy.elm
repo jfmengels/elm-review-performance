@@ -105,7 +105,7 @@ expressionVisitor node context =
         Expression.Application ((Node lazyRange (Expression.FunctionOrValue _ "lazy")) :: lazifiedFunction :: _) ->
             case ModuleNameLookupTable.moduleNameAt context.lookupTable lazyRange of
                 Just [ "Html", "Lazy" ] ->
-                    if context.functionHasArguments && isStableReference lazifiedFunction then
+                    if context.functionHasArguments && not (isStableReference lazifiedFunction) then
                         ( [ Rule.error
                                 { message = "Misuse of a lazy function"
                                 , details = [ "REPLACEME" ]
@@ -127,4 +127,9 @@ expressionVisitor node context =
 
 isStableReference : Node Expression -> Bool
 isStableReference node =
-    True
+    case Node.value node of
+        Expression.FunctionOrValue _ _ ->
+            True
+
+        _ ->
+            False
