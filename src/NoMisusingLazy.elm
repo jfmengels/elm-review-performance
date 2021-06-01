@@ -102,15 +102,15 @@ declarationVisitor node context =
 expressionVisitor : Node Expression -> Context -> ( List (Rule.Error {}), Context )
 expressionVisitor node context =
     case Node.value node of
-        Expression.Application ((Node functionRange (Expression.FunctionOrValue _ "lazy")) :: _) ->
-            case ModuleNameLookupTable.moduleNameAt context.lookupTable functionRange of
+        Expression.Application ((Node lazyRange (Expression.FunctionOrValue _ "lazy")) :: lazifiedFunction :: _) ->
+            case ModuleNameLookupTable.moduleNameAt context.lookupTable lazyRange of
                 Just [ "Html", "Lazy" ] ->
-                    if context.functionHasArguments then
+                    if context.functionHasArguments && isStableReference lazifiedFunction then
                         ( [ Rule.error
                                 { message = "Misuse of a lazy function"
                                 , details = [ "REPLACEME" ]
                                 }
-                                functionRange
+                                lazyRange
                           ]
                         , context
                         )
@@ -123,3 +123,8 @@ expressionVisitor node context =
 
         _ ->
             ( [], context )
+
+
+isStableReference : Node Expression -> Bool
+isStableReference node =
+    True
