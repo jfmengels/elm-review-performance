@@ -40,7 +40,9 @@ view model =
         , workingLazy 1
         , workingLazyWithLambda 1
         , workingLazyWithArgButStableReference 1
+        , workingLazyWithLetFunction 1
         , failingLazyWithArgAndUnstableReference 1 2
+        , failingLazyWithArgumentAndLetFunction 1 2
         ]
 
 
@@ -95,3 +97,24 @@ failingLazyWithArgAndUnstableReference : a -> b -> Html msg
 failingLazyWithArgAndUnstableReference _ =
     -- The reference to `viewNothing` is recomputed every time this function is called
     Html.Lazy.lazy (viewNothing "failingLazyWithArgAndUnstableReference")
+
+
+workingLazyWithLetFunction : a -> Html msg
+workingLazyWithLetFunction =
+    let
+        helper : b -> Html msg
+        helper =
+            viewNothing "workingLazyWithLetFunction"
+    in
+    Html.Lazy.lazy helper
+
+
+failingLazyWithArgumentAndLetFunction : a -> b -> Html msg
+failingLazyWithArgumentAndLetFunction _ =
+    let
+        -- The reference to `helper` is recomputed every time this function is called
+        helper : b -> Html msg
+        helper =
+            viewNothing "failingLazyWithArgumentAndLetFunction"
+    in
+    Html.Lazy.lazy helper
