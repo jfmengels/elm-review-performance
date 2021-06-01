@@ -8,6 +8,7 @@ module NoMisusingLazy exposing (rule)
 
 import Elm.Syntax.Expression as Expression exposing (Expression)
 import Elm.Syntax.Node as Node exposing (Node(..))
+import Review.ModuleNameLookupTable exposing (ModuleNameLookupTable)
 import Review.Rule as Rule exposing (Rule)
 
 
@@ -53,13 +54,24 @@ elm-review --template jfmengels/elm-review-performance/example --rules NoMisusin
 -}
 rule : Rule
 rule =
-    Rule.newModuleRuleSchema "NoMisusingLazy" ()
+    Rule.newModuleRuleSchemaUsingContextCreator "NoMisusingLazy" initialContext
         |> Rule.withExpressionEnterVisitor expressionVisitor
         |> Rule.fromModuleRuleSchema
 
 
 type alias Context =
-    ()
+    { lookupTable : ModuleNameLookupTable
+    }
+
+
+initialContext : Rule.ContextCreator () Context
+initialContext =
+    Rule.initContextCreator
+        (\lookupTable () ->
+            { lookupTable = lookupTable
+            }
+        )
+        |> Rule.withModuleNameLookupTable
 
 
 expressionVisitor : Node Expression -> Context -> ( List (Rule.Error {}), Context )
