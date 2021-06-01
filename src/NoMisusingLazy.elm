@@ -139,7 +139,7 @@ expressionVisitor node context =
                     else
                         ( [], context )
 
-                _ ->
+                Nothing ->
                     ( [], context )
 
         _ ->
