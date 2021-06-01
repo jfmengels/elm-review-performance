@@ -39,7 +39,7 @@ The rule uses `optOutWithComment "IGNORE TCO"` as its configuration.
 
 ## Success
 
-Not reported because it is tail-call optimized.
+This function won't be reported because it is tail-call optimized.
 
     fun n =
         if condition n then
@@ -48,7 +48,7 @@ Not reported because it is tail-call optimized.
         else
             n
 
-Not reported because the function has been tagged as ignored.
+This function won't be reported because it has been tagged as ignored.
 
     -- With opt-out configuration
     config =
@@ -59,7 +59,7 @@ Not reported because the function has been tagged as ignored.
         -- elm-review: IGNORE TCO
         fun n * n
 
-Not reported because the function has not been tagged.
+This function won't be reported because it has not been tagged.
 
     -- With opt-in configuration
     config =
@@ -74,15 +74,15 @@ Not reported because the function has not been tagged.
 
 To understand when a function would not get tail-call optimized, it is important to understand when it would be optimized.
 
-The Elm compiler is able to do tail-call elimination **only** when all the recursive calls are the last operation that the function would do in that branch. Any recursive calls not happening in those locations de-optimizes the function.
+The Elm compiler is able to do tail-call elimination **only** when all the recursive calls are the last operation that the function would do in a branch. Any recursive calls happening in other locations de-optimizes the function.
 
 Here are the locations when a recursive call may happen in:
 
   - branches of an if expression
   - branches of a case expression
-  - in the body of a let expression (but not the functions)
+  - in the body of a let expression
 
-only if each of the above appeared at the root of the function or in one of the above locations themselves.
+and only if each of the above appeared at the root of the function or in one of the above locations themselves.
 
 Following is a list of likely situations that will be reported.
 
@@ -99,7 +99,7 @@ The result of this function gets multiplied by `n`, making the recursive call no
         else
             factorial (n - 1) * n
 
-Hint: When you need to apply a function on the result of a recursive call, what you can often do is to add an argument holding the result value and apply the operations on it instead.
+Hint: When you need to apply an operation on the result of a recursive call, what you can do is to add an argument holding the result value and apply the operations on it instead.
 
     factorialHelp : Int -> Int -> Int
     factorialHelp n result =
@@ -107,9 +107,9 @@ Hint: When you need to apply a function on the result of a recursive call, what 
             result
 
         else
-            factorial (result * n) * n
+            factorial (result * n)
 
-And split the function into the one that will do recursive calls (above) and a "public-facing" function which will set the initial result value (below).
+and split the function into the one that will do recursive calls (above) and a "API-facing" function which will set the initial result value (below).
 
     factorial : Int -> Int
     factorial n =
@@ -118,7 +118,9 @@ And split the function into the one that will do recursive calls (above) and a "
 
 ### Calls using the |> or <| operators
 
-The following won't be optimized. The fix here is very easy, as you only need to remove the operator and use parentheses instead.
+Even though you may consider these operators as syntactic sugar for function calls, the compiler doesn't and
+the following won't be optimized. The compiler doesn't special-case these functions and considers them as operators just
+like `(*)` in the example above.
 
     fun n =
         if condition n then
@@ -133,6 +135,8 @@ The following won't be optimized. The fix here is very easy, as you only need to
 
         else
             n
+
+The fix here consists of converting the recursive calls to ones that don't use the operator.
 
 
 ### Calls appearing in || or && conditions
@@ -151,7 +155,7 @@ The following won't be optimized.
             ( p :: ps, x :: xs ) ->
                 p == x && isPrefixOf ps xs
 
-The fix here is very easy, as you only need to use if expressions instead.
+The fix here is consists of using if expressions instead.
 
     isPrefixOf : List a -> List a -> Bool
     isPrefixOf prefix list =
@@ -172,12 +176,17 @@ The fix here is very easy, as you only need to use if expressions instead.
 
 ### Calls from let declarations
 
+Calls from let functions won't be optimized.
+
     fun n =
         let
             funHelp y =
                 fun (y - 1)
         in
         funHelp n
+
+Note that recursive let functions can be optimized if they call themselves, but calling the parent function
+will cause the parent to not be optimized.
 
 -}
 
@@ -214,9 +223,6 @@ This comment has to appear on the line after the `=` that follows the declaratio
 comment only needs to contain the tag that you're choosing and that it is case-sensitive.
 The same will apply for functions defined in a let expression, since they can be tail-call optimized as well.
 
-I recommend toggling between the two configuration options while you're fixing/ignoring the existing issues, and to use the
-opt-out configuration afterwards.
-
 -}
 type Configuration
     = OptOut String
@@ -239,8 +245,13 @@ With the configuration above, the following function would not be reported.
         else
             n
 
+The reasons for allowing to opt-out is because sometimes recursive functions are simply not translatable to
+tail-call optimized ones, for instance the ones that need to recurse over multiple elements (`fun left + fun right`).
+
 I recommend to **not** default to ignoring a reported issue, and instead to discuss with your colleagues how to best
 solve the error when you encounter it or when you see them ignore an error.
+
+I recommend to use this configuration option as your permanent configuration once you have fixed or opted-out of every function.
 
 -}
 optOutWithComment : String -> Configuration
