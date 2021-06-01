@@ -38,14 +38,15 @@ view model =
 
         -- Lazy functions
         , workingLazy 1
-        , workingLazyWithLambda 1
         , workingLazyWithArgButStableReference 1
+        , workingLazyWith2Args 1 2
+        , workingLazyWith2ArgsButOneAlreadyApplied 1
+        , workingLazyWithLambda 1
         , workingLazyWithLetFunction 1
         , workingLazyUsingIf model 1
         , workingLazyWithPreappliedArguments 1
         , failingLazyWithArgAndUnstableReference 1 2
         , failingLazyWithArgumentAndLetFunction 1 2
-        , workingLazy .foo
         ]
 
 
@@ -79,6 +80,16 @@ viewNothing textToPrint _ =
 workingLazy : a -> Html msg
 workingLazy =
     Html.Lazy.lazy (viewNothing "SHOULD NOT BE PRINTED: workingLazy")
+
+
+workingLazyWith2Args : a -> b -> Html msg
+workingLazyWith2Args =
+    Html.Lazy.lazy2 (\_ -> viewNothing "SHOULD NOT BE PRINTED: workingLazyWith2Args")
+
+
+workingLazyWith2ArgsButOneAlreadyApplied : b -> Html msg
+workingLazyWith2ArgsButOneAlreadyApplied =
+    workingLazyWith2Args {}
 
 
 workingLazyWithLambda : a -> Html msg
