@@ -126,7 +126,7 @@ expressionVisitor node context =
         Expression.Application ((Node lazyRange (Expression.FunctionOrValue _ "lazy")) :: lazifiedFunction :: _) ->
             case ModuleNameLookupTable.moduleNameAt context.lookupTable lazyRange of
                 Just [ "Html", "Lazy" ] ->
-                    if context.functionHasNoArguments || isStableReference lazifiedFunction then
+                    if context.functionHasNoArguments || isStableReference context lazifiedFunction then
                         ( [], context )
 
                     else
@@ -146,8 +146,8 @@ expressionVisitor node context =
             ( [], context )
 
 
-isStableReference : Node Expression -> Bool
-isStableReference node =
+isStableReference : Context -> Node Expression -> Bool
+isStableReference context node =
     case Node.value node of
         Expression.FunctionOrValue _ _ ->
             True
