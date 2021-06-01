@@ -129,19 +129,23 @@ expressionVisitor node context =
         Expression.Application ((Node lazyRange (Expression.FunctionOrValue _ functionName)) :: lazifiedFunction :: _) ->
             if Set.member functionName lazyFunctionNames then
                 case ModuleNameLookupTable.moduleNameAt context.lookupTable lazyRange of
-                    Just [ "Html", "Lazy" ] ->
-                        if context.functionHasNoArguments || isStableReference context lazifiedFunction then
-                            ( [], context )
+                    Just moduleName ->
+                        if Set.member moduleName (Set.fromList [ [ "Html", "Lazy" ], [ "Svg", "Lazy" ] ]) then
+                            if context.functionHasNoArguments || isStableReference context lazifiedFunction then
+                                ( [], context )
+
+                            else
+                                ( [ Rule.error
+                                        { message = "Misuse of a lazy function"
+                                        , details = [ "The argument passed to the lazy function must be a stable reference, but a new reference will be created everytime this function is called." ]
+                                        }
+                                        lazyRange
+                                  ]
+                                , context
+                                )
 
                         else
-                            ( [ Rule.error
-                                    { message = "Misuse of a lazy function"
-                                    , details = [ "The argument passed to the lazy function must be a stable reference, but a new reference will be created everytime this function is called." ]
-                                    }
-                                    lazyRange
-                              ]
-                            , context
-                            )
+                            ( [], context )
 
                     _ ->
                         ( [], context )

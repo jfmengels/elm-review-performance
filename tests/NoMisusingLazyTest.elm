@@ -262,4 +262,21 @@ helper _ _ _ = text ""
                             , under = "Html.Lazy.lazy8"
                             }
                         ]
+        , test "should report an error when encountering problematic Svg.Lazy.lazy" <|
+            \() ->
+                """module A exposing (..)
+import Svg.Lazy
+a n =
+  Svg.Lazy.lazy (helper x)
+
+helper _ _ _ = text ""
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = message
+                            , details = details
+                            , under = "Svg.Lazy.lazy"
+                            }
+                        ]
         ]
