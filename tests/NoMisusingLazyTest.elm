@@ -30,9 +30,9 @@ helper _ = text ""
             \() ->
                 """module A exposing (..)
 a n =
-  Html.Lazy.lazy helper n
+  Html.Lazy.lazy (helper x) n
 
-helper _ = text ""
+helper _ _ = text ""
 """
                     |> Review.Test.runWithProjectData project rule
                     |> Review.Test.expectErrors
@@ -42,6 +42,16 @@ helper _ = text ""
                             , under = "Html.Lazy.lazy"
                             }
                         ]
+        , test "should not report for lazy functions with arguments but stable reference" <|
+            \() ->
+                """module A exposing (..)
+a n =
+  Html.Lazy.lazy helper n
+
+helper _ = text ""
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectNoErrors
         , test "should not report an error when lazy is not from one of the known supported libraries" <|
             \() ->
                 """module A exposing (..)
