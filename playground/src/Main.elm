@@ -43,6 +43,7 @@ view model =
         , workingLazyWithLetFunction 1
         , failingLazyWithArgAndUnstableReference 1 2
         , failingLazyWithArgumentAndLetFunction 1 2
+        , workingLazyUsingIf model 1
         ]
 
 
@@ -91,6 +92,26 @@ viewNothing_workingLazyWithArgButStableReference =
 workingLazyWithArgButStableReference : a -> Html msg
 workingLazyWithArgButStableReference a =
     Html.Lazy.lazy viewNothing_workingLazyWithArgButStableReference a
+
+
+viewNothing_ifLazy_Before3 : a -> Html msg
+viewNothing_ifLazy_Before3 =
+    viewNothing "SHOULD NOT BE PRINTED: workingLazyUsingIf before 3"
+
+
+viewNothing_ifLazy_After3 : a -> Html msg
+viewNothing_ifLazy_After3 =
+    viewNothing "SHOULD NOT BE PRINTED: workingLazyUsingIf after 3"
+
+
+workingLazyUsingIf : Int -> b -> Html msg
+workingLazyUsingIf n =
+    if n < 3 then
+        -- The reference to `viewNothing` is recomputed every time this function is called
+        Html.Lazy.lazy viewNothing_ifLazy_Before3
+
+    else
+        Html.Lazy.lazy viewNothing_ifLazy_After3
 
 
 failingLazyWithArgAndUnstableReference : a -> b -> Html msg
