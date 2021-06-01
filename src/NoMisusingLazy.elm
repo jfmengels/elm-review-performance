@@ -68,6 +68,7 @@ type alias Context =
     { lookupTable : ModuleNameLookupTable
     , topLevelFunctionNames : Set String
     , currentFunctionHasNoArguments : Bool
+    , lazyFunctions : Set ( ModuleName, String )
     }
 
 
@@ -78,6 +79,7 @@ initialContext =
             { lookupTable = lookupTable
             , topLevelFunctionNames = Set.empty
             , currentFunctionHasNoArguments = False
+            , lazyFunctions = Set.singleton ( [], "lazyView" )
             }
         )
         |> Rule.withModuleNameLookupTable
@@ -160,8 +162,9 @@ reportUnstableFunctionReference context functionRange lazyFunctionArgument =
         ]
 
 
+reportUnstableArgumentReferences : Context -> Range -> ModuleName -> String -> List (Node Expression) -> List (Rule.Error {})
 reportUnstableArgumentReferences context functionRange moduleName functionName arguments =
-    if not context.currentFunctionHasNoArguments && Set.member ( moduleName, functionName ) (Set.singleton ( [], "lazyView" )) then
+    if not context.currentFunctionHasNoArguments && Set.member ( moduleName, functionName ) context.lazyFunctions then
         arguments
             |> List.filter isArgumentANewReference
             |> List.map
