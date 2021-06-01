@@ -16,7 +16,7 @@ project =
 all : Test
 all =
     describe "NoMisusingLazy"
-        [ test "should not report for lazy functions without arguments" <|
+        [ test "should not report for lazy functions without arguments and stable reference" <|
             \() ->
                 """module A exposing (..)
 a =
@@ -47,16 +47,6 @@ helper _ _ = text ""
                 """module A exposing (..)
 a n =
   Html.Lazy.lazy helper n
-
-helper _ = text ""
-"""
-                    |> Review.Test.runWithProjectData project rule
-                    |> Review.Test.expectNoErrors
-        , test "should not report for lazy functions without arguments and unstable reference" <|
-            \() ->
-                """module A exposing (..)
-a n =
-  Html.Lazy.lazy (helper x) n
 
 helper _ = text ""
 """
