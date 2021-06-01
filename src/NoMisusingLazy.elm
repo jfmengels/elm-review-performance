@@ -130,22 +130,11 @@ declarationVisitor node context =
 expressionVisitor : Node Expression -> Context -> ( List (Rule.Error {}), Context )
 expressionVisitor node context =
     case Node.value node of
-        Expression.Application ((Node lazyRange (Expression.FunctionOrValue _ functionName)) :: lazifiedFunction :: _) ->
-            case ModuleNameLookupTable.moduleNameAt context.lookupTable lazyRange of
+        Expression.Application ((Node functionRange (Expression.FunctionOrValue _ functionName)) :: lazyFunctionArgument :: _) ->
+            case ModuleNameLookupTable.moduleNameAt context.lookupTable functionRange of
                 Just moduleName ->
                     if Set.member moduleName lazyModuleNames && Set.member functionName lazyFunctionNames then
-                        if context.currentFunctionHasNoArguments || isStableReference context lazifiedFunction then
-                            ( [], context )
-
-                        else
-                            ( [ Rule.error
-                                    { message = "Misuse of a lazy function"
-                                    , details = [ "The argument passed to the lazy function must be a stable reference, but a new reference will be created everytime this function is called." ]
-                                    }
-                                    lazyRange
-                              ]
-                            , context
-                            )
+                        ( reportUnstableFunctionReference context functionRange lazyFunctionArgument, context )
 
                     else
                         ( [], context )
@@ -155,6 +144,20 @@ expressionVisitor node context =
 
         _ ->
             ( [], context )
+
+
+reportUnstableFunctionReference : Context -> Range -> Node Expression -> List (Rule.Error {})
+reportUnstableFunctionReference context functionRange lazyFunctionArgument =
+    if context.currentFunctionHasNoArguments || isStableReference context lazyFunctionArgument then
+        []
+
+    else
+        [ Rule.error
+            { message = "Misuse of a lazy function"
+            , details = [ "The argument passed to the lazy function must be a stable reference, but a new reference will be created everytime this function is called." ]
+            }
+            functionRange
+        ]
 
 
 lazyModuleNames : Set ModuleName
