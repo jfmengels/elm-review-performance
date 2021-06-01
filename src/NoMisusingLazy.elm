@@ -61,6 +61,7 @@ rule =
 
 type alias Context =
     { lookupTable : ModuleNameLookupTable
+    , functionHasArguments : Bool
     }
 
 
@@ -69,6 +70,7 @@ initialContext =
     Rule.initContextCreator
         (\lookupTable () ->
             { lookupTable = lookupTable
+            , functionHasArguments = False
             }
         )
         |> Rule.withModuleNameLookupTable
