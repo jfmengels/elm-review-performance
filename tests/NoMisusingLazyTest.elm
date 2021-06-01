@@ -32,4 +32,16 @@ helper _ = text ""
                             , under = "Html.Lazy.lazy"
                             }
                         ]
+        , test "should not report an error when lazy is not from one of the known supported libraries" <|
+            \() ->
+                """module A exposing (..)
+a n =
+  lazy helper n
+
+lazy _ _ = text ""
+
+helper _ = text ""
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectNoErrors
         ]
