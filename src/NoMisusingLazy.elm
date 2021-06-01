@@ -135,7 +135,7 @@ expressionVisitor node context =
                     else
                         ( [ Rule.error
                                 { message = "Misuse of a lazy function"
-                                , details = [ "REPLACEME" ]
+                                , details = [ "The argument passed to the lazy function must be a stable reference, but a new reference will be created everytime this function is called." ]
                                 }
                                 lazyRange
                           ]

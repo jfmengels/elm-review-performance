@@ -7,6 +7,16 @@ import Review.Test.Dependencies
 import Test exposing (Test, describe, test)
 
 
+message : String
+message =
+    "Misuse of a lazy function"
+
+
+details : List String
+details =
+    [ "The argument passed to the lazy function must be a stable reference, but a new reference will be created everytime this function is called." ]
+
+
 project : Review.Project.Project
 project =
     Review.Test.Dependencies.projectWithElmCore
@@ -86,8 +96,8 @@ helper _ _ = text ""
                     |> Review.Test.runWithProjectData project rule
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = "Misuse of a lazy function"
-                            , details = [ "REPLACEME" ]
+                            { message = message
+                            , details = details
                             , under = "Html.Lazy.lazy"
                             }
                         ]
@@ -128,8 +138,8 @@ a n =
                     |> Review.Test.runWithProjectData project rule
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = "Misuse of a lazy function"
-                            , details = [ "REPLACEME" ]
+                            { message = message
+                            , details = details
                             , under = "Html.Lazy.lazy"
                             }
                         ]
