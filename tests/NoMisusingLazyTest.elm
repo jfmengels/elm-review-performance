@@ -62,6 +62,18 @@ a =
 """
                     |> Review.Test.runWithProjectData project rule
                     |> Review.Test.expectNoErrors
+        , test "should not report for lazy function with arguments and stable reference to other module" <|
+            \() ->
+                [ """module A exposing (..)
+import Html.Lazy
+import B
+a n =
+  Html.Lazy.lazy B.helper n
+""", """module B exposing (..)
+helper _ = text ""
+""" ]
+                    |> Review.Test.runOnModulesWithProjectData project rule
+                    |> Review.Test.expectNoErrors
         , test "should report an error when encountering Html.lazy with arguments and an unstable reference" <|
             \() ->
                 """module A exposing (..)

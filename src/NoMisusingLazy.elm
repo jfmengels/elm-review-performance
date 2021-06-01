@@ -151,7 +151,11 @@ isStableReference : Context -> Node Expression -> Bool
 isStableReference context node =
     case Node.value node of
         Expression.FunctionOrValue moduleName name ->
-            moduleName == [] && Set.member name context.topLevelFunctionNames
+            if moduleName == [] then
+                Set.member name context.topLevelFunctionNames
+
+            else
+                ModuleNameLookupTable.moduleNameFor context.lookupTable node /= Just []
 
         _ ->
             False
