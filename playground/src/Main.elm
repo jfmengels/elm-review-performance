@@ -39,7 +39,8 @@ view model =
         -- Lazy functions
         , workingLazy 1
         , workingLazyWithLambda 1
-        , failingLazy 1 2
+        , workingLazyWithArgButStableReference 1
+        , failingLazyWithArgAndUnstableReference 1 2
         ]
 
 
@@ -80,7 +81,17 @@ workingLazyWithLambda =
     Html.Lazy.lazy (\a -> viewNothing "SHOULD NOT BE PRINTED: workingLazyWithLambda" a)
 
 
-failingLazy : a -> b -> Html msg
-failingLazy _ =
-    -- The reference to `viewNothing` is recomputed every time
-    Html.Lazy.lazy (viewNothing "failingLazy")
+viewNothing_workingLazyWithArgButStableReference : a -> Html msg
+viewNothing_workingLazyWithArgButStableReference =
+    viewNothing "SHOULD NOT BE PRINTED: workingLazyWithArgButStableReference"
+
+
+workingLazyWithArgButStableReference : a -> Html msg
+workingLazyWithArgButStableReference a =
+    Html.Lazy.lazy viewNothing_workingLazyWithArgButStableReference a
+
+
+failingLazyWithArgAndUnstableReference : a -> b -> Html msg
+failingLazyWithArgAndUnstableReference _ =
+    -- The reference to `viewNothing` is recomputed every time this function is called
+    Html.Lazy.lazy (viewNothing "failingLazyWithArgAndUnstableReference")
