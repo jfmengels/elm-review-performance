@@ -53,6 +53,10 @@ header model =
         ]
 
 
+
+-- HELPER
+
+
 viewNothing : String -> a -> Html msg
 viewNothing textToPrint _ =
     let
@@ -60,6 +64,10 @@ viewNothing textToPrint _ =
             Debug.log textToPrint ()
     in
     Html.text ""
+
+
+
+-- LAZY VIEWS
 
 
 workingLazy : a -> Html msg
@@ -73,5 +81,6 @@ workingLazyWithLambda =
 
 
 failingLazy : a -> b -> Html msg
-failingLazy a =
+failingLazy _ =
+    -- The reference to `viewNothing` is recomputed every time
     Html.Lazy.lazy (viewNothing "failingLazy")
