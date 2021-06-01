@@ -6,8 +6,8 @@ module NoMisusingLazy exposing (rule)
 
 -}
 
-import Elm.Syntax.Expression exposing (Expression)
-import Elm.Syntax.Node as Node exposing (Node)
+import Elm.Syntax.Expression as Expression exposing (Expression)
+import Elm.Syntax.Node as Node exposing (Node(..))
 import Review.Rule as Rule exposing (Rule)
 
 
@@ -58,11 +58,16 @@ type alias Context =
 
 expressionVisitor : Node Expression -> Context -> ( List (Rule.Error {}), Context )
 expressionVisitor node context =
-    ( [ Rule.error
-            { message = "Misuse of a lazy function"
-            , details = [ "REPLACEME" ]
-            }
-            (Node.range node)
-      ]
-    , context
-    )
+    case Node.value node of
+        Expression.Application ((Node functionRange (Expression.FunctionOrValue _ "lazy")) :: _) ->
+            ( [ Rule.error
+                    { message = "Misuse of a lazy function"
+                    , details = [ "REPLACEME" ]
+                    }
+                    functionRange
+              ]
+            , context
+            )
+
+        _ ->
+            ( [], context )
