@@ -36,6 +36,16 @@ helper _ = text ""
 """
                     |> Review.Test.runWithProjectData project rule
                     |> Review.Test.expectNoErrors
+        , test "should not report for lazy function without arguments and lambda argument" <|
+            \() ->
+                """module A exposing (..)
+a =
+  Html.Lazy.lazy (\\_ -> helper) n
+
+helper _ = text ""
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectNoErrors
         , test "should report an error when encountering Html.lazy with arguments and an unstable reference" <|
             \() ->
                 """module A exposing (..)
