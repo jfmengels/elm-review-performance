@@ -91,8 +91,15 @@ declarationListVisitor declarations context =
         newContext : Context
         newContext =
             { context | topLevelFunctionNames = Set.fromList (List.filterMap topLevelFunctionNames declarations) }
+
+        lazyFunctions : Set ( ModuleName, String )
+        lazyFunctions =
+            declarations
+                |> List.filterMap (checkIfIsLazyFunction context.lookupTable)
+                |> List.map (Tuple.pair [])
+                |> Set.fromList
     in
-    ( [], newContext )
+    ( [], { newContext | lazyFunctions = Set.union lazyFunctions newContext.lazyFunctions } )
 
 
 topLevelFunctionNames : Node Declaration -> Maybe String
@@ -107,6 +114,62 @@ topLevelFunctionNames node =
 
         _ ->
             Nothing
+
+
+checkIfIsLazyFunction : ModuleNameLookupTable -> Node Declaration -> Maybe String
+checkIfIsLazyFunction lookupTable node =
+    case Node.value node of
+        Declaration.FunctionDeclaration function ->
+            let
+                declaration : Expression.FunctionImplementation
+                declaration =
+                    Node.value function.declaration
+            in
+            if checkIfReturnsLazyFunction lookupTable declaration.expression then
+                Just (Node.value declaration.name)
+
+            else
+                Nothing
+
+        _ ->
+            Nothing
+
+
+checkIfReturnsLazyFunction : ModuleNameLookupTable -> Node Expression -> Bool
+checkIfReturnsLazyFunction lookupTable node =
+    case Node.value node of
+        Expression.Application ((Node functionRange (Expression.FunctionOrValue _ functionName)) :: lazyFunctionArgument :: restOfArguments) ->
+            case ModuleNameLookupTable.moduleNameAt lookupTable functionRange of
+                Just moduleName ->
+                    Set.member moduleName lazyModuleNames && Set.member functionName lazyFunctionNames
+
+                Nothing ->
+                    False
+
+        Expression.OperatorApplication _ _ _ _ ->
+            -- TODO
+            False
+
+        Expression.ParenthesizedExpression expr ->
+            checkIfReturnsLazyFunction lookupTable expr
+
+        Expression.LetExpression { expression } ->
+            checkIfReturnsLazyFunction lookupTable expression
+
+        Expression.IfBlock _ _ _ ->
+            -- ???
+            False
+
+        Expression.CaseExpression caseBlock ->
+            -- ???
+            False
+
+        Expression.LambdaExpression lambda ->
+            -- ???
+            False
+
+        _ ->
+            False
 
 
 declarationVisitor : Node Declaration -> Context -> ( List nothing, Context )
