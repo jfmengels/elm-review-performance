@@ -180,12 +180,14 @@ reportUnstableArgumentReferences functionRange moduleName functionName arguments
 isArgumentANewReference : Node Expression -> Bool
 isArgumentANewReference node =
     case Node.value node of
-        -- TODO Handle parens
         Expression.RecordExpr _ ->
             True
 
         Expression.RecordUpdateExpression _ _ ->
             True
+
+        Expression.ParenthesizedExpression expr ->
+            isArgumentANewReference expr
 
         _ ->
             False
