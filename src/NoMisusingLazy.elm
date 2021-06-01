@@ -8,7 +8,9 @@ module NoMisusingLazy exposing (rule)
 
 import Elm.Syntax.Declaration as Declaration exposing (Declaration)
 import Elm.Syntax.Expression as Expression exposing (Expression)
+import Elm.Syntax.ModuleName exposing (ModuleName)
 import Elm.Syntax.Node as Node exposing (Node(..))
+import Elm.Syntax.Range exposing (Range)
 import Review.ModuleNameLookupTable as ModuleNameLookupTable exposing (ModuleNameLookupTable)
 import Review.Rule as Rule exposing (Rule)
 import Set exposing (Set)
@@ -151,11 +153,16 @@ isStableReference : Context -> Node Expression -> Bool
 isStableReference context node =
     case Node.value node of
         Expression.FunctionOrValue moduleName name ->
-            if moduleName == [] then
-                Set.member name context.topLevelFunctionNames
-
-            else
-                ModuleNameLookupTable.moduleNameFor context.lookupTable node /= Just []
+            isVariableFromLetDeclaration context (Node.range node) moduleName name
 
         _ ->
             False
+
+
+isVariableFromLetDeclaration : Context -> Range -> ModuleName -> String -> Bool
+isVariableFromLetDeclaration context range moduleName name =
+    if moduleName == [] then
+        Set.member name context.topLevelFunctionNames
+
+    else
+        ModuleNameLookupTable.moduleNameAt context.lookupTable range /= Just []
