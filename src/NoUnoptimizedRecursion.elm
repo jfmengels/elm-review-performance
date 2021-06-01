@@ -328,6 +328,10 @@ initialContext =
     }
 
 
+
+-- VISITORS
+
+
 commentsVisitor : Configuration -> List (Node String) -> Context -> ( List nothing, Context )
 commentsVisitor configuration comments context =
     let
