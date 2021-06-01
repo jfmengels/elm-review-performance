@@ -63,7 +63,7 @@ rule =
 
 type alias Context =
     { lookupTable : ModuleNameLookupTable
-    , functionHasArguments : Bool
+    , functionHasNoArguments : Bool
     }
 
 
@@ -72,7 +72,7 @@ initialContext =
     Rule.initContextCreator
         (\lookupTable () ->
             { lookupTable = lookupTable
-            , functionHasArguments = False
+            , functionHasNoArguments = False
             }
         )
         |> Rule.withModuleNameLookupTable
@@ -83,16 +83,15 @@ declarationVisitor node context =
     case Node.value node of
         Declaration.FunctionDeclaration function ->
             let
-                hasArguments : Bool
-                hasArguments =
+                hasNoArguments : Bool
+                hasNoArguments =
                     function.declaration
                         |> Node.value
                         |> .arguments
                         |> List.isEmpty
-                        |> not
             in
             ( []
-            , { context | functionHasArguments = hasArguments }
+            , { context | functionHasNoArguments = hasNoArguments }
             )
 
         _ ->
@@ -105,7 +104,10 @@ expressionVisitor node context =
         Expression.Application ((Node lazyRange (Expression.FunctionOrValue _ "lazy")) :: lazifiedFunction :: _) ->
             case ModuleNameLookupTable.moduleNameAt context.lookupTable lazyRange of
                 Just [ "Html", "Lazy" ] ->
-                    if context.functionHasArguments && not (isStableReference lazifiedFunction) then
+                    if context.functionHasNoArguments || isStableReference lazifiedFunction then
+                        ( [], context )
+
+                    else
                         ( [ Rule.error
                                 { message = "Misuse of a lazy function"
                                 , details = [ "REPLACEME" ]
@@ -114,9 +116,6 @@ expressionVisitor node context =
                           ]
                         , context
                         )
-
-                    else
-                        ( [], context )
 
                 _ ->
                     ( [], context )
