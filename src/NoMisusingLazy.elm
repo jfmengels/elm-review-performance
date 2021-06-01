@@ -161,12 +161,16 @@ reportUnstableFunctionReference context functionRange lazyFunctionArgument =
 
 
 reportUnstableArgumentReferences functionRange moduleName functionName arguments =
-    [ Rule.error
-        { message = "FOO"
-        , details = [ "BAR" ]
-        }
-        functionRange
-    ]
+    if Set.member ( moduleName, functionName ) Set.empty then
+        [ Rule.error
+            { message = "FOO"
+            , details = [ "BAR" ]
+            }
+            functionRange
+        ]
+
+    else
+        []
 
 
 lazyModuleNames : Set ModuleName
