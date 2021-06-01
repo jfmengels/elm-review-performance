@@ -11,6 +11,12 @@ import Elm.Syntax.Node as Node exposing (Node(..))
 import Review.Rule as Rule exposing (Rule)
 
 
+
+-- TODO Report lazy being used on its own
+-- TODO Handle calls through operators
+-- TODO SUpport Element.lazy, and other known lazy functions (https://klaftertief.github.io/elm-search/?q=lazy)
+
+
 {-| Reports... REPLACEME
 
     config =
