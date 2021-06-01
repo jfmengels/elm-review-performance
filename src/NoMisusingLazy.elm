@@ -6,6 +6,7 @@ module NoMisusingLazy exposing (rule)
 
 -}
 
+import Elm.Syntax.Declaration as Declaration exposing (Declaration)
 import Elm.Syntax.Expression as Expression exposing (Expression)
 import Elm.Syntax.Node as Node exposing (Node(..))
 import Review.ModuleNameLookupTable as ModuleNameLookupTable exposing (ModuleNameLookupTable)
@@ -55,6 +56,7 @@ elm-review --template jfmengels/elm-review-performance/example --rules NoMisusin
 rule : Rule
 rule =
     Rule.newModuleRuleSchemaUsingContextCreator "NoMisusingLazy" initialContext
+        |> Rule.withDeclarationEnterVisitor declarationVisitor
         |> Rule.withExpressionEnterVisitor expressionVisitor
         |> Rule.fromModuleRuleSchema
 
@@ -74,6 +76,27 @@ initialContext =
             }
         )
         |> Rule.withModuleNameLookupTable
+
+
+declarationVisitor : Node Declaration -> Context -> ( List nothing, Context )
+declarationVisitor node context =
+    case Node.value node of
+        Declaration.FunctionDeclaration function ->
+            let
+                hasArguments : Bool
+                hasArguments =
+                    function.declaration
+                        |> Node.value
+                        |> .arguments
+                        |> List.isEmpty
+                        |> not
+            in
+            ( []
+            , { context | functionHasArguments = hasArguments }
+            )
+
+        _ ->
+            ( [], context )
 
 
 expressionVisitor : Node Expression -> Context -> ( List (Rule.Error {}), Context )
