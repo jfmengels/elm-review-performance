@@ -5,6 +5,7 @@ Provides [`elm-review`](https://package.elm-lang.org/packages/jfmengels/elm-revi
 
 ## Provided rules
 
+- [`NoMisusingLazy`](https://package.elm-lang.org/packages/jfmengels/elm-review-performance/1.0.1/NoMisusingLazy) - Reports REPLACEME.
 - [`NoUnoptimizedRecursion`](https://package.elm-lang.org/packages/jfmengels/elm-review-performance/1.0.1/NoUnoptimizedRecursion) - Reports recursive functions that are not [tail-call optimized](https://functional-programming-in-elm.netlify.app/recursion/tail-call-elimination.html).
 
 
@@ -13,12 +14,14 @@ Provides [`elm-review`](https://package.elm-lang.org/packages/jfmengels/elm-revi
 ```elm
 module ReviewConfig exposing (config)
 
+import NoMisusingLazy
 import NoUnoptimizedRecursion
 import Review.Rule exposing (Rule)
 
 config : List Rule
 config =
     [ NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optOutWithComment "IGNORE TCO")
+    , NoMisusingLazy.rule
     ]
 ```
 

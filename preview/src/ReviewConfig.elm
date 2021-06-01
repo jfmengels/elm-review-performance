@@ -11,6 +11,7 @@ when inside the directory containing this file.
 
 -}
 
+import NoMisusingLazy
 import NoUnoptimizedRecursion
 import Review.Rule exposing (Rule)
 
@@ -18,4 +19,5 @@ import Review.Rule exposing (Rule)
 config : List Rule
 config =
     [ NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optOutWithComment "IGNORE TCO")
+    , NoMisusingLazy.rule
     ]
