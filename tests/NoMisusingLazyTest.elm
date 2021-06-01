@@ -117,9 +117,7 @@ helper _ = text ""
                 """module A exposing (..)
 a n =
   lazy helper n
-
 lazy _ _ = text ""
-
 helper _ = text ""
 """
                     |> Review.Test.runWithProjectData project rule
@@ -133,7 +131,6 @@ a n =
     helper _ _ = text ""
   in
   Html.Lazy.lazy helper n
-
 """
                     |> Review.Test.runWithProjectData project rule
                     |> Review.Test.expectErrors
@@ -149,7 +146,6 @@ a n =
 import Html.Lazy
 a n =
   Html.Lazy.lazy2 (helper x)
-
 helper _ _ _ = text ""
 """
                     |> Review.Test.runWithProjectData project rule
@@ -166,7 +162,6 @@ helper _ _ _ = text ""
 import Html.Lazy
 a n =
   Html.Lazy.lazy3 (helper x)
-
 helper _ _ _ = text ""
 """
                     |> Review.Test.runWithProjectData project rule
@@ -183,7 +178,6 @@ helper _ _ _ = text ""
 import Html.Lazy
 a n =
   Html.Lazy.lazy4 (helper x)
-
 helper _ _ _ = text ""
 """
                     |> Review.Test.runWithProjectData project rule
@@ -200,7 +194,6 @@ helper _ _ _ = text ""
 import Html.Lazy
 a n =
   Html.Lazy.lazy5 (helper x)
-
 helper _ _ _ = text ""
 """
                     |> Review.Test.runWithProjectData project rule
@@ -217,7 +210,6 @@ helper _ _ _ = text ""
 import Html.Lazy
 a n =
   Html.Lazy.lazy6 (helper x)
-
 helper _ _ _ = text ""
 """
                     |> Review.Test.runWithProjectData project rule
@@ -234,7 +226,6 @@ helper _ _ _ = text ""
 import Html.Lazy
 a n =
   Html.Lazy.lazy7 (helper x)
-
 helper _ _ _ = text ""
 """
                     |> Review.Test.runWithProjectData project rule
@@ -251,7 +242,6 @@ helper _ _ _ = text ""
 import Html.Lazy
 a n =
   Html.Lazy.lazy8 (helper x)
-
 helper _ _ _ = text ""
 """
                     |> Review.Test.runWithProjectData project rule
@@ -268,7 +258,6 @@ helper _ _ _ = text ""
 import Svg.Lazy
 a n =
   Svg.Lazy.lazy (helper x)
-
 helper _ _ _ = text ""
 """
                     |> Review.Test.runWithProjectData project rule
@@ -277,6 +266,22 @@ helper _ _ _ = text ""
                             { message = message
                             , details = details
                             , under = "Svg.Lazy.lazy"
+                            }
+                        ]
+        , test "should report an error when encountering problematic VirtualDom.lazy" <|
+            \() ->
+                """module A exposing (..)
+import VirtualDom
+a n =
+  VirtualDom.lazy (helper x)
+helper _ _ _ = text ""
+"""
+                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = message
+                            , details = details
+                            , under = "VirtualDom.lazy"
                             }
                         ]
         ]

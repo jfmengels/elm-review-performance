@@ -162,6 +162,7 @@ lazyModuleNames =
     Set.fromList
         [ [ "Html", "Lazy" ]
         , [ "Svg", "Lazy" ]
+        , [ "VirtualDom" ]
         ]
 
 
