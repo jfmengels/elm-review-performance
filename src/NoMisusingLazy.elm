@@ -11,6 +11,7 @@ import Elm.Syntax.Expression as Expression exposing (Expression)
 import Elm.Syntax.Node as Node exposing (Node(..))
 import Review.ModuleNameLookupTable as ModuleNameLookupTable exposing (ModuleNameLookupTable)
 import Review.Rule as Rule exposing (Rule)
+import Set exposing (Set)
 
 
 
@@ -63,6 +64,7 @@ rule =
 
 type alias Context =
     { lookupTable : ModuleNameLookupTable
+    , topLevelFunctionNames : Set String
     , functionHasNoArguments : Bool
     }
 
@@ -72,10 +74,30 @@ initialContext =
     Rule.initContextCreator
         (\lookupTable () ->
             { lookupTable = lookupTable
+            , topLevelFunctionNames = Set.empty
             , functionHasNoArguments = False
             }
         )
         |> Rule.withModuleNameLookupTable
+
+
+declarationListVisitor : List (Node Declaration) -> Context -> ( List nothing, Context )
+declarationListVisitor declarations context =
+    ( [], { context | topLevelFunctionNames = Set.fromList (List.filterMap topLevelFunctionNames declarations) } )
+
+
+topLevelFunctionNames : Node Declaration -> Maybe String
+topLevelFunctionNames node =
+    case Node.value node of
+        Declaration.FunctionDeclaration function ->
+            function.declaration
+                |> Node.value
+                |> .name
+                |> Node.value
+                |> Just
+
+        _ ->
+            Nothing
 
 
 declarationVisitor : Node Declaration -> Context -> ( List nothing, Context )
