@@ -56,6 +56,6 @@ type alias Context =
     ()
 
 
-expressionVisitor : Node Expression -> Context -> ( List nothing, Context )
+expressionVisitor : Node Expression -> Context -> ( List (Rule.Error {}), Context )
 expressionVisitor node context =
     ( [], context )
