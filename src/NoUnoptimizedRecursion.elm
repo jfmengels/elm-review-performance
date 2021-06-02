@@ -307,7 +307,8 @@ type alias Context =
     , parentScopes : List ( Range, Scope )
     , parentNames : Set String
     , comments : Set Int
-    , deOptimization : Maybe { reason : List String, range : Range }
+    , deOptimizationRange : Maybe Range
+    , deOptimizationReason : List String
     }
 
 
@@ -326,7 +327,8 @@ initialContext =
     , parentScopes = []
     , parentNames = Set.empty
     , comments = Set.empty
-    , deOptimization = Nothing
+    , deOptimizationRange = Nothing
+    , deOptimizationReason = []
     }
 
 
@@ -381,7 +383,8 @@ declarationVisitor configuration node context =
               , parentScopes = []
               , parentNames = Set.empty
               , comments = context.comments
-              , deOptimization = Nothing
+              , deOptimizationRange = Nothing
+              , deOptimizationReason = []
               }
             )
 
@@ -410,7 +413,8 @@ expressionEnterVisitor configuration node context =
                                 :: context.parentScopes
                         , parentNames = Set.insert context.currentFunctionName context.parentNames
                         , comments = context.comments
-                        , deOptimization = context.deOptimization
+                        , deOptimizationRange = context.deOptimizationRange
+                        , deOptimizationReason = context.deOptimizationReason
                         }
 
                     else
@@ -428,15 +432,7 @@ reportRecursiveCallInNonAllowedLocation node context =
     case Node.value node of
         Expression.FunctionOrValue [] name ->
             if name == context.currentFunctionName then
-                [ error (Node.range node)
-                    (case context.deOptimization of
-                        Just { reason } ->
-                            reason
-
-                        Nothing ->
-                            []
-                    )
-                ]
+                [ error (Node.range node) context.deOptimizationReason ]
 
             else
                 []
@@ -476,21 +472,15 @@ addAllowedLocation configuration node context =
         Expression.Application (function :: _) ->
             { context
                 | tcoLocations = Node.range function :: context.tcoLocations
-                , deOptimization =
-                    Just
-                        { range = Node.range node
-                        , reason = [ "Among other possible reasons, you are applying operations on the result of recursive call. The recursive call should be the last thing to happen in this branch." ]
-                        }
+                , deOptimizationRange = Just (Node.range node)
+                , deOptimizationReason = [ "Among other possible reasons, you are applying operations on the result of recursive call. The recursive call should be the last thing to happen in this branch." ]
             }
 
         Expression.IfBlock condition thenBranch elseBranch ->
             { context
                 | tcoLocations = Node.range thenBranch :: Node.range elseBranch :: context.tcoLocations
-                , deOptimization =
-                    Just
-                        { range = Node.range condition
-                        , reason = [ "Among other possible reasons, the recursive call should not appear inside an if condition." ]
-                        }
+                , deOptimizationRange = Just (Node.range condition)
+                , deOptimizationReason = [ "Among other possible reasons, the recursive call should not appear inside an if condition." ]
             }
 
         Expression.LetExpression { declarations, expression } ->
@@ -550,91 +540,64 @@ addAllowedLocation configuration node context =
             in
             { context
                 | tcoLocations = caseBodies ++ context.tcoLocations
-                , deOptimization =
-                    Just
-                        { range = Node.range node
-                        , reason = [ "Among other possible reasons, the recursive call should not appear in the pattern to evaluate for a case expression." ]
-                        }
+                , deOptimizationRange = Just (Node.range node)
+                , deOptimizationReason = [ "Among other possible reasons, the recursive call should not appear in the pattern to evaluate for a case expression." ]
             }
 
         Expression.OperatorApplication operator _ _ _ ->
             { context
-                | deOptimization =
-                    Just
-                        { range = Node.range node
-                        , reason =
-                            List.filterMap identity
-                                [ Just "Among other possible reasons, you are applying operations on the result of recursive call. The recursive call should be the last thing to happen in this branch."
-                                , if operator == "<|" || operator == "|>" then
-                                    Just ("Removing the usage of `" ++ operator ++ "` may fix the issue here.")
+                | deOptimizationRange = Just (Node.range node)
+                , deOptimizationReason =
+                    List.filterMap identity
+                        [ Just "Among other possible reasons, you are applying operations on the result of recursive call. The recursive call should be the last thing to happen in this branch."
+                        , if operator == "<|" || operator == "|>" then
+                            Just ("Removing the usage of `" ++ operator ++ "` may fix the issue here.")
 
-                                  else
-                                    Nothing
-                                ]
-                        }
+                          else
+                            Nothing
+                        ]
             }
 
         Expression.Negation _ ->
             { context
-                | deOptimization =
-                    Just
-                        { range = Node.range node
-                        , reason = [ "Among other possible reasons, you are applying operations on the result of recursive call. The recursive call should be the last thing to happen in this branch." ]
-                        }
+                | deOptimizationRange = Just (Node.range node)
+                , deOptimizationReason = [ "Among other possible reasons, you are applying operations on the result of recursive call. The recursive call should be the last thing to happen in this branch." ]
             }
 
         Expression.TupledExpression _ ->
             { context
-                | deOptimization =
-                    Just
-                        { range = Node.range node
-                        , reason = [ "Among other possible reasons, you are storing the result of recursive call inside a tuple. The recursive call should be the last thing to happen in this branch." ]
-                        }
+                | deOptimizationRange = Just (Node.range node)
+                , deOptimizationReason = [ "Among other possible reasons, you are storing the result of recursive call inside a tuple. The recursive call should be the last thing to happen in this branch." ]
             }
 
         Expression.ListExpr _ ->
             { context
-                | deOptimization =
-                    Just
-                        { range = Node.range node
-                        , reason = [ "Among other possible reasons, you are storing the result of recursive call inside a list. The recursive call should be the last thing to happen in this branch." ]
-                        }
+                | deOptimizationRange = Just (Node.range node)
+                , deOptimizationReason = [ "Among other possible reasons, you are storing the result of recursive call inside a list. The recursive call should be the last thing to happen in this branch." ]
             }
 
         Expression.RecordExpr _ ->
             { context
-                | deOptimization =
-                    Just
-                        { range = Node.range node
-                        , reason = [ "Among other possible reasons, you are storing the result of recursive call inside a record. The recursive call should be the last thing to happen in this branch." ]
-                        }
+                | deOptimizationRange = Just (Node.range node)
+                , deOptimizationReason = [ "Among other possible reasons, you are storing the result of recursive call inside a record. The recursive call should be the last thing to happen in this branch." ]
             }
 
         Expression.RecordUpdateExpression _ _ ->
             { context
-                | deOptimization =
-                    Just
-                        { range = Node.range node
-                        , reason = [ "Among other possible reasons, you are storing the result of recursive call inside a record. The recursive call should be the last thing to happen in this branch." ]
-                        }
+                | deOptimizationRange = Just (Node.range node)
+                , deOptimizationReason = [ "Among other possible reasons, you are storing the result of recursive call inside a record. The recursive call should be the last thing to happen in this branch." ]
             }
 
         Expression.RecordAccess _ _ ->
             { context
-                | deOptimization =
-                    Just
-                        { range = Node.range node
-                        , reason = [ "Among other possible reasons, you are accessing a field on the result of recursive call. The recursive call should be the last thing to happen in this branch." ]
-                        }
+                | deOptimizationRange = Just (Node.range node)
+                , deOptimizationReason = [ "Among other possible reasons, you are accessing a field on the result of recursive call. The recursive call should be the last thing to happen in this branch." ]
             }
 
         Expression.LambdaExpression _ ->
             { context
-                | deOptimization =
-                    Just
-                        { range = Node.range node
-                        , reason = [ "Among other possible reasons, the recursive call should not appear inside an anonymous function." ]
-                        }
+                | deOptimizationRange = Just (Node.range node)
+                , deOptimizationReason = [ "Among other possible reasons, the recursive call should not appear inside an anonymous function." ]
             }
 
         _ ->
@@ -645,28 +608,34 @@ expressionExitVisitor : Node Expression -> Context -> ( List nothing, Context )
 expressionExitVisitor node context =
     case context.parentScopes of
         [] ->
-            ( [], context )
+            ( [], removeDeOptimizationRangeIfNeeded node context )
 
         ( headRange, headScope ) :: restOfParentScopes ->
             if headRange == Node.range node then
                 ( []
-                , { currentFunctionName = headScope.currentFunctionName
-                  , tcoLocations = headScope.tcoLocations
-                  , newScopesForLet = headScope.newScopes
-                  , parentScopes = restOfParentScopes
-                  , parentNames = Set.remove headScope.currentFunctionName context.parentNames
-                  , comments = context.comments
-                  , deOptimization =
-                        if Just headRange == Maybe.map .range context.deOptimization then
-                            Nothing
-
-                        else
-                            context.deOptimization
-                  }
+                , removeDeOptimizationRangeIfNeeded node
+                    { currentFunctionName = headScope.currentFunctionName
+                    , tcoLocations = headScope.tcoLocations
+                    , newScopesForLet = headScope.newScopes
+                    , parentScopes = restOfParentScopes
+                    , parentNames = Set.remove headScope.currentFunctionName context.parentNames
+                    , comments = context.comments
+                    , deOptimizationRange = context.deOptimizationRange
+                    , deOptimizationReason = context.deOptimizationReason
+                    }
                 )
 
             else
-                ( [], context )
+                ( [], removeDeOptimizationRangeIfNeeded node context )
+
+
+removeDeOptimizationRangeIfNeeded : Node Expression -> Context -> Context
+removeDeOptimizationRangeIfNeeded node context =
+    if Just (Node.range node) == context.deOptimizationRange then
+        { context | deOptimizationRange = Nothing }
+
+    else
+        context
 
 
 isInTcoLocation : Context -> Range -> Bool
