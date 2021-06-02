@@ -603,7 +603,13 @@ addAllowedLocation configuration node context =
             }
 
         Expression.LambdaExpression _ ->
-            context
+            { context
+                | deOptimization =
+                    Just
+                        { range = Node.range node
+                        , reason = [ "Among maybe other reasons, the recursive call should not appear inside an anonymous function." ]
+                        }
+            }
 
         Expression.RecordExpr _ ->
             context
