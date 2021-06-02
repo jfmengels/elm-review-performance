@@ -612,7 +612,13 @@ addAllowedLocation configuration node context =
             }
 
         Expression.RecordUpdateExpression _ _ ->
-            context
+            { context
+                | deOptimization =
+                    Just
+                        { range = Node.range node
+                        , reason = [ "Among maybe other reasons, you are storing the result of recursive call inside a record, when the recursive call should be the last thing to happen in this branch." ]
+                        }
+            }
 
         Expression.RecordAccess _ _ ->
             context
