@@ -102,7 +102,11 @@ fun x =
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
-                            , details = details
+                            , details =
+                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
+                                , "Among maybe other reasons, the recursive call should not appear in the pattern to evaluate for a case expression."
+                                , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
+                                ]
                             , under = "fun"
                             }
                             |> Review.Test.atExactly { start = { row = 3, column = 8 }, end = { row = 3, column = 11 } }

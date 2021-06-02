@@ -542,7 +542,14 @@ addAllowedLocation configuration node context =
                 caseBodies =
                     List.map (Tuple.second >> Node.range) cases
             in
-            { context | tcoLocations = caseBodies ++ context.tcoLocations }
+            { context
+                | tcoLocations = caseBodies ++ context.tcoLocations
+                , deOptimization =
+                    Just
+                        { range = Node.range node
+                        , reason = [ "Among maybe other reasons, the recursive call should not appear in the pattern to evaluate for a case expression." ]
+                        }
+            }
 
         Expression.OperatorApplication operator _ _ _ ->
             { context
