@@ -621,7 +621,13 @@ addAllowedLocation configuration node context =
             }
 
         Expression.RecordAccess _ _ ->
-            context
+            { context
+                | deOptimization =
+                    Just
+                        { range = Node.range node
+                        , reason = [ "Among maybe other reasons, it seems you're accessing a field on the result of recursive call, when the recursive call should be the last thing to happen in this branch." ]
+                        }
+            }
 
         Expression.LambdaExpression _ ->
             { context
