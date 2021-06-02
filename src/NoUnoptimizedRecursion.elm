@@ -89,7 +89,7 @@ Following is a list of likely situations that will be reported.
 
 ### An operation is applied on the result of a function call
 
-The result of this function gets multiplied by `n`, making the recursive call not the last thing to happen in this branch.
+The result of this recursive call gets multiplied by `n`, making the recursive call not the last thing to happen in this branch.
 
     factorial : Int -> Int
     factorial n =
@@ -107,9 +107,9 @@ Hint: When you need to apply an operation on the result of a recursive call, wha
             result
 
         else
-            factorial (result * n)
+            factorialHelp (result * n)
 
-and split the function into the one that will do recursive calls (above) and a "API-facing" function which will set the initial result value (below).
+and split the function into the one that will do recursive calls (above) and an "API-facing" function which will set the initial result value (below).
 
     factorial : Int -> Int
     factorial n =
@@ -136,7 +136,7 @@ like `(*)` in the example above.
         else
             n
 
-The fix here consists of converting the recursive calls to ones that don't use the operator.
+The fix here consists of converting the recursive calls to ones that don't use a pipe operator.
 
 
 ### Calls appearing in || or && conditions
