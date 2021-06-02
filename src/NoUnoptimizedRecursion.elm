@@ -575,17 +575,23 @@ addAllowedLocation configuration node context =
                         }
             }
 
-        Expression.Negation expr ->
+        Expression.Negation _ ->
             { context
                 | deOptimization =
                     Just
-                        { range = Node.range expr
+                        { range = Node.range node
                         , reason = [ "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch." ]
                         }
             }
 
         Expression.TupledExpression _ ->
-            context
+            { context
+                | deOptimization =
+                    Just
+                        { range = Node.range node
+                        , reason = [ "Among maybe other reasons, you are storing the result of recursive call inside a tuple, when the recursive call should be the last thing to happen in this branch." ]
+                        }
+            }
 
         Expression.LambdaExpression _ ->
             context
