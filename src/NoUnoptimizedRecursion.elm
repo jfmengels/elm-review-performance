@@ -450,7 +450,7 @@ reportReferencesToParentFunctions node context =
     case Node.value node of
         Expression.Application ((Node funcRange (Expression.FunctionOrValue [] name)) :: _) ->
             if Set.member name context.parentNames then
-                [ error funcRange [ "Among maybe other reasons, the recursive call should not appear inside a let declaration." ] ]
+                [ error funcRange [ "Among other possible reasons, the recursive call should not appear inside a let declaration." ] ]
 
             else
                 []
@@ -462,10 +462,9 @@ reportReferencesToParentFunctions node context =
 error : Range -> List String -> Rule.Error {}
 error range additionalDetails =
     Rule.error
-        { message = "Recursive function is not tail-call optimized"
+        { message = "This function cannot be tail-call optimized"
         , details =
-            "The way this function is called recursively here prevents the function from being tail-call optimized."
-                :: additionalDetails
+            additionalDetails
                 ++ [ "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail" ]
         }
         range
@@ -480,7 +479,7 @@ addAllowedLocation configuration node context =
                 , deOptimization =
                     Just
                         { range = Node.range node
-                        , reason = [ "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch." ]
+                        , reason = [ "Among other possible reasons, you are applying operations on the result of recursive call. The recursive call should be the last thing to happen in this branch." ]
                         }
             }
 
@@ -490,7 +489,7 @@ addAllowedLocation configuration node context =
                 , deOptimization =
                     Just
                         { range = Node.range condition
-                        , reason = [ "Among maybe other reasons, the recursive call should not appear inside an if condition." ]
+                        , reason = [ "Among other possible reasons, the recursive call should not appear inside an if condition." ]
                         }
             }
 
@@ -554,7 +553,7 @@ addAllowedLocation configuration node context =
                 , deOptimization =
                     Just
                         { range = Node.range node
-                        , reason = [ "Among maybe other reasons, the recursive call should not appear in the pattern to evaluate for a case expression." ]
+                        , reason = [ "Among other possible reasons, the recursive call should not appear in the pattern to evaluate for a case expression." ]
                         }
             }
 
@@ -565,7 +564,7 @@ addAllowedLocation configuration node context =
                         { range = Node.range node
                         , reason =
                             List.filterMap identity
-                                [ Just "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                [ Just "Among other possible reasons, you are applying operations on the result of recursive call. The recursive call should be the last thing to happen in this branch."
                                 , if operator == "<|" || operator == "|>" then
                                     Just ("Removing the usage of `" ++ operator ++ "` may fix the issue here.")
 
@@ -580,7 +579,7 @@ addAllowedLocation configuration node context =
                 | deOptimization =
                     Just
                         { range = Node.range node
-                        , reason = [ "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch." ]
+                        , reason = [ "Among other possible reasons, you are applying operations on the result of recursive call. The recursive call should be the last thing to happen in this branch." ]
                         }
             }
 
@@ -589,7 +588,7 @@ addAllowedLocation configuration node context =
                 | deOptimization =
                     Just
                         { range = Node.range node
-                        , reason = [ "Among maybe other reasons, you are storing the result of recursive call inside a tuple, when the recursive call should be the last thing to happen in this branch." ]
+                        , reason = [ "Among other possible reasons, you are storing the result of recursive call inside a tuple. The recursive call should be the last thing to happen in this branch." ]
                         }
             }
 
@@ -598,7 +597,7 @@ addAllowedLocation configuration node context =
                 | deOptimization =
                     Just
                         { range = Node.range node
-                        , reason = [ "Among maybe other reasons, you are storing the result of recursive call inside a list, when the recursive call should be the last thing to happen in this branch." ]
+                        , reason = [ "Among other possible reasons, you are storing the result of recursive call inside a list. The recursive call should be the last thing to happen in this branch." ]
                         }
             }
 
@@ -607,7 +606,7 @@ addAllowedLocation configuration node context =
                 | deOptimization =
                     Just
                         { range = Node.range node
-                        , reason = [ "Among maybe other reasons, you are storing the result of recursive call inside a record, when the recursive call should be the last thing to happen in this branch." ]
+                        , reason = [ "Among other possible reasons, you are storing the result of recursive call inside a record. The recursive call should be the last thing to happen in this branch." ]
                         }
             }
 
@@ -616,7 +615,7 @@ addAllowedLocation configuration node context =
                 | deOptimization =
                     Just
                         { range = Node.range node
-                        , reason = [ "Among maybe other reasons, you are storing the result of recursive call inside a record, when the recursive call should be the last thing to happen in this branch." ]
+                        , reason = [ "Among other possible reasons, you are storing the result of recursive call inside a record. The recursive call should be the last thing to happen in this branch." ]
                         }
             }
 
@@ -625,7 +624,7 @@ addAllowedLocation configuration node context =
                 | deOptimization =
                     Just
                         { range = Node.range node
-                        , reason = [ "Among maybe other reasons, it seems you're accessing a field on the result of recursive call, when the recursive call should be the last thing to happen in this branch." ]
+                        , reason = [ "Among other possible reasons, you are accessing a field on the result of recursive call. The recursive call should be the last thing to happen in this branch." ]
                         }
             }
 
@@ -634,7 +633,7 @@ addAllowedLocation configuration node context =
                 | deOptimization =
                     Just
                         { range = Node.range node
-                        , reason = [ "Among maybe other reasons, the recursive call should not appear inside an anonymous function." ]
+                        , reason = [ "Among other possible reasons, the recursive call should not appear inside an anonymous function." ]
                         }
             }
 

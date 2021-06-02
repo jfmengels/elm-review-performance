@@ -7,7 +7,7 @@ import Test exposing (Test, describe, test)
 
 message : String
 message =
-    "Recursive function is not tail-call optimized"
+    "This function cannot be tail-call optimized"
 
 
 all : Test
@@ -32,8 +32,7 @@ fun x =
                         [ Review.Test.error
                             { message = message
                             , details =
-                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-                                , "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                [ "Among other possible reasons, you are applying operations on the result of recursive call. The recursive call should be the last thing to happen in this branch."
                                 , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
                                 ]
                             , under = "fun"
@@ -73,8 +72,7 @@ fun x =
                         [ Review.Test.error
                             { message = message
                             , details =
-                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-                                , "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                [ "Among other possible reasons, you are applying operations on the result of recursive call. The recursive call should be the last thing to happen in this branch."
                                 , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
                                 ]
                             , under = "fun"
@@ -95,8 +93,7 @@ fun x =
                         [ Review.Test.error
                             { message = message
                             , details =
-                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-                                , "Among maybe other reasons, the recursive call should not appear inside an if condition."
+                                [ "Among other possible reasons, the recursive call should not appear inside an if condition."
                                 , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
                                 ]
                             , under = "fun"
@@ -114,8 +111,7 @@ fun x =
                         [ Review.Test.error
                             { message = message
                             , details =
-                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-                                , "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                [ "Among other possible reasons, you are applying operations on the result of recursive call. The recursive call should be the last thing to happen in this branch."
                                 , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
                                 ]
                             , under = "fun"
@@ -133,8 +129,7 @@ fun x =
                         [ Review.Test.error
                             { message = message
                             , details =
-                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-                                , "Among maybe other reasons, it seems you're accessing a field on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                [ "Among other possible reasons, you are accessing a field on the result of recursive call. The recursive call should be the last thing to happen in this branch."
                                 , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
                                 ]
                             , under = "fun"
@@ -152,8 +147,7 @@ fun x =
                         [ Review.Test.error
                             { message = message
                             , details =
-                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-                                , "Among maybe other reasons, you are storing the result of recursive call inside a tuple, when the recursive call should be the last thing to happen in this branch."
+                                [ "Among other possible reasons, you are storing the result of recursive call inside a tuple. The recursive call should be the last thing to happen in this branch."
                                 , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
                                 ]
                             , under = "fun"
@@ -171,8 +165,7 @@ fun x =
                         [ Review.Test.error
                             { message = message
                             , details =
-                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-                                , "Among maybe other reasons, you are storing the result of recursive call inside a list, when the recursive call should be the last thing to happen in this branch."
+                                [ "Among other possible reasons, you are storing the result of recursive call inside a list. The recursive call should be the last thing to happen in this branch."
                                 , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
                                 ]
                             , under = "fun"
@@ -190,8 +183,7 @@ fun x =
                         [ Review.Test.error
                             { message = message
                             , details =
-                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-                                , "Among maybe other reasons, you are storing the result of recursive call inside a record, when the recursive call should be the last thing to happen in this branch."
+                                [ "Among other possible reasons, you are storing the result of recursive call inside a record. The recursive call should be the last thing to happen in this branch."
                                 , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
                                 ]
                             , under = "fun"
@@ -209,8 +201,7 @@ fun x =
                         [ Review.Test.error
                             { message = message
                             , details =
-                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-                                , "Among maybe other reasons, you are storing the result of recursive call inside a record, when the recursive call should be the last thing to happen in this branch."
+                                [ "Among other possible reasons, you are storing the result of recursive call inside a record. The recursive call should be the last thing to happen in this branch."
                                 , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
                                 ]
                             , under = "fun"
@@ -229,8 +220,7 @@ fun x =
                         [ Review.Test.error
                             { message = message
                             , details =
-                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-                                , "Among maybe other reasons, the recursive call should not appear in the pattern to evaluate for a case expression."
+                                [ "Among other possible reasons, the recursive call should not appear in the pattern to evaluate for a case expression."
                                 , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
                                 ]
                             , under = "fun"
@@ -272,8 +262,7 @@ fun x =
                         [ Review.Test.error
                             { message = message
                             , details =
-                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-                                , "Among maybe other reasons, the recursive call should not appear inside a let declaration."
+                                [ "Among other possible reasons, the recursive call should not appear inside a let declaration."
                                 , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
                                 ]
                             , under = "fun"
@@ -299,8 +288,7 @@ fun n =
                         [ Review.Test.error
                             { message = message
                             , details =
-                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-                                , "Among maybe other reasons, the recursive call should not appear inside an anonymous function."
+                                [ "Among other possible reasons, the recursive call should not appear inside an anonymous function."
                                 , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
                                 ]
                             , under = "fun"
@@ -323,8 +311,7 @@ fun x n =
                         [ Review.Test.error
                             { message = message
                             , details =
-                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-                                , "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                [ "Among other possible reasons, you are applying operations on the result of recursive call. The recursive call should be the last thing to happen in this branch."
                                 , "Removing the usage of `|>` may fix the issue here."
                                 , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
                                 ]
@@ -344,8 +331,7 @@ fun x =
                         [ Review.Test.error
                             { message = message
                             , details =
-                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-                                , "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                [ "Among other possible reasons, you are applying operations on the result of recursive call. The recursive call should be the last thing to happen in this branch."
                                 , "Removing the usage of `|>` may fix the issue here."
                                 , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
                                 ]
@@ -368,8 +354,7 @@ fun x n =
                         [ Review.Test.error
                             { message = message
                             , details =
-                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-                                , "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                [ "Among other possible reasons, you are applying operations on the result of recursive call. The recursive call should be the last thing to happen in this branch."
                                 , "Removing the usage of `<|` may fix the issue here."
                                 , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
                                 ]
@@ -392,8 +377,7 @@ a n =
                         [ Review.Test.error
                             { message = message
                             , details =
-                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-                                , "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                [ "Among other possible reasons, you are applying operations on the result of recursive call. The recursive call should be the last thing to happen in this branch."
                                 , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
                                 ]
                             , under = "fun"
@@ -480,8 +464,7 @@ fun x =
                         [ Review.Test.error
                             { message = message
                             , details =
-                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-                                , "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                [ "Among other possible reasons, you are applying operations on the result of recursive call. The recursive call should be the last thing to happen in this branch."
                                 , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
                                 ]
                             , under = "fun"
@@ -504,8 +487,7 @@ a n =
                         [ Review.Test.error
                             { message = message
                             , details =
-                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-                                , "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                [ "Among other possible reasons, you are applying operations on the result of recursive call. The recursive call should be the last thing to happen in this branch."
                                 , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
                                 ]
                             , under = "fun"
