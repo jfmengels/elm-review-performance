@@ -307,7 +307,7 @@ type alias Context =
     , parentScopes : List ( Range, Scope )
     , parentNames : Set String
     , comments : Set Int
-    , deOptimization : Maybe { reason : String, range : Range }
+    , deOptimization : Maybe { reason : List String, range : Range }
     }
 
 
@@ -428,7 +428,15 @@ reportRecursiveCallInNonAllowedLocation node context =
     case Node.value node of
         Expression.FunctionOrValue [] name ->
             if name == context.currentFunctionName then
-                [ error (Node.range node) (Maybe.map .reason context.deOptimization) ]
+                [ error (Node.range node)
+                    (case context.deOptimization of
+                        Just { reason } ->
+                            reason
+
+                        Nothing ->
+                            []
+                    )
+                ]
 
             else
                 []
@@ -442,7 +450,7 @@ reportReferencesToParentFunctions node context =
     case Node.value node of
         Expression.Application ((Node funcRange (Expression.FunctionOrValue [] name)) :: _) ->
             if Set.member name context.parentNames then
-                [ error funcRange (Just "Among maybe other reasons, the recursive call should not appear inside a let declaration.") ]
+                [ error funcRange [ "Among maybe other reasons, the recursive call should not appear inside a let declaration." ] ]
 
             else
                 []
@@ -451,16 +459,14 @@ reportReferencesToParentFunctions node context =
             []
 
 
-error : Range -> Maybe String -> Rule.Error {}
+error : Range -> List String -> Rule.Error {}
 error range additionalDetails =
     Rule.error
         { message = "Recursive function is not tail-call optimized"
         , details =
-            List.filterMap identity
-                [ Just "The way this function is called recursively here prevents the function from being tail-call optimized."
-                , additionalDetails
-                , Just "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
-                ]
+            "The way this function is called recursively here prevents the function from being tail-call optimized."
+                :: additionalDetails
+                ++ [ "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail" ]
         }
         range
 
@@ -531,12 +537,20 @@ addAllowedLocation configuration node context =
             in
             { context | tcoLocations = caseBodies ++ context.tcoLocations }
 
-        Expression.OperatorApplication _ _ _ _ ->
+        Expression.OperatorApplication operator _ _ _ ->
             { context
                 | deOptimization =
                     Just
                         { range = Node.range node
-                        , reason = "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                        , reason =
+                            List.filterMap identity
+                                [ Just "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                , if operator == "<|" || operator == "|>" then
+                                    Just ("Removing the usage of `" ++ operator ++ "` may fix the issue here.")
+
+                                  else
+                                    Nothing
+                                ]
                         }
             }
 

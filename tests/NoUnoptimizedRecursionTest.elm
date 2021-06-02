@@ -186,9 +186,8 @@ fun x n =
                             { message = message
                             , details =
                                 [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-
-                                -- TODO Improve
                                 , "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                , "Removing the usage of `|>` may fix the issue here."
                                 , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
                                 ]
                             , under = "fun"
@@ -208,9 +207,8 @@ fun x =
                             { message = message
                             , details =
                                 [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-
-                                -- TODO Improve
                                 , "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                , "Removing the usage of `|>` may fix the issue here."
                                 , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
                                 ]
                             , under = "fun"
@@ -233,9 +231,8 @@ fun x n =
                             { message = message
                             , details =
                                 [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-
-                                -- TODO Improve
                                 , "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                , "Removing the usage of `<|` may fix the issue here."
                                 , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
                                 ]
                             , under = "fun"
