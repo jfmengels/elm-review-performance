@@ -133,7 +133,11 @@ fun x =
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
-                            , details = details
+                            , details =
+                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
+                                , "Among maybe other reasons, the recursive call should not appear inside a let declaration."
+                                , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
+                                ]
                             , under = "fun"
                             }
                             |> Review.Test.atExactly { start = { row = 5, column = 7 }, end = { row = 5, column = 10 } }

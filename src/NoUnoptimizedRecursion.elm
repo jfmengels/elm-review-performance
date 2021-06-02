@@ -424,7 +424,7 @@ reportRecursiveCallInNonAllowedLocation node context =
     case Node.value node of
         Expression.FunctionOrValue [] name ->
             if name == context.currentFunctionName then
-                [ error (Node.range node) ]
+                [ error (Node.range node) Nothing ]
 
             else
                 []
@@ -438,7 +438,7 @@ reportReferencesToParentFunctions node context =
     case Node.value node of
         Expression.Application ((Node funcRange (Expression.FunctionOrValue [] name)) :: _) ->
             if Set.member name context.parentNames then
-                [ error funcRange ]
+                [ error funcRange (Just "Among maybe other reasons, the recursive call should not appear inside a let declaration.") ]
 
             else
                 []
@@ -447,14 +447,16 @@ reportReferencesToParentFunctions node context =
             []
 
 
-error : Range -> Rule.Error {}
-error range =
+error : Range -> Maybe String -> Rule.Error {}
+error range additionalDetails =
     Rule.error
         { message = "Recursive function is not tail-call optimized"
         , details =
-            [ "The way this function is called recursively here prevents the function from being tail-call optimized."
-            , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
-            ]
+            List.filterMap identity
+                [ Just "The way this function is called recursively here prevents the function from being tail-call optimized."
+                , additionalDetails
+                , Just "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
+                ]
         }
         range
 
