@@ -74,7 +74,7 @@ This function won't be reported because it has not been tagged.
 
 To understand when a function would not get tail-call optimized, it is important to understand when it would be optimized.
 
-The Elm compiler is able to do tail-call elimination **only** when all the recursive calls are the last operation that the function would do in a branch. Any recursive calls happening in other locations de-optimizes the function.
+The Elm compiler is able to do tail-call optimization **only** when all the recursive calls are the last operation that the function would do in a branch. Any recursive calls happening in other locations de-optimizes the function.
 
 Here are the locations when a recursive call may happen in:
 
