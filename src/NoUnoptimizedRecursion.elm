@@ -575,8 +575,14 @@ addAllowedLocation configuration node context =
                         }
             }
 
-        Expression.Negation _ ->
-            context
+        Expression.Negation expr ->
+            { context
+                | deOptimization =
+                    Just
+                        { range = Node.range expr
+                        , reason = [ "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch." ]
+                        }
+            }
 
         Expression.TupledExpression _ ->
             context
