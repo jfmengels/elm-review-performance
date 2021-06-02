@@ -69,7 +69,7 @@ fun x =
 """
                     |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectNoErrors
-        , test "should report an error when a function calls itself in the condition of an if block" <|
+        , test "should report recursive call in the condition of an if block" <|
             \() ->
                 """module A exposing (..)
 fun x =
@@ -87,7 +87,7 @@ fun x =
                             }
                             |> Review.Test.atExactly { start = { row = 3, column = 6 }, end = { row = 3, column = 9 } }
                         ]
-        , test "should report an error when a function calls itself in the case of pattern to evaluate" <|
+        , test "should report recursive call in the case of pattern to evaluate" <|
             \() ->
                 """module A exposing (..)
 fun x =
@@ -154,7 +154,7 @@ fun x =
 """
                     |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectNoErrors
-        , test "should report an error when a function calls itself in a lambda" <|
+        , test "should report recursive call in a lambda" <|
             \() ->
                 """module A exposing (..)
 fun n =
@@ -169,7 +169,7 @@ fun n =
                             }
                             |> Review.Test.atExactly { start = { row = 3, column = 12 }, end = { row = 3, column = 15 } }
                         ]
-        , test "should report an error when a function calls itself using |>" <|
+        , test "should report recursive call using |>" <|
             \() ->
                 """module A exposing (..)
 fun x n =
@@ -194,7 +194,7 @@ fun x n =
                             }
                             |> Review.Test.atExactly { start = { row = 8, column = 16 }, end = { row = 8, column = 19 } }
                         ]
-        , test "should report an error when a function calls itself using |> (simple reference)" <|
+        , test "should report recursive call using |> (simple reference)" <|
             \() ->
                 """module A exposing (..)
 fun x =
@@ -215,7 +215,7 @@ fun x =
                             }
                             |> Review.Test.atExactly { start = { row = 4, column = 12 }, end = { row = 4, column = 15 } }
                         ]
-        , test "should report an error when a function calls itself using <|" <|
+        , test "should report recursive call using <|" <|
             \() ->
                 """module A exposing (..)
 fun x n =
