@@ -307,6 +307,7 @@ type alias Context =
     , parentScopes : List ( Range, Scope )
     , parentNames : Set String
     , comments : Set Int
+    , deOptimization : Maybe { reason : String, range : Range }
     }
 
 
@@ -325,6 +326,7 @@ initialContext =
     , parentScopes = []
     , parentNames = Set.empty
     , comments = Set.empty
+    , deOptimization = Nothing
     }
 
 
@@ -379,6 +381,7 @@ declarationVisitor configuration node context =
               , parentScopes = []
               , parentNames = Set.empty
               , comments = context.comments
+              , deOptimization = Nothing
               }
             )
 
@@ -407,6 +410,7 @@ expressionEnterVisitor configuration node context =
                                 :: context.parentScopes
                         , parentNames = Set.insert context.currentFunctionName context.parentNames
                         , comments = context.comments
+                        , deOptimization = context.deOptimization
                         }
 
                     else
@@ -424,7 +428,7 @@ reportRecursiveCallInNonAllowedLocation node context =
     case Node.value node of
         Expression.FunctionOrValue [] name ->
             if name == context.currentFunctionName then
-                [ error (Node.range node) Nothing ]
+                [ error (Node.range node) (Maybe.map .reason context.deOptimization) ]
 
             else
                 []
@@ -527,6 +531,36 @@ addAllowedLocation configuration node context =
             in
             { context | tcoLocations = caseBodies ++ context.tcoLocations }
 
+        Expression.OperatorApplication _ _ _ _ ->
+            { context
+                | deOptimization =
+                    Just
+                        { range = Node.range node
+                        , reason = "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                        }
+            }
+
+        Expression.Negation _ ->
+            context
+
+        Expression.TupledExpression _ ->
+            context
+
+        Expression.LambdaExpression _ ->
+            context
+
+        Expression.RecordExpr _ ->
+            context
+
+        Expression.ListExpr _ ->
+            context
+
+        Expression.RecordAccess _ _ ->
+            context
+
+        Expression.RecordUpdateExpression _ _ ->
+            context
+
         _ ->
             context
 
@@ -546,6 +580,12 @@ expressionExitVisitor node context =
                   , parentScopes = restOfParentScopes
                   , parentNames = Set.remove headScope.currentFunctionName context.parentNames
                   , comments = context.comments
+                  , deOptimization =
+                        if Just headRange == Maybe.map .range context.deOptimization then
+                            Nothing
+
+                        else
+                            context.deOptimization
                   }
                 )
 

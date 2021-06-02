@@ -38,7 +38,11 @@ fun x =
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
-                            , details = details
+                            , details =
+                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
+                                , "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
+                                ]
                             , under = "fun"
                             }
                             |> Review.Test.atExactly { start = { row = 3, column = 3 }, end = { row = 3, column = 6 } }
@@ -180,7 +184,13 @@ fun x n =
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
-                            , details = details
+                            , details =
+                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
+
+                                -- TODO Improve
+                                , "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
+                                ]
                             , under = "fun"
                             }
                             |> Review.Test.atExactly { start = { row = 8, column = 16 }, end = { row = 8, column = 19 } }
@@ -196,7 +206,13 @@ fun x =
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
-                            , details = details
+                            , details =
+                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
+
+                                -- TODO Improve
+                                , "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
+                                ]
                             , under = "fun"
                             }
                             |> Review.Test.atExactly { start = { row = 4, column = 12 }, end = { row = 4, column = 15 } }
@@ -215,7 +231,13 @@ fun x n =
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
-                            , details = details
+                            , details =
+                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
+
+                                -- TODO Improve
+                                , "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
+                                ]
                             , under = "fun"
                             }
                             |> Review.Test.atExactly { start = { row = 7, column = 9 }, end = { row = 7, column = 12 } }
@@ -234,7 +256,11 @@ a n =
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
-                            , details = details
+                            , details =
+                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
+                                , "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
+                                ]
                             , under = "fun"
                             }
                             |> Review.Test.atExactly { start = { row = 5, column = 7 }, end = { row = 5, column = 10 } }
@@ -318,7 +344,11 @@ fun x =
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
-                            , details = details
+                            , details =
+                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
+                                , "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
+                                ]
                             , under = "fun"
                             }
                             |> Review.Test.atExactly { start = { row = 4, column = 3 }, end = { row = 4, column = 6 } }
@@ -338,7 +368,11 @@ a n =
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
-                            , details = details
+                            , details =
+                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
+                                , "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
+                                ]
                             , under = "fun"
                             }
                             |> Review.Test.atExactly { start = { row = 6, column = 7 }, end = { row = 6, column = 10 } }
