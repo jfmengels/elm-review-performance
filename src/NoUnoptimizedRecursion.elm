@@ -477,8 +477,15 @@ addAllowedLocation configuration node context =
         Expression.Application (function :: _) ->
             { context | tcoLocations = Node.range function :: context.tcoLocations }
 
-        Expression.IfBlock _ thenBranch elseBranch ->
-            { context | tcoLocations = Node.range thenBranch :: Node.range elseBranch :: context.tcoLocations }
+        Expression.IfBlock condition thenBranch elseBranch ->
+            { context
+                | tcoLocations = Node.range thenBranch :: Node.range elseBranch :: context.tcoLocations
+                , deOptimization =
+                    Just
+                        { range = Node.range condition
+                        , reason = [ "Among maybe other reasons, the recursive call should not appear inside an if condition." ]
+                        }
+            }
 
         Expression.LetExpression { declarations, expression } ->
             let
