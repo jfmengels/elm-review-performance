@@ -593,13 +593,19 @@ addAllowedLocation configuration node context =
                         }
             }
 
+        Expression.ListExpr _ ->
+            { context
+                | deOptimization =
+                    Just
+                        { range = Node.range node
+                        , reason = [ "Among maybe other reasons, you are storing the result of recursive call inside a list, when the recursive call should be the last thing to happen in this branch." ]
+                        }
+            }
+
         Expression.LambdaExpression _ ->
             context
 
         Expression.RecordExpr _ ->
-            context
-
-        Expression.ListExpr _ ->
             context
 
         Expression.RecordAccess _ _ ->
