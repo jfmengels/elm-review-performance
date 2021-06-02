@@ -160,6 +160,25 @@ fun x =
                             }
                             |> Review.Test.atExactly { start = { row = 3, column = 5 }, end = { row = 3, column = 8 } }
                         ]
+        , test "should report recursive call from inside a record expression" <|
+            \() ->
+                """module A exposing (..)
+fun x =
+  { result = fun (x - 1) }
+"""
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = message
+                            , details =
+                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
+                                , "Among maybe other reasons, you are storing the result of recursive call inside a record, when the recursive call should be the last thing to happen in this branch."
+                                , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
+                                ]
+                            , under = "fun"
+                            }
+                            |> Review.Test.atExactly { start = { row = 3, column = 14 }, end = { row = 3, column = 17 } }
+                        ]
         , test "should report recursive call in the case of pattern to evaluate" <|
             \() ->
                 """module A exposing (..)

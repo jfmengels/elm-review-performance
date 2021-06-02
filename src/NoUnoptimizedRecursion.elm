@@ -602,6 +602,21 @@ addAllowedLocation configuration node context =
                         }
             }
 
+        Expression.RecordExpr _ ->
+            { context
+                | deOptimization =
+                    Just
+                        { range = Node.range node
+                        , reason = [ "Among maybe other reasons, you are storing the result of recursive call inside a record, when the recursive call should be the last thing to happen in this branch." ]
+                        }
+            }
+
+        Expression.RecordUpdateExpression _ _ ->
+            context
+
+        Expression.RecordAccess _ _ ->
+            context
+
         Expression.LambdaExpression _ ->
             { context
                 | deOptimization =
@@ -610,15 +625,6 @@ addAllowedLocation configuration node context =
                         , reason = [ "Among maybe other reasons, the recursive call should not appear inside an anonymous function." ]
                         }
             }
-
-        Expression.RecordExpr _ ->
-            context
-
-        Expression.RecordAccess _ _ ->
-            context
-
-        Expression.RecordUpdateExpression _ _ ->
-            context
 
         _ ->
             context
