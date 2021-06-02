@@ -69,6 +69,25 @@ fun x =
 """
                     |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectNoErrors
+        , test "should report recursive call in the arguments of a function call" <|
+            \() ->
+                """module A exposing (..)
+fun x =
+  other (fun (x - 1))
+"""
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = message
+                            , details =
+                                [ "The way this function is called recursively here prevents the function from being tail-call optimized."
+                                , "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch."
+                                , "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail"
+                                ]
+                            , under = "fun"
+                            }
+                            |> Review.Test.atExactly { start = { row = 3, column = 10 }, end = { row = 3, column = 13 } }
+                        ]
         , test "should report recursive call in the condition of an if block" <|
             \() ->
                 """module A exposing (..)

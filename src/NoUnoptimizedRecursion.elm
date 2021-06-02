@@ -475,7 +475,14 @@ addAllowedLocation : Configuration -> Node Expression -> Context -> Context
 addAllowedLocation configuration node context =
     case Node.value node of
         Expression.Application (function :: _) ->
-            { context | tcoLocations = Node.range function :: context.tcoLocations }
+            { context
+                | tcoLocations = Node.range function :: context.tcoLocations
+                , deOptimization =
+                    Just
+                        { range = Node.range node
+                        , reason = [ "Among maybe other reasons, it seems you're applying operations on the result of recursive call, when the recursive call should be the last thing to happen in this branch." ]
+                        }
+            }
 
         Expression.IfBlock condition thenBranch elseBranch ->
             { context
