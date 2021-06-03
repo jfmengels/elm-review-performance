@@ -80,7 +80,7 @@ initialContext =
             { lookupTable = lookupTable
             , topLevelFunctionNames = Set.empty
             , currentFunctionHasNoArguments = False
-            , lazyFunctions = Set.singleton ( [], "lazyView" )
+            , lazyFunctions = Set.empty
             }
         )
         |> Rule.withModuleNameLookupTable
