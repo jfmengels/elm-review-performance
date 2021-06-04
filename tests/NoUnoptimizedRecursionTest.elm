@@ -21,6 +21,30 @@ fun x = a + x
 """
                     |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
                     |> Review.Test.expectNoErrors
+        , test "should not report self-referential values without arguments" <|
+            \() ->
+                """module A exposing (..)
+commentDecoder =
+  map2 Comment
+    (field "message" string)
+    (field "responses" (map Responses (list (lazy (\\_ -> commentDecoder)))))
+"""
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
+                    |> Review.Test.expectNoErrors
+        , test "should not report self-referential let values without arguments" <|
+            \() ->
+                """module A exposing (..)
+a =
+  let
+    commentDecoder =
+      map2 Comment
+        (field "message" string)
+        (field "responses" (map Responses (list (lazy (\\_ -> commentDecoder)))))
+  in
+  commentDecoder
+"""
+                    |> Review.Test.run (rule (optOutWithComment "OPT OUT"))
+                    |> Review.Test.expectNoErrors
         , test "should report an error when a function is recursive but applies operations on the result" <|
             \() ->
                 """module A exposing (..)
