@@ -12,6 +12,9 @@ Tail-call optimization makes Elm code more performant and helps prevent stack ov
 Since this optimization is done silently and under specific circumstances, it is unfortunately relatively easy
 to not notice when the optimization is not being applied. You can find the [reasons why a function would not be optimized below](#fail).
 
+I wrote a whole [article about tail-call optimization](https://jfmengels.net/tail-call-optimization/). Some of the information
+are repeated in this rule's documentation, but it's more complete.
+
 
 ## Configuration
 
@@ -74,15 +77,22 @@ This function won't be reported because it has not been tagged.
 
 To understand when a function would not get tail-call optimized, it is important to understand when it would be optimized.
 
-The Elm compiler is able to do tail-call optimization **only** when all the recursive calls are the last operation that the function would do in a branch. Any recursive calls happening in other locations de-optimizes the function.
+The Elm compiler is able to apply tail-call optimization **only** when a recursive call **(1)** is a simple function application and **(2)** is the last operation that the function does in a branch.
 
-Here are the locations when a recursive call may happen in:
+**(1)** means that while `recurse n = recurse (n - 1)` would be optimized, `recurse n = recurse <| n - 1` would not. Even though you may consider `<|` and `|>` as syntactic sugar for function calls, the compiler doesn't (at least with regard to TCO).
+
+As for **(2)**, the locations where a recursive call may happen are:
 
   - branches of an if expression
   - branches of a case expression
   - in the body of a let expression
+  - inside simple parentheses
 
 and only if each of the above appeared at the root of the function or in one of the above locations themselves.
+
+The compiler optimizes every recursive call that adheres to the rules above, and simply doesn't optimize the other
+branches which would call the function naively and add to the stack frame.
+It is therefore possible to have **partially tail-call optimized functions**.
 
 Following is a list of likely situations that will be reported.
 
