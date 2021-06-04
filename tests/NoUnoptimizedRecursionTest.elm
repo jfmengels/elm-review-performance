@@ -7,7 +7,7 @@ import Test exposing (Test, describe, test)
 
 message : String
 message =
-    "This function cannot be tail-call optimized"
+    "This function call cannot be tail-call optimized"
 
 
 all : Test

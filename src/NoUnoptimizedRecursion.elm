@@ -477,7 +477,7 @@ reportReferencesToParentFunctions node context =
 error : Range -> List String -> Rule.Error {}
 error range additionalDetails =
     Rule.error
-        { message = "This function cannot be tail-call optimized"
+        { message = "This function call cannot be tail-call optimized"
         , details =
             additionalDetails
                 ++ [ "You can read more about why over at https://package.elm-lang.org/packages/jfmengels/elm-review-performance/latest/NoUnoptimizedRecursion#fail" ]
