@@ -3,7 +3,7 @@
     "name": "jfmengels/elm-review-performance",
     "summary": "Provides elm-review rules to report performance problems in your Elm project",
     "license": "BSD-3-Clause",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "exposed-modules": [
         "NoUnoptimizedRecursion"
     ],
