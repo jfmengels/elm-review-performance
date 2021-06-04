@@ -1,8 +1,9 @@
 module NoMisusingLazyTest exposing (all)
 
 import Expect exposing (Expectation)
-import NoMisusingLazy exposing (defaults, rule)
+import NoMisusingLazy exposing (defaults, rule, withLazyModule)
 import Review.Project
+import Review.Rule exposing (Rule)
 import Review.Test
 import Review.Test.Dependencies
 import Test exposing (Test, describe, test)
@@ -371,6 +372,29 @@ helper _ _ _ = text ""
                             { message = message
                             , details = details
                             , under = "Element.WithContext.Lazy.lazy"
+                            }
+                        ]
+        , test "should report an error when encountering problematic custom lazy function" <|
+            \() ->
+                let
+                    configuredRule : Rule
+                    configuredRule =
+                        defaults
+                            |> withLazyModule [ "Some.Module" ]
+                            |> rule
+                in
+                """module A exposing (..)
+import Some.Module
+a n =
+  Some.Module.lazy (helper x)
+helper _ _ _ = text ""
+"""
+                    |> Review.Test.runWithProjectData project configuredRule
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = message
+                            , details = details
+                            , under = "Some.Module.lazy"
                             }
                         ]
         ]

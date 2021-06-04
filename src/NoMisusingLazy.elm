@@ -61,10 +61,18 @@ elm-review --template jfmengels/elm-review-performance/example --rules NoMisusin
 -}
 rule : Configuration -> Rule
 rule (Configuration { lazyModules }) =
+    let
+        lazyModuleNames : Set ModuleName
+        lazyModuleNames =
+            lazyModules
+                |> List.map (String.split ".")
+                |> Set.fromList
+                |> Set.union baseLazyModuleNames
+    in
     Rule.newModuleRuleSchemaUsingContextCreator "NoMisusingLazy" initialContext
-        |> Rule.withDeclarationListVisitor declarationListVisitor
+        |> Rule.withDeclarationListVisitor (declarationListVisitor lazyModuleNames)
         |> Rule.withDeclarationEnterVisitor declarationVisitor
-        |> Rule.withExpressionEnterVisitor expressionVisitor
+        |> Rule.withExpressionEnterVisitor (expressionVisitor lazyModuleNames)
         |> Rule.fromModuleRuleSchema
 
 
@@ -120,8 +128,8 @@ initialContext =
         |> Rule.withModuleNameLookupTable
 
 
-declarationListVisitor : List (Node Declaration) -> Context -> ( List nothing, Context )
-declarationListVisitor declarations context =
+declarationListVisitor : Set ModuleName -> List (Node Declaration) -> Context -> ( List nothing, Context )
+declarationListVisitor lazyModuleNames declarations context =
     let
         newContext : Context
         newContext =
@@ -130,7 +138,7 @@ declarationListVisitor declarations context =
         lazyFunctions : Set ( ModuleName, String )
         lazyFunctions =
             declarations
-                |> List.filterMap (checkIfIsLazyFunction context.lookupTable)
+                |> List.filterMap (checkIfIsLazyFunction lazyModuleNames context.lookupTable)
                 |> List.map (Tuple.pair [])
                 |> Set.fromList
     in
@@ -151,8 +159,8 @@ topLevelFunctionNames node =
             Nothing
 
 
-checkIfIsLazyFunction : ModuleNameLookupTable -> Node Declaration -> Maybe String
-checkIfIsLazyFunction lookupTable node =
+checkIfIsLazyFunction : Set ModuleName -> ModuleNameLookupTable -> Node Declaration -> Maybe String
+checkIfIsLazyFunction lazyModuleNames lookupTable node =
     case Node.value node of
         Declaration.FunctionDeclaration function ->
             let
@@ -160,7 +168,7 @@ checkIfIsLazyFunction lookupTable node =
                 declaration =
                     Node.value function.declaration
             in
-            if checkIfReturnsLazyFunction lookupTable declaration.expression then
+            if checkIfReturnsLazyFunction lazyModuleNames lookupTable declaration.expression then
                 Just (Node.value declaration.name)
 
             else
@@ -170,8 +178,8 @@ checkIfIsLazyFunction lookupTable node =
             Nothing
 
 
-checkIfReturnsLazyFunction : ModuleNameLookupTable -> Node Expression -> Bool
-checkIfReturnsLazyFunction lookupTable node =
+checkIfReturnsLazyFunction : Set ModuleName -> ModuleNameLookupTable -> Node Expression -> Bool
+checkIfReturnsLazyFunction lazyModuleNames lookupTable node =
     case Node.value node of
         Expression.Application ((Node functionRange (Expression.FunctionOrValue _ functionName)) :: lazyFunctionArgument :: restOfArguments) ->
             case ModuleNameLookupTable.moduleNameAt lookupTable functionRange of
@@ -186,10 +194,10 @@ checkIfReturnsLazyFunction lookupTable node =
             False
 
         Expression.ParenthesizedExpression expr ->
-            checkIfReturnsLazyFunction lookupTable expr
+            checkIfReturnsLazyFunction lazyModuleNames lookupTable expr
 
         Expression.LetExpression { expression } ->
-            checkIfReturnsLazyFunction lookupTable expression
+            checkIfReturnsLazyFunction lazyModuleNames lookupTable expression
 
         Expression.IfBlock _ _ _ ->
             -- ???
@@ -227,8 +235,8 @@ declarationVisitor node context =
             ( [], context )
 
 
-expressionVisitor : Node Expression -> Context -> ( List (Rule.Error {}), Context )
-expressionVisitor node context =
+expressionVisitor : Set ModuleName -> Node Expression -> Context -> ( List (Rule.Error {}), Context )
+expressionVisitor lazyModuleNames node context =
     case Node.value node of
         Expression.Application ((Node functionRange (Expression.FunctionOrValue _ functionName)) :: lazyFunctionArgument :: restOfArguments) ->
             case ModuleNameLookupTable.moduleNameAt context.lookupTable functionRange of
@@ -306,8 +314,8 @@ isArgumentANewReference node =
             False
 
 
-lazyModuleNames : Set ModuleName
-lazyModuleNames =
+baseLazyModuleNames : Set ModuleName
+baseLazyModuleNames =
     Set.fromList
         [ -- https://package.elm-lang.org/packages/elm/html/latest/Html.Lazy
           [ "Html", "Lazy" ]
