@@ -1,4 +1,7 @@
-module NoMisusingLazy exposing (rule)
+module NoMisusingLazy exposing
+    ( rule
+    , Configuration, defaults, withLazyModule
+    )
 
 {-|
 
@@ -25,7 +28,7 @@ import Set exposing (Set)
 {-| Reports... REPLACEME
 
     config =
-        [ NoMisusingLazy.rule
+        [ NoMisusingLazy.rule NoMisusingLazy.defaults
         ]
 
 
@@ -56,13 +59,44 @@ elm-review --template jfmengels/elm-review-performance/example --rules NoMisusin
 ```
 
 -}
-rule : Rule
-rule =
+rule : Configuration -> Rule
+rule (Configuration { lazyModules }) =
     Rule.newModuleRuleSchemaUsingContextCreator "NoMisusingLazy" initialContext
         |> Rule.withDeclarationListVisitor declarationListVisitor
         |> Rule.withDeclarationEnterVisitor declarationVisitor
         |> Rule.withExpressionEnterVisitor expressionVisitor
         |> Rule.fromModuleRuleSchema
+
+
+
+-- CONFIGURATION
+
+
+{-| Configuration for this rule. Create a new one with [`defaults`](#defaults) and use [`withLazyModule`](#withLazyModule) to alter it.
+-}
+type Configuration
+    = Configuration
+        { lazyModules : List String
+        }
+
+
+{-| Default configuration for this rule. Use [`ignoreCaseOfForTypes`](#ignoreCaseOfForTypes) if you want to change the configuration.
+
+    config =
+        [ Simplify.defaults
+            |> Simplify.withLazyModule [ "Module.Name.Type" ]
+            |> Simplify.rule
+        ]
+
+-}
+defaults : Configuration
+defaults =
+    Configuration { lazyModules = [] }
+
+
+withLazyModule : List String -> Configuration -> Configuration
+withLazyModule lazyModules (Configuration config) =
+    Configuration { config | lazyModules = lazyModules ++ config.lazyModules }
 
 
 type alias Context =

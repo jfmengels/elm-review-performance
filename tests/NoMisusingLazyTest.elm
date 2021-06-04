@@ -1,7 +1,7 @@
 module NoMisusingLazyTest exposing (all)
 
 import Expect exposing (Expectation)
-import NoMisusingLazy exposing (rule)
+import NoMisusingLazy exposing (defaults, rule)
 import Review.Project
 import Review.Test
 import Review.Test.Dependencies
@@ -44,7 +44,7 @@ a =
 
 helper _ = text ""
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectNoErrors
         , test "should not report for lazy function without arguments and unstable reference" <|
             \() ->
@@ -55,7 +55,7 @@ a =
 
 helper _ = text ""
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectNoErrors
         , test "should not report for lazy function without arguments and lambda argument" <|
             \() ->
@@ -66,7 +66,7 @@ a =
 
 helper _ = text ""
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectNoErrors
         , test "should not report for lazy function without arguments and let in argument" <|
             \() ->
@@ -79,7 +79,7 @@ a =
   Html.Lazy.lazy helper n
 
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectNoErrors
         , test "should not report for lazy function with arguments and stable reference to other module" <|
             \() ->
@@ -91,7 +91,7 @@ a n =
 """, """module B exposing (..)
 helper _ = text ""
 """ ]
-                    |> Review.Test.runOnModulesWithProjectData project rule
+                    |> Review.Test.runOnModulesWithProjectData project (rule defaults)
                     |> Review.Test.expectNoErrors
         , test "should report an error when encountering Html.lazy with arguments and an unstable reference" <|
             \() ->
@@ -102,7 +102,7 @@ a n =
 
 helper _ _ = text ""
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
@@ -119,7 +119,7 @@ a n =
 
 helper _ = text ""
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectNoErrors
         , test "should not report an error when lazy is not from one of the known supported libraries" <|
             \() ->
@@ -129,7 +129,7 @@ a n =
 lazy _ _ = text ""
 helper _ = text ""
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectNoErrors
         , test "should report an error when encountering Html.lazy with arguments and an let in reference" <|
             \() ->
@@ -141,7 +141,7 @@ a n =
   in
   Html.Lazy.lazy helper n
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
@@ -157,7 +157,7 @@ a n =
   Html.Lazy.lazy2 (helper x)
 helper _ _ _ = text ""
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
@@ -173,7 +173,7 @@ a n =
   Html.Lazy.lazy3 (helper x)
 helper _ _ _ = text ""
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
@@ -189,7 +189,7 @@ a n =
   Html.Lazy.lazy4 (helper x)
 helper _ _ _ = text ""
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
@@ -205,7 +205,7 @@ a n =
   Html.Lazy.lazy5 (helper x)
 helper _ _ _ = text ""
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
@@ -221,7 +221,7 @@ a n =
   Html.Lazy.lazy6 (helper x)
 helper _ _ _ = text ""
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
@@ -237,7 +237,7 @@ a n =
   Html.Lazy.lazy7 (helper x)
 helper _ _ _ = text ""
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
@@ -253,7 +253,7 @@ a n =
   Html.Lazy.lazy8 (helper x)
 helper _ _ _ = text ""
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
@@ -269,7 +269,7 @@ a n =
   Svg.Lazy.lazy (helper x)
 helper _ _ _ = text ""
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
@@ -285,7 +285,7 @@ a n =
   VirtualDom.lazy (helper x)
 helper _ _ _ = text ""
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
@@ -301,7 +301,7 @@ a n =
   Html.String.Lazy.lazy (helper x)
 helper _ _ _ = text ""
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
@@ -317,7 +317,7 @@ a n =
   Html.Styled.Lazy.lazy (helper x)
 helper _ _ _ = text ""
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
@@ -333,7 +333,7 @@ a n =
   Svg.Styled.Lazy.lazy (helper x)
 helper _ _ _ = text ""
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
@@ -349,7 +349,7 @@ a n =
   Element.Lazy.lazy (helper x)
 helper _ _ _ = text ""
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
@@ -365,7 +365,7 @@ a n =
   Element.WithContext.Lazy.lazy (helper x)
 helper _ _ _ = text ""
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
                             { message = message
@@ -390,7 +390,7 @@ helper _ = text ""
 view model =
     lazyView model
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectNoErrors
         , test "should not report errors when arguments are unstable references but the function takes no arguments" <|
             \() ->
@@ -403,7 +403,7 @@ helper _ = text ""
 view =
     lazyView {}
 """
-                    |> Review.Test.runWithProjectData project rule
+                    |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectNoErrors
         , test "should report errors when arguments to lazy function is a record literal inside parens" <|
             \() -> reportWhenArgumentIs "({})"
@@ -430,7 +430,7 @@ helper _ = text ""
 
 view model =
     lazyView """ ++ thing)
-        |> Review.Test.runWithProjectData project rule
+        |> Review.Test.runWithProjectData project (rule defaults)
         |> Review.Test.expectErrors
             [ Review.Test.error
                 { message = "FOO"
