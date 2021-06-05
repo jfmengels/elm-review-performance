@@ -1,6 +1,6 @@
 module NoMisusingLazy exposing
     ( rule
-    , Configuration, defaults, withLazyModule
+    , Configuration, defaults, withLazyModules
     )
 
 {-|
@@ -9,6 +9,7 @@ module NoMisusingLazy exposing
 
 -}
 
+import Elm.Module
 import Elm.Syntax.Declaration as Declaration exposing (Declaration)
 import Elm.Syntax.Expression as Expression exposing (Expression)
 import Elm.Syntax.ModuleName exposing (ModuleName)
@@ -62,25 +63,74 @@ elm-review --template jfmengels/elm-review-performance/example --rules NoMisusin
 rule : Configuration -> Rule
 rule (Configuration { lazyModules }) =
     let
-        lazyModuleNames : Set ModuleName
-        lazyModuleNames =
+        parsedModuleNames : Result (List String) (List ModuleName)
+        parsedModuleNames =
             lazyModules
-                |> List.map (String.split ".")
-                |> Set.fromList
-                |> Set.union baseLazyModuleNames
+                |> List.map parseModuleNames
+                |> resultSequence (Ok [])
     in
-    Rule.newModuleRuleSchemaUsingContextCreator "NoMisusingLazy" initialContext
-        |> Rule.withDeclarationListVisitor (declarationListVisitor lazyModuleNames)
-        |> Rule.withDeclarationEnterVisitor declarationVisitor
-        |> Rule.withExpressionEnterVisitor (expressionVisitor lazyModuleNames)
-        |> Rule.fromModuleRuleSchema
+    case parsedModuleNames of
+        Ok configurationLazyModulesNames ->
+            let
+                lazyModuleNames : Set ModuleName
+                lazyModuleNames =
+                    Set.union baseLazyModuleNames (Set.fromList configurationLazyModulesNames)
+            in
+            Rule.newModuleRuleSchemaUsingContextCreator "NoMisusingLazy" initialContext
+                |> Rule.withDeclarationListVisitor (declarationListVisitor lazyModuleNames)
+                |> Rule.withDeclarationEnterVisitor declarationVisitor
+                |> Rule.withExpressionEnterVisitor (expressionVisitor lazyModuleNames)
+                |> Rule.fromModuleRuleSchema
+
+        Err errors ->
+            Rule.configurationError "NoMisusingLazy"
+                { message = "I found some problems with the arguments to withLazyModules"
+                , details = List.map (\str -> "  - " ++ str) errors
+                }
+
+
+parseModuleNames : String -> Result String (List String)
+parseModuleNames moduleName =
+    if moduleName == "" then
+        Err "One of the module names I received was empty"
+
+    else
+        case Elm.Module.fromString moduleName of
+            Just _ ->
+                Ok (String.split "." moduleName)
+
+            Nothing ->
+                Err (moduleName ++ " is not a valid module name")
+
+
+resultSequence : Result (List x) (List a) -> List (Result x a) -> Result (List x) (List a)
+resultSequence acc results =
+    case results of
+        [] ->
+            acc
+
+        (Ok ok) :: restOfResults ->
+            case acc of
+                Ok previousOks ->
+                    resultSequence (Ok (ok :: previousOks)) restOfResults
+
+                Err _ ->
+                    acc
+
+        (Err err) :: restOfResults ->
+            case acc of
+                Err previousErrors ->
+                    resultSequence (Err (err :: previousErrors)) restOfResults
+
+                Ok _ ->
+                    resultSequence (Err [ err ]) restOfResults
 
 
 
 -- CONFIGURATION
 
 
-{-| Configuration for this rule. Create a new one with [`defaults`](#defaults) and use [`withLazyModule`](#withLazyModule) to alter it.
+{-| Configuration for this rule. Create a new one with [`defaults`](#defaults) and use [`withLazyModules`](#withLazyModules) to alter it.
 -}
 type Configuration
     = Configuration
@@ -92,7 +142,7 @@ type Configuration
 
     config =
         [ Simplify.defaults
-            |> Simplify.withLazyModule [ "Module.Name.Type" ]
+            |> Simplify.withLazyModules [ "Some.Module.Name" ]
             |> Simplify.rule
         ]
 
@@ -102,8 +152,8 @@ defaults =
     Configuration { lazyModules = [] }
 
 
-withLazyModule : List String -> Configuration -> Configuration
-withLazyModule lazyModules (Configuration config) =
+withLazyModules : List String -> Configuration -> Configuration
+withLazyModules lazyModules (Configuration config) =
     Configuration { config | lazyModules = lazyModules ++ config.lazyModules }
 
 

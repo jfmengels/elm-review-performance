@@ -1,7 +1,7 @@
 module NoMisusingLazyTest exposing (all)
 
 import Expect exposing (Expectation)
-import NoMisusingLazy exposing (defaults, rule, withLazyModule)
+import NoMisusingLazy exposing (defaults, rule, withLazyModules)
 import Review.Project
 import Review.Rule exposing (Rule)
 import Review.Test
@@ -387,7 +387,7 @@ configurationTests =
                     configuredRule : Rule
                     configuredRule =
                         defaults
-                            |> withLazyModule [ "Some.Module" ]
+                            |> withLazyModules [ "Some.Module" ]
                             |> rule
                 in
                 """module A exposing (..)
@@ -407,11 +407,20 @@ helper _ _ _ = text ""
         , test "should report a configuration error when passed module name is invalid" <|
             \() ->
                 defaults
-                    |> withLazyModule [ "Some.module" ]
+                    |> withLazyModules [ "Some.module" ]
                     |> rule
                     |> Review.Test.expectConfigurationError
-                        { message = "Some.module is not a valid module name"
-                        , details = [ "Some details" ]
+                        { message = "I found some problems with the arguments to withLazyModules"
+                        , details = [ "  - Some.module is not a valid module name" ]
+                        }
+        , test "should report a configuration error when passed an empty module name" <|
+            \() ->
+                defaults
+                    |> withLazyModules [ "" ]
+                    |> rule
+                    |> Review.Test.expectConfigurationError
+                        { message = "I found some problems with the arguments to withLazyModules"
+                        , details = [ "  - One of the module names I received was empty" ]
                         }
         ]
 
