@@ -383,8 +383,6 @@ baseLazyModuleNames =
           [ "Element", "WithContext", "Lazy" ]
         , -- https://package.elm-lang.org/packages/austinshenk/elm-w3/latest/W3-Html
           [ "W3", "Html" ]
-        , -- https://package.elm-lang.org/packages/zwilias/elm-html-string/latest/Html-String-Lazy
-          [ "Html", "String", "Lazy" ]
         ]
 
 
