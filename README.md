@@ -21,7 +21,7 @@ import Review.Rule exposing (Rule)
 config : List Rule
 config =
     [ NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optOutWithComment "IGNORE TCO")
-    , NoMisusingLazy.rule
+    , NoMisusingLazy.rule NoMisusingLazy.defaults
     ]
 ```
 
