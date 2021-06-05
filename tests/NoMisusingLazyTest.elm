@@ -451,6 +451,36 @@ view =
 """
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectNoErrors
+        , test "should not report errors when argument to lazy function is a type alias" <|
+            \() ->
+                """module A exposing (..)
+import Html.Lazy
+lazyView =
+    Html.Lazy.lazy2 (helper)
+helper _ = text ""
+
+type alias RecordAlias = {}
+
+view model =
+    lazyView RecordAlias
+"""
+                    |> Review.Test.runWithProjectData project (rule defaults)
+                    |> Review.Test.expectNoErrors
+        , test "should not report errors when argument to lazy function is a custom type constructor" <|
+            \() ->
+                """module A exposing (..)
+import Html.Lazy
+lazyView =
+    Html.Lazy.lazy2 (helper)
+helper _ = text ""
+
+type CustomType = Constructor
+
+view model =
+    lazyView Constructor
+"""
+                    |> Review.Test.runWithProjectData project (rule defaults)
+                    |> Review.Test.expectNoErrors
         , test "should report errors when argument to lazy function is a record literal inside parens" <|
             \() -> reportWhenArgumentIs "({})"
         , test "should report errors when arguments to lazy function is a record update function" <|

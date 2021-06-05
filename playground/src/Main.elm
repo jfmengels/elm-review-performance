@@ -38,6 +38,7 @@ view model =
 
         -- Lazy functions
         , workingLazy 1
+        , workingLazy EmptyRecordAlias
         , workingLazyWithArgButStableReference 1
         , workingLazyWith2Args 1 2
         , workingLazyWithLambda 1
@@ -47,6 +48,10 @@ view model =
         , failingLazyWithArgAndUnstableReference 1 2
         , failingLazyWithArgumentAndLetFunction 1 2
         ]
+
+
+type alias EmptyRecordAlias =
+    {}
 
 
 header : Model -> Html Msg
