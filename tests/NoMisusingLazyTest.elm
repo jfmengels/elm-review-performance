@@ -412,7 +412,7 @@ helper _ _ _ = text ""
 argumentReferenceTests : Test
 argumentReferenceTests =
     describe "Arguments passed to lazy functions"
-        [ test "should not report errors when arguments to lazy function is a function or value" <|
+        [ test "should not report errors when argument to lazy function is a function or value" <|
             \() ->
                 """module A exposing (..)
 import Html.Lazy
@@ -425,7 +425,20 @@ view model =
 """
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectNoErrors
-        , test "should not report errors when arguments are unstable references but the function takes no arguments" <|
+        , test "should not report errors when argument to lazy function is stable but wrapped in parens" <|
+            \() ->
+                """module A exposing (..)
+import Html.Lazy
+lazyView =
+    Html.Lazy.lazy (helper)
+helper _ = text ""
+
+view model =
+    lazyView model
+"""
+                    |> Review.Test.runWithProjectData project (rule defaults)
+                    |> Review.Test.expectNoErrors
+        , test "should not report errors when argument is an unstable references but the function takes no arguments" <|
             \() ->
                 """module A exposing (..)
 import Html.Lazy
@@ -438,7 +451,7 @@ view =
 """
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectNoErrors
-        , test "should report errors when arguments to lazy function is a record literal inside parens" <|
+        , test "should report errors when argument to lazy function is a record literal inside parens" <|
             \() -> reportWhenArgumentIs "({})"
         , test "should report errors when arguments to lazy function is a record update function" <|
             \() -> reportWhenArgumentIs "{ model | a = 1 }"

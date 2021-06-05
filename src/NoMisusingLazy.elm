@@ -397,7 +397,6 @@ isStableReference context node =
         Expression.FunctionOrValue moduleName name ->
             isVariableFromLetDeclaration context (Node.range node) moduleName name
 
-        -- TODO Support parens
         _ ->
             False
 
