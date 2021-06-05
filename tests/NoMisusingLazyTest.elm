@@ -29,6 +29,7 @@ all : Test
 all =
     describe "NoMisusingLazy"
         [ lazyDefinitionTests
+        , configurationTests
         , argumentReferenceTests
         ]
 
@@ -374,7 +375,13 @@ helper _ _ _ = text ""
                             , under = "Element.WithContext.Lazy.lazy"
                             }
                         ]
-        , test "should report an error when encountering problematic custom lazy function" <|
+        ]
+
+
+configurationTests : Test
+configurationTests =
+    describe "Configuration"
+        [ test "should report an error when encountering problematic custom lazy function" <|
             \() ->
                 let
                     configuredRule : Rule
@@ -397,6 +404,15 @@ helper _ _ _ = text ""
                             , under = "Some.Module.lazy"
                             }
                         ]
+        , test "should report a configuration error when passed module name is invalid" <|
+            \() ->
+                defaults
+                    |> withLazyModule [ "Some.module" ]
+                    |> rule
+                    |> Review.Test.expectConfigurationError
+                        { message = "Some.module is not a valid module name"
+                        , details = [ "Some details" ]
+                        }
         ]
 
 
