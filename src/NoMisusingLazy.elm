@@ -23,7 +23,6 @@ import Set exposing (Set)
 
 -- TODO Report lazy being used on its own?
 -- TODO Support lazy used with <| and |>
--- TODO Report Application as argument if `Type args` (don't care about custom type or type alias)
 
 
 {-| Reports... REPLACEME
@@ -358,7 +357,12 @@ isArgumentANewReference node =
             True
 
         Expression.Application ((Node _ (Expression.FunctionOrValue _ functionName)) :: _) ->
-            True
+            case String.uncons functionName of
+                Just ( firstChar, _ ) ->
+                    Char.isUpper firstChar
+
+                Nothing ->
+                    False
 
         Expression.ParenthesizedExpression expr ->
             isArgumentANewReference expr

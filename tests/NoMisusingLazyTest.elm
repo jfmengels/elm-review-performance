@@ -438,6 +438,19 @@ view model =
 """
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectNoErrors
+        , test "should not report errors when argument to lazy function is an unknown function call" <|
+            \() ->
+                """module A exposing (..)
+import Html.Lazy
+lazyView =
+    Html.Lazy.lazy (helper)
+helper _ = text ""
+
+view model =
+    lazyView (unknown argument)
+"""
+                    |> Review.Test.runWithProjectData project (rule defaults)
+                    |> Review.Test.expectNoErrors
         , test "should not report errors when argument is an unstable references but the function takes no arguments" <|
             \() ->
                 """module A exposing (..)
