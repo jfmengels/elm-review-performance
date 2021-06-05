@@ -23,6 +23,7 @@ import Set exposing (Set)
 
 -- TODO Report lazy being used on its own?
 -- TODO Support lazy used with <| and |>
+-- TODO Add configuration to specify whether to consider functions as creating new references by default or not, and taking a list of exceptions
 
 
 {-| Reports... REPLACEME
