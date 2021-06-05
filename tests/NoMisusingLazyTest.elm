@@ -493,6 +493,8 @@ view model =
             \() -> reportWhenArgumentIs ".name"
         , test "should report errors when arguments to lazy function is a lambda" <|
             \() -> reportWhenArgumentIs "(\\a -> a.name)"
+        , test "should report errors when arguments to lazy function is function call of a type or type alias" <|
+            \() -> reportWhenArgumentIs "(Constructor argument)"
         ]
 
 

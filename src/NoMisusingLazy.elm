@@ -357,6 +357,9 @@ isArgumentANewReference node =
         Expression.LambdaExpression _ ->
             True
 
+        Expression.Application ((Node _ (Expression.FunctionOrValue _ functionName)) :: _) ->
+            True
+
         Expression.ParenthesizedExpression expr ->
             isArgumentANewReference expr
 
