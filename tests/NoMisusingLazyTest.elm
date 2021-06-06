@@ -538,6 +538,10 @@ view model =
             \() -> reportWhenArgumentIs "(Constructor <| argument)"
         , test "should report errors when arguments to lazy function is function call of a type or type alias (using |>)" <|
             \() -> reportWhenArgumentIs "(argument |> Constructor)"
+        , test "should report errors when arguments to lazy function is function call of a type or type alias with already an argument (using <|)" <|
+            \() -> reportWhenArgumentIs "(Constructor 1 <| argument)"
+        , test "should report errors when arguments to lazy function is function call of a type or type alias with already an argument (using |>)" <|
+            \() -> reportWhenArgumentIs "(argument |> Constructor 1)"
         ]
 
 

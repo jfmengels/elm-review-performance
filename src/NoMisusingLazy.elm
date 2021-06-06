@@ -360,11 +360,27 @@ isArgumentANewReference node =
         Expression.Application ((Node _ (Expression.FunctionOrValue _ functionName)) :: _) ->
             isTypeOrTypeAliasConstructor functionName
 
-        Expression.OperatorApplication "<|" _ (Node _ (Expression.FunctionOrValue _ functionName)) _ ->
-            isTypeOrTypeAliasConstructor functionName
+        Expression.OperatorApplication "<|" _ left _ ->
+            case Node.value left of
+                Expression.FunctionOrValue _ functionName ->
+                    isTypeOrTypeAliasConstructor functionName
 
-        Expression.OperatorApplication "|>" _ _ (Node _ (Expression.FunctionOrValue _ functionName)) ->
-            isTypeOrTypeAliasConstructor functionName
+                Expression.Application ((Node _ (Expression.FunctionOrValue _ functionName)) :: _) ->
+                    isTypeOrTypeAliasConstructor functionName
+
+                _ ->
+                    False
+
+        Expression.OperatorApplication "|>" _ _ right ->
+            case Node.value right of
+                Expression.FunctionOrValue _ functionName ->
+                    isTypeOrTypeAliasConstructor functionName
+
+                Expression.Application ((Node _ (Expression.FunctionOrValue _ functionName)) :: _) ->
+                    isTypeOrTypeAliasConstructor functionName
+
+                _ ->
+                    False
 
         Expression.ParenthesizedExpression expr ->
             isArgumentANewReference expr
