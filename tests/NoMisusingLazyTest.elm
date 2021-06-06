@@ -561,7 +561,7 @@ view model =
             \() -> reportWhenArgumentIs "(argument |> Constructor 1)"
         , test "should report errors when arguments to lazy function is function call of a type or type alias with already an argument (using <| and extra parens)" <|
             \() -> reportWhenArgumentIs "((Constructor 1) <| argument)"
-        , test "should report errors when arguments to functions sprinkled with lazy are unstable" <|
+        , test "should report errors when arguments to function sprinkled with lazy are unstable" <|
             \() ->
                 """module A exposing (..)
 import Html.Lazy
@@ -578,6 +578,24 @@ helper = text
                             }
                             |> Review.Test.atExactly { start = { row = 4, column = 5 }, end = { row = 4, column = 19 } }
                         ]
+        , Test.skip <|
+            test "should report errors when arguments to function sprinkled with lazy and wrapped in parens are unstable" <|
+                \() ->
+                    """module A exposing (..)
+import Html.Lazy
+lazyView n =
+    (Html.Lazy.lazy helper) {}
+helper = text
+"""
+                        |> Review.Test.runWithProjectData project (rule defaults)
+                        |> Review.Test.expectErrors
+                            [ Review.Test.error
+                                { message = "FOO"
+                                , details = [ "BAR" ]
+                                , under = "Html.Lazy.lazy"
+                                }
+                                |> Review.Test.atExactly { start = { row = 4, column = 5 }, end = { row = 4, column = 19 } }
+                            ]
         ]
 
 
