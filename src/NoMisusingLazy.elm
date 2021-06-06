@@ -305,6 +305,17 @@ expressionVisitor lazyModuleNames node context =
                 _ ->
                     ( [], context )
 
+        Expression.OperatorApplication "|>" _ leftNode rightNode ->
+            case Node.value rightNode of
+                Expression.FunctionOrValue _ _ ->
+                    handleCall lazyModuleNames context rightNode leftNode []
+
+                Expression.Application (function :: firstArgument :: arguments) ->
+                    handleCall lazyModuleNames context function firstArgument (arguments ++ [ leftNode ])
+
+                _ ->
+                    ( [], context )
+
         _ ->
             ( [], context )
 
