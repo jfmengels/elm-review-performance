@@ -451,6 +451,32 @@ view model =
 """
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectNoErrors
+        , test "should not report errors when argument to lazy function is an unknown function call (<|)" <|
+            \() ->
+                """module A exposing (..)
+import Html.Lazy
+lazyView =
+    Html.Lazy.lazy (helper)
+helper _ = text ""
+
+view model =
+    lazyView (unknown <| argument)
+"""
+                    |> Review.Test.runWithProjectData project (rule defaults)
+                    |> Review.Test.expectNoErrors
+        , test "should not report errors when argument to lazy function is an unknown function call (|>)" <|
+            \() ->
+                """module A exposing (..)
+import Html.Lazy
+lazyView =
+    Html.Lazy.lazy (helper)
+helper _ = text ""
+
+view model =
+    lazyView (argument |> unknown)
+"""
+                    |> Review.Test.runWithProjectData project (rule defaults)
+                    |> Review.Test.expectNoErrors
         , test "should not report errors when argument is an unstable references but the function takes no arguments" <|
             \() ->
                 """module A exposing (..)
@@ -508,6 +534,10 @@ view model =
             \() -> reportWhenArgumentIs "(\\a -> a.name)"
         , test "should report errors when arguments to lazy function is function call of a type or type alias" <|
             \() -> reportWhenArgumentIs "(Constructor argument)"
+        , test "should report errors when arguments to lazy function is function call of a type or type alias (using <|)" <|
+            \() -> reportWhenArgumentIs "(Constructor <| argument)"
+        , test "should report errors when arguments to lazy function is function call of a type or type alias (using |>)" <|
+            \() -> reportWhenArgumentIs "(argument |> Constructor)"
         ]
 
 
