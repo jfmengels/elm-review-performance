@@ -382,6 +382,9 @@ isFunctionCallOfTypeConstructor node =
         Expression.Application ((Node _ (Expression.FunctionOrValue _ functionName)) :: _) ->
             isTypeOrTypeAliasConstructor functionName
 
+        Expression.ParenthesizedExpression expr ->
+            isFunctionCallOfTypeConstructor expr
+
         _ ->
             False
 
