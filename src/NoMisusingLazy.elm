@@ -294,22 +294,15 @@ expressionVisitor lazyModuleNames node context =
         Expression.Application (function :: firstArg :: restOfArguments) ->
             handleCall lazyModuleNames context function firstArg restOfArguments
 
-        Expression.OperatorApplication "<|" _ (Node functionRange (Expression.FunctionOrValue _ functionName)) lazyFunctionArgument ->
-            case ModuleNameLookupTable.moduleNameAt context.lookupTable functionRange of
-                Just moduleName ->
-                    if Set.member moduleName lazyModuleNames && Set.member functionName lazyFunctionNames then
-                        ( reportUnstableFunctionReference context functionRange lazyFunctionArgument, context )
+        Expression.OperatorApplication "<|" _ leftNode rightNode ->
+            case Node.value leftNode of
+                Expression.FunctionOrValue _ _ ->
+                    handleCall lazyModuleNames context leftNode rightNode []
 
-                    else
-                        ( if Set.member ( moduleName, functionName ) context.lazyFunctions then
-                            reportUnstableArgumentReferences context functionRange [ lazyFunctionArgument ]
+                Expression.Application (function :: firstArgument :: arguments) ->
+                    handleCall lazyModuleNames context function firstArgument (arguments ++ [ rightNode ])
 
-                          else
-                            []
-                        , context
-                        )
-
-                Nothing ->
+                _ ->
                     ( [], context )
 
         _ ->
