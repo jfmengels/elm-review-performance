@@ -112,6 +112,23 @@ helper _ _ = text ""
                             , under = "Html.Lazy.lazy"
                             }
                         ]
+        , test "should report an error when encountering Html.lazy with an unstable reference passed using <|" <|
+            \() ->
+                """module A exposing (..)
+import Html.Lazy
+a n =
+  Html.Lazy.lazy <| helper x
+
+helper _ _ = text ""
+"""
+                    |> Review.Test.runWithProjectData project (rule defaults)
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = message
+                            , details = details
+                            , under = "Html.Lazy.lazy"
+                            }
+                        ]
         , test "should not report for lazy function with arguments but stable reference" <|
             \() ->
                 """module A exposing (..)
