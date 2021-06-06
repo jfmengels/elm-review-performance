@@ -297,7 +297,13 @@ expressionVisitor lazyModuleNames node context =
                         ( reportUnstableFunctionReference context functionRange lazyFunctionArgument, context )
 
                     else
-                        ( reportUnstableArgumentReferences context functionRange moduleName functionName (lazyFunctionArgument :: restOfArguments), context )
+                        ( if Set.member ( moduleName, functionName ) context.lazyFunctions then
+                            reportUnstableArgumentReferences context functionRange (lazyFunctionArgument :: restOfArguments)
+
+                          else
+                            []
+                        , context
+                        )
 
                 Nothing ->
                     ( [], context )
@@ -309,7 +315,13 @@ expressionVisitor lazyModuleNames node context =
                         ( reportUnstableFunctionReference context functionRange lazyFunctionArgument, context )
 
                     else
-                        ( reportUnstableArgumentReferences context functionRange moduleName functionName [ lazyFunctionArgument ], context )
+                        ( if Set.member ( moduleName, functionName ) context.lazyFunctions then
+                            reportUnstableArgumentReferences context functionRange [ lazyFunctionArgument ]
+
+                          else
+                            []
+                        , context
+                        )
 
                 Nothing ->
                     ( [], context )
@@ -332,9 +344,9 @@ reportUnstableFunctionReference context functionRange lazyFunctionArgument =
         ]
 
 
-reportUnstableArgumentReferences : Context -> Range -> ModuleName -> String -> List (Node Expression) -> List (Rule.Error {})
-reportUnstableArgumentReferences context functionRange moduleName functionName arguments =
-    if not context.currentFunctionHasNoArguments && Set.member ( moduleName, functionName ) context.lazyFunctions then
+reportUnstableArgumentReferences : Context -> Range -> List (Node Expression) -> List (Rule.Error {})
+reportUnstableArgumentReferences context under arguments =
+    if not context.currentFunctionHasNoArguments then
         arguments
             |> List.filter isArgumentANewReference
             |> List.map
@@ -343,7 +355,7 @@ reportUnstableArgumentReferences context functionRange moduleName functionName a
                         { message = "FOO"
                         , details = [ "BAR" ]
                         }
-                        functionRange
+                        under
                 )
 
     else
