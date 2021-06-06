@@ -302,6 +302,18 @@ expressionVisitor lazyModuleNames node context =
                 Nothing ->
                     ( [], context )
 
+        Expression.OperatorApplication "<|" _ (Node functionRange (Expression.FunctionOrValue _ functionName)) lazyFunctionArgument ->
+            case ModuleNameLookupTable.moduleNameAt context.lookupTable functionRange of
+                Just moduleName ->
+                    if Set.member moduleName lazyModuleNames && Set.member functionName lazyFunctionNames then
+                        ( reportUnstableFunctionReference context functionRange lazyFunctionArgument, context )
+
+                    else
+                        ( reportUnstableArgumentReferences context functionRange moduleName functionName [ lazyFunctionArgument ], context )
+
+                Nothing ->
+                    ( [], context )
+
         _ ->
             ( [], context )
 
