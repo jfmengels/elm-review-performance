@@ -291,26 +291,8 @@ declarationVisitor node context =
 expressionVisitor : Set ModuleName -> Node Expression -> Context -> ( List (Rule.Error {}), Context )
 expressionVisitor lazyModuleNames node context =
     case Node.value node of
-        Expression.Application ((Node functionRange (Expression.FunctionOrValue _ functionName)) :: lazyFunctionArgument :: restOfArguments) ->
-            case ModuleNameLookupTable.moduleNameAt context.lookupTable functionRange of
-                Just moduleName ->
-                    if Set.member moduleName lazyModuleNames && Set.member functionName lazyFunctionNames then
-                        ( reportUnstableFunctionReference context functionRange lazyFunctionArgument
-                            ++ reportUnstableArgumentReferences context functionRange restOfArguments
-                        , context
-                        )
-
-                    else
-                        ( if Set.member ( moduleName, functionName ) context.lazyFunctions then
-                            reportUnstableArgumentReferences context functionRange (lazyFunctionArgument :: restOfArguments)
-
-                          else
-                            []
-                        , context
-                        )
-
-                Nothing ->
-                    ( [], context )
+        Expression.Application (function :: firstArg :: restOfArguments) ->
+            handleCall lazyModuleNames context function firstArg restOfArguments
 
         Expression.OperatorApplication "<|" _ (Node functionRange (Expression.FunctionOrValue _ functionName)) lazyFunctionArgument ->
             case ModuleNameLookupTable.moduleNameAt context.lookupTable functionRange of
@@ -321,6 +303,39 @@ expressionVisitor lazyModuleNames node context =
                     else
                         ( if Set.member ( moduleName, functionName ) context.lazyFunctions then
                             reportUnstableArgumentReferences context functionRange [ lazyFunctionArgument ]
+
+                          else
+                            []
+                        , context
+                        )
+
+                Nothing ->
+                    ( [], context )
+
+        _ ->
+            ( [], context )
+
+
+handleCall : Set ModuleName -> Context -> Node Expression -> Node Expression -> List (Node Expression) -> ( List (Rule.Error {}), { lookupTable : ModuleNameLookupTable, topLevelFunctionNames : Set String, currentFunctionHasNoArguments : Bool, lazyFunctions : Set ( ModuleName, String ) } )
+handleCall lazyModuleNames context node firstArg restOfArguments =
+    case Node.value node of
+        Expression.FunctionOrValue _ functionName ->
+            let
+                functionRange : Range
+                functionRange =
+                    Node.range node
+            in
+            case ModuleNameLookupTable.moduleNameAt context.lookupTable functionRange of
+                Just moduleName ->
+                    if Set.member moduleName lazyModuleNames && Set.member functionName lazyFunctionNames then
+                        ( reportUnstableFunctionReference context functionRange firstArg
+                            ++ reportUnstableArgumentReferences context functionRange restOfArguments
+                        , context
+                        )
+
+                    else
+                        ( if Set.member ( moduleName, functionName ) context.lazyFunctions then
+                            reportUnstableArgumentReferences context functionRange (firstArg :: restOfArguments)
 
                           else
                             []
