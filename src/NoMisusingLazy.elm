@@ -294,7 +294,10 @@ expressionVisitor lazyModuleNames node context =
             case ModuleNameLookupTable.moduleNameAt context.lookupTable functionRange of
                 Just moduleName ->
                     if Set.member moduleName lazyModuleNames && Set.member functionName lazyFunctionNames then
-                        ( reportUnstableFunctionReference context functionRange lazyFunctionArgument, context )
+                        ( reportUnstableFunctionReference context functionRange lazyFunctionArgument
+                            ++ reportUnstableArgumentReferences context functionRange restOfArguments
+                        , context
+                        )
 
                     else
                         ( if Set.member ( moduleName, functionName ) context.lazyFunctions then

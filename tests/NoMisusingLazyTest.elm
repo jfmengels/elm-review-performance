@@ -574,9 +574,9 @@ helper = text
                         [ Review.Test.error
                             { message = "FOO"
                             , details = [ "BAR" ]
-                            , under = "lazyView"
+                            , under = "Html.Lazy.lazy"
                             }
-                            |> Review.Test.atExactly { start = { row = 8, column = 5 }, end = { row = 8, column = 13 } }
+                            |> Review.Test.atExactly { start = { row = 4, column = 5 }, end = { row = 4, column = 19 } }
                         ]
         ]
 
