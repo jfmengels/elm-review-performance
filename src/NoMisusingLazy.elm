@@ -365,6 +365,22 @@ isArgumentANewReference node =
                 Nothing ->
                     False
 
+        Expression.OperatorApplication "<|" _ (Node _ (Expression.FunctionOrValue _ functionName)) _ ->
+            case String.uncons functionName of
+                Just ( firstChar, _ ) ->
+                    Char.isUpper firstChar
+
+                Nothing ->
+                    False
+
+        Expression.OperatorApplication "|>" _ _ (Node _ (Expression.FunctionOrValue _ functionName)) ->
+            case String.uncons functionName of
+                Just ( firstChar, _ ) ->
+                    Char.isUpper firstChar
+
+                Nothing ->
+                    False
+
         Expression.ParenthesizedExpression expr ->
             isArgumentANewReference expr
 
