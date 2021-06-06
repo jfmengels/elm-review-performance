@@ -358,33 +358,28 @@ isArgumentANewReference node =
             True
 
         Expression.Application ((Node _ (Expression.FunctionOrValue _ functionName)) :: _) ->
-            case String.uncons functionName of
-                Just ( firstChar, _ ) ->
-                    Char.isUpper firstChar
-
-                Nothing ->
-                    False
+            isTypeOrTypeAliasConstructor functionName
 
         Expression.OperatorApplication "<|" _ (Node _ (Expression.FunctionOrValue _ functionName)) _ ->
-            case String.uncons functionName of
-                Just ( firstChar, _ ) ->
-                    Char.isUpper firstChar
-
-                Nothing ->
-                    False
+            isTypeOrTypeAliasConstructor functionName
 
         Expression.OperatorApplication "|>" _ _ (Node _ (Expression.FunctionOrValue _ functionName)) ->
-            case String.uncons functionName of
-                Just ( firstChar, _ ) ->
-                    Char.isUpper firstChar
-
-                Nothing ->
-                    False
+            isTypeOrTypeAliasConstructor functionName
 
         Expression.ParenthesizedExpression expr ->
             isArgumentANewReference expr
 
         _ ->
+            False
+
+
+isTypeOrTypeAliasConstructor : String -> Bool
+isTypeOrTypeAliasConstructor functionName =
+    case String.uncons functionName of
+        Just ( firstChar, _ ) ->
+            Char.isUpper firstChar
+
+        Nothing ->
             False
 
 
