@@ -480,6 +480,9 @@ isStableReference context node =
         Expression.FunctionOrValue moduleName name ->
             isVariableFromLetDeclaration context (Node.range node) moduleName name
 
+        Expression.ParenthesizedExpression expr ->
+            isStableReference context expr
+
         _ ->
             False
 
