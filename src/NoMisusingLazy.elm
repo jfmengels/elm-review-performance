@@ -345,6 +345,9 @@ handleCall lazyModuleNames context node firstArg restOfArguments =
                 Nothing ->
                     ( [], context )
 
+        Expression.ParenthesizedExpression expr ->
+            handleCall lazyModuleNames context expr firstArg restOfArguments
+
         _ ->
             ( [], context )
 
