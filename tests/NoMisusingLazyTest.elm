@@ -9,14 +9,26 @@ import Review.Test.Dependencies
 import Test exposing (Test, describe, test)
 
 
-message : String
-message =
+lazyFunctionMisuseMessage : String
+lazyFunctionMisuseMessage =
     "Misuse of a lazy function"
 
 
-details : List String
-details =
+lazyFunctionMisuseDetails : List String
+lazyFunctionMisuseDetails =
     [ "The argument passed to the lazy function must be a stable reference, but a new reference will be created everytime this function is called." ]
+
+
+lazyArgumentMessage : String
+lazyArgumentMessage =
+    "Argument de-optimizes a lazy function"
+
+
+lazyArgumentDetails : List String
+lazyArgumentDetails =
+    [ "This argument is passed to a function that is being optimized by a 'lazy' function."
+    , "The way this argument is constructed creates a new reference every time, which invalidates the lazy function's optimization."
+    ]
 
 
 project : Review.Project.Project
@@ -107,8 +119,8 @@ helper _ _ = text ""
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = message
-                            , details = details
+                            { message = lazyFunctionMisuseMessage
+                            , details = lazyFunctionMisuseDetails
                             , under = "Html.Lazy.lazy"
                             }
                         ]
@@ -124,8 +136,8 @@ helper _ _ = text ""
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = message
-                            , details = details
+                            { message = lazyFunctionMisuseMessage
+                            , details = lazyFunctionMisuseDetails
                             , under = "Html.Lazy.lazy"
                             }
                         ]
@@ -163,8 +175,8 @@ a n =
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = message
-                            , details = details
+                            { message = lazyFunctionMisuseMessage
+                            , details = lazyFunctionMisuseDetails
                             , under = "Html.Lazy.lazy"
                             }
                         ]
@@ -179,8 +191,8 @@ helper _ _ _ = text ""
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = message
-                            , details = details
+                            { message = lazyFunctionMisuseMessage
+                            , details = lazyFunctionMisuseDetails
                             , under = "Html.Lazy.lazy2"
                             }
                         ]
@@ -195,8 +207,8 @@ helper _ _ _ = text ""
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = message
-                            , details = details
+                            { message = lazyFunctionMisuseMessage
+                            , details = lazyFunctionMisuseDetails
                             , under = "Html.Lazy.lazy3"
                             }
                         ]
@@ -211,8 +223,8 @@ helper _ _ _ = text ""
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = message
-                            , details = details
+                            { message = lazyFunctionMisuseMessage
+                            , details = lazyFunctionMisuseDetails
                             , under = "Html.Lazy.lazy4"
                             }
                         ]
@@ -227,8 +239,8 @@ helper _ _ _ = text ""
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = message
-                            , details = details
+                            { message = lazyFunctionMisuseMessage
+                            , details = lazyFunctionMisuseDetails
                             , under = "Html.Lazy.lazy5"
                             }
                         ]
@@ -243,8 +255,8 @@ helper _ _ _ = text ""
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = message
-                            , details = details
+                            { message = lazyFunctionMisuseMessage
+                            , details = lazyFunctionMisuseDetails
                             , under = "Html.Lazy.lazy6"
                             }
                         ]
@@ -259,8 +271,8 @@ helper _ _ _ = text ""
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = message
-                            , details = details
+                            { message = lazyFunctionMisuseMessage
+                            , details = lazyFunctionMisuseDetails
                             , under = "Html.Lazy.lazy7"
                             }
                         ]
@@ -275,8 +287,8 @@ helper _ _ _ = text ""
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = message
-                            , details = details
+                            { message = lazyFunctionMisuseMessage
+                            , details = lazyFunctionMisuseDetails
                             , under = "Html.Lazy.lazy8"
                             }
                         ]
@@ -291,8 +303,8 @@ helper _ _ _ = text ""
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = message
-                            , details = details
+                            { message = lazyFunctionMisuseMessage
+                            , details = lazyFunctionMisuseDetails
                             , under = "Svg.Lazy.lazy"
                             }
                         ]
@@ -307,8 +319,8 @@ helper _ _ _ = text ""
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = message
-                            , details = details
+                            { message = lazyFunctionMisuseMessage
+                            , details = lazyFunctionMisuseDetails
                             , under = "VirtualDom.lazy"
                             }
                         ]
@@ -323,8 +335,8 @@ helper _ _ _ = text ""
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = message
-                            , details = details
+                            { message = lazyFunctionMisuseMessage
+                            , details = lazyFunctionMisuseDetails
                             , under = "Html.Styled.Lazy.lazy"
                             }
                         ]
@@ -339,8 +351,8 @@ helper _ _ _ = text ""
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = message
-                            , details = details
+                            { message = lazyFunctionMisuseMessage
+                            , details = lazyFunctionMisuseDetails
                             , under = "Svg.Styled.Lazy.lazy"
                             }
                         ]
@@ -355,8 +367,8 @@ helper _ _ _ = text ""
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = message
-                            , details = details
+                            { message = lazyFunctionMisuseMessage
+                            , details = lazyFunctionMisuseDetails
                             , under = "Element.Lazy.lazy"
                             }
                         ]
@@ -371,8 +383,8 @@ helper _ _ _ = text ""
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = message
-                            , details = details
+                            { message = lazyFunctionMisuseMessage
+                            , details = lazyFunctionMisuseDetails
                             , under = "Element.WithContext.Lazy.lazy"
                             }
                         ]
@@ -400,8 +412,8 @@ helper _ _ _ = text ""
                     |> Review.Test.runWithProjectData project configuredRule
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = message
-                            , details = details
+                            { message = lazyFunctionMisuseMessage
+                            , details = lazyFunctionMisuseDetails
                             , under = "Some.Module.lazy"
                             }
                         ]
@@ -572,11 +584,10 @@ helper = text
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = "FOO"
-                            , details = [ "BAR" ]
-                            , under = "Html.Lazy.lazy"
+                            { message = lazyArgumentMessage
+                            , details = lazyArgumentDetails
+                            , under = "{}"
                             }
-                            |> Review.Test.atExactly { start = { row = 4, column = 5 }, end = { row = 4, column = 19 } }
                         ]
         , test "should report errors when arguments to function sprinkled with lazy (lazy wrapped in parens) are unstable" <|
             \() ->
@@ -589,11 +600,10 @@ helper = text
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = "FOO"
-                            , details = [ "BAR" ]
-                            , under = "Html.Lazy.lazy"
+                            { message = lazyArgumentMessage
+                            , details = lazyArgumentDetails
+                            , under = "{}"
                             }
-                            |> Review.Test.atExactly { start = { row = 4, column = 6 }, end = { row = 4, column = 20 } }
                         ]
         , test "should report errors when arguments to function sprinkled with lazy (function wrapped in parens) are unstable" <|
             \() ->
@@ -606,11 +616,10 @@ helper = text
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = "FOO"
-                            , details = [ "BAR" ]
-                            , under = "Html.Lazy.lazy"
+                            { message = lazyArgumentMessage
+                            , details = lazyArgumentDetails
+                            , under = "{}"
                             }
-                            |> Review.Test.atExactly { start = { row = 4, column = 5 }, end = { row = 4, column = 19 } }
                         ]
         , test "should report errors when arguments to function sprinkled with lazy are unstable (using <|)" <|
             \() ->
@@ -623,11 +632,10 @@ helper = text
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = "FOO"
-                            , details = [ "BAR" ]
-                            , under = "Html.Lazy.lazy"
+                            { message = lazyArgumentMessage
+                            , details = lazyArgumentDetails
+                            , under = "{}"
                             }
-                            |> Review.Test.atExactly { start = { row = 4, column = 5 }, end = { row = 4, column = 19 } }
                         ]
         , test "should report errors when arguments to function sprinkled with lazy are unstable (using |>)" <|
             \() ->
@@ -640,11 +648,10 @@ helper = text
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = "FOO"
-                            , details = [ "BAR" ]
-                            , under = "Html.Lazy.lazy"
+                            { message = lazyArgumentMessage
+                            , details = lazyArgumentDetails
+                            , under = "{}"
                             }
-                            |> Review.Test.atExactly { start = { row = 4, column = 11 }, end = { row = 4, column = 25 } }
                         ]
         , Test.skip <|
             test "should report errors when arguments to function sprinkled with lazy and wrapped in parens are unstable" <|
@@ -658,11 +665,10 @@ helper = text
                         |> Review.Test.runWithProjectData project (rule defaults)
                         |> Review.Test.expectErrors
                             [ Review.Test.error
-                                { message = "FOO"
-                                , details = [ "BAR" ]
-                                , under = "Html.Lazy.lazy"
+                                { message = lazyArgumentMessage
+                                , details = lazyArgumentDetails
+                                , under = "{}"
                                 }
-                                |> Review.Test.atExactly { start = { row = 4, column = 5 }, end = { row = 4, column = 19 } }
                             ]
         ]
 
@@ -680,9 +686,8 @@ view model =
         |> Review.Test.runWithProjectData project (rule defaults)
         |> Review.Test.expectErrors
             [ Review.Test.error
-                { message = "FOO"
-                , details = [ "BAR" ]
-                , under = "lazyView"
+                { message = lazyArgumentMessage
+                , details = lazyArgumentDetails
+                , under = thing
                 }
-                |> Review.Test.atExactly { start = { row = 8, column = 5 }, end = { row = 8, column = 13 } }
             ]

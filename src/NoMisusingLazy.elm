@@ -375,12 +375,15 @@ reportUnstableArgumentReferences context under arguments =
         arguments
             |> List.filter isArgumentANewReference
             |> List.map
-                (\_ ->
+                (\arg ->
                     Rule.error
-                        { message = "FOO"
-                        , details = [ "BAR" ]
+                        { message = "Argument de-optimizes a lazy function"
+                        , details =
+                            [ "This argument is passed to a function that is being optimized by a 'lazy' function."
+                            , "The way this argument is constructed creates a new reference every time, which invalidates the lazy function's optimization."
+                            ]
                         }
-                        under
+                        (Node.range arg)
                 )
 
     else
