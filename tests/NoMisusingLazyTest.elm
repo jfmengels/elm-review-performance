@@ -121,7 +121,7 @@ helper _ _ = text ""
                         [ Review.Test.error
                             { message = lazyFunctionMisuseMessage
                             , details = lazyFunctionMisuseDetails
-                            , under = "Html.Lazy.lazy"
+                            , under = "(helper x)"
                             }
                         ]
         , test "should report an error when encountering Html.lazy with an unstable reference passed using <|" <|
@@ -138,7 +138,7 @@ helper _ _ = text ""
                         [ Review.Test.error
                             { message = lazyFunctionMisuseMessage
                             , details = lazyFunctionMisuseDetails
-                            , under = "Html.Lazy.lazy"
+                            , under = "helper x"
                             }
                         ]
         , test "should not report for lazy function with arguments but stable reference" <|
@@ -162,7 +162,7 @@ helper _ = text ""
 """
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectNoErrors
-        , test "should report an error when encountering Html.lazy with arguments and an let in reference" <|
+        , test "should report an error when encountering Html.lazy with arguments and a let in reference" <|
             \() ->
                 """module A exposing (..)
 import Html.Lazy
@@ -177,8 +177,9 @@ a n =
                         [ Review.Test.error
                             { message = lazyFunctionMisuseMessage
                             , details = lazyFunctionMisuseDetails
-                            , under = "Html.Lazy.lazy"
+                            , under = "helper"
                             }
+                            |> Review.Test.atExactly { start = { row = 7, column = 18 }, end = { row = 7, column = 24 } }
                         ]
         , test "should report an error when encountering problematic Html.Lazy.lazy2" <|
             \() ->
@@ -193,7 +194,7 @@ helper _ _ _ = text ""
                         [ Review.Test.error
                             { message = lazyFunctionMisuseMessage
                             , details = lazyFunctionMisuseDetails
-                            , under = "Html.Lazy.lazy2"
+                            , under = "(helper x)"
                             }
                         ]
         , test "should report an error when encountering problematic Html.Lazy.lazy3" <|
@@ -209,7 +210,7 @@ helper _ _ _ = text ""
                         [ Review.Test.error
                             { message = lazyFunctionMisuseMessage
                             , details = lazyFunctionMisuseDetails
-                            , under = "Html.Lazy.lazy3"
+                            , under = "(helper x)"
                             }
                         ]
         , test "should report an error when encountering problematic Html.Lazy.lazy4" <|
@@ -225,7 +226,7 @@ helper _ _ _ = text ""
                         [ Review.Test.error
                             { message = lazyFunctionMisuseMessage
                             , details = lazyFunctionMisuseDetails
-                            , under = "Html.Lazy.lazy4"
+                            , under = "(helper x)"
                             }
                         ]
         , test "should report an error when encountering problematic Html.Lazy.lazy5" <|
@@ -241,7 +242,7 @@ helper _ _ _ = text ""
                         [ Review.Test.error
                             { message = lazyFunctionMisuseMessage
                             , details = lazyFunctionMisuseDetails
-                            , under = "Html.Lazy.lazy5"
+                            , under = "(helper x)"
                             }
                         ]
         , test "should report an error when encountering problematic Html.Lazy.lazy6" <|
@@ -257,7 +258,7 @@ helper _ _ _ = text ""
                         [ Review.Test.error
                             { message = lazyFunctionMisuseMessage
                             , details = lazyFunctionMisuseDetails
-                            , under = "Html.Lazy.lazy6"
+                            , under = "(helper x)"
                             }
                         ]
         , test "should report an error when encountering problematic Html.Lazy.lazy7" <|
@@ -273,7 +274,7 @@ helper _ _ _ = text ""
                         [ Review.Test.error
                             { message = lazyFunctionMisuseMessage
                             , details = lazyFunctionMisuseDetails
-                            , under = "Html.Lazy.lazy7"
+                            , under = "(helper x)"
                             }
                         ]
         , test "should report an error when encountering problematic Html.Lazy.lazy8" <|
@@ -289,7 +290,7 @@ helper _ _ _ = text ""
                         [ Review.Test.error
                             { message = lazyFunctionMisuseMessage
                             , details = lazyFunctionMisuseDetails
-                            , under = "Html.Lazy.lazy8"
+                            , under = "(helper x)"
                             }
                         ]
         , test "should report an error when encountering problematic Svg.Lazy.lazy" <|
@@ -305,7 +306,7 @@ helper _ _ _ = text ""
                         [ Review.Test.error
                             { message = lazyFunctionMisuseMessage
                             , details = lazyFunctionMisuseDetails
-                            , under = "Svg.Lazy.lazy"
+                            , under = "(helper x)"
                             }
                         ]
         , test "should report an error when encountering problematic VirtualDom.lazy" <|
@@ -321,7 +322,7 @@ helper _ _ _ = text ""
                         [ Review.Test.error
                             { message = lazyFunctionMisuseMessage
                             , details = lazyFunctionMisuseDetails
-                            , under = "VirtualDom.lazy"
+                            , under = "(helper x)"
                             }
                         ]
         , test "should report an error when encountering problematic Html.Styled.Lazy.lazy" <|
@@ -337,7 +338,7 @@ helper _ _ _ = text ""
                         [ Review.Test.error
                             { message = lazyFunctionMisuseMessage
                             , details = lazyFunctionMisuseDetails
-                            , under = "Html.Styled.Lazy.lazy"
+                            , under = "(helper x)"
                             }
                         ]
         , test "should report an error when encountering problematic Svg.Styled.Lazy.lazy" <|
@@ -353,7 +354,7 @@ helper _ _ _ = text ""
                         [ Review.Test.error
                             { message = lazyFunctionMisuseMessage
                             , details = lazyFunctionMisuseDetails
-                            , under = "Svg.Styled.Lazy.lazy"
+                            , under = "(helper x)"
                             }
                         ]
         , test "should report an error when encountering problematic Element.Lazy.lazy" <|
@@ -369,7 +370,7 @@ helper _ _ _ = text ""
                         [ Review.Test.error
                             { message = lazyFunctionMisuseMessage
                             , details = lazyFunctionMisuseDetails
-                            , under = "Element.Lazy.lazy"
+                            , under = "(helper x)"
                             }
                         ]
         , test "should report an error when encountering problematic Element.WithContext.Lazy.lazy" <|
@@ -385,7 +386,7 @@ helper _ _ _ = text ""
                         [ Review.Test.error
                             { message = lazyFunctionMisuseMessage
                             , details = lazyFunctionMisuseDetails
-                            , under = "Element.WithContext.Lazy.lazy"
+                            , under = "(helper x)"
                             }
                         ]
         ]
@@ -414,7 +415,7 @@ helper _ _ _ = text ""
                         [ Review.Test.error
                             { message = lazyFunctionMisuseMessage
                             , details = lazyFunctionMisuseDetails
-                            , under = "Some.Module.lazy"
+                            , under = "(helper x)"
                             }
                         ]
         , test "should report a configuration error when passed module name is invalid" <|

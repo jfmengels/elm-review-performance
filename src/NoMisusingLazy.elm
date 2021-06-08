@@ -323,15 +323,10 @@ handleCall : Set ModuleName -> Context -> Node Expression -> Node Expression -> 
 handleCall lazyModuleNames context node firstArg restOfArguments =
     case Node.value node of
         Expression.FunctionOrValue _ functionName ->
-            let
-                functionRange : Range
-                functionRange =
-                    Node.range node
-            in
-            case ModuleNameLookupTable.moduleNameAt context.lookupTable functionRange of
+            case ModuleNameLookupTable.moduleNameFor context.lookupTable node of
                 Just moduleName ->
                     if Set.member moduleName lazyModuleNames && Set.member functionName lazyFunctionNames then
-                        ( reportUnstableFunctionReference context functionRange firstArg
+                        ( reportUnstableFunctionReference context firstArg
                             ++ reportUnstableArgumentReferences context restOfArguments
                         , context
                         )
@@ -355,8 +350,8 @@ handleCall lazyModuleNames context node firstArg restOfArguments =
             ( [], context )
 
 
-reportUnstableFunctionReference : Context -> Range -> Node Expression -> List (Rule.Error {})
-reportUnstableFunctionReference context functionRange lazyFunctionArgument =
+reportUnstableFunctionReference : Context -> Node Expression -> List (Rule.Error {})
+reportUnstableFunctionReference context lazyFunctionArgument =
     if context.currentFunctionHasNoArguments || isStableReference context lazyFunctionArgument then
         []
 
@@ -365,7 +360,7 @@ reportUnstableFunctionReference context functionRange lazyFunctionArgument =
             { message = "Misuse of a lazy function"
             , details = [ "The argument passed to the lazy function must be a stable reference, but a new reference will be created everytime this function is called." ]
             }
-            functionRange
+            (Node.range lazyFunctionArgument)
         ]
 
 
