@@ -332,13 +332,13 @@ handleCall lazyModuleNames context node firstArg restOfArguments =
                 Just moduleName ->
                     if Set.member moduleName lazyModuleNames && Set.member functionName lazyFunctionNames then
                         ( reportUnstableFunctionReference context functionRange firstArg
-                            ++ reportUnstableArgumentReferences context functionRange restOfArguments
+                            ++ reportUnstableArgumentReferences context restOfArguments
                         , context
                         )
 
                     else
                         ( if Set.member ( moduleName, functionName ) context.lazyFunctions then
-                            reportUnstableArgumentReferences context functionRange (firstArg :: restOfArguments)
+                            reportUnstableArgumentReferences context (firstArg :: restOfArguments)
 
                           else
                             []
@@ -369,8 +369,8 @@ reportUnstableFunctionReference context functionRange lazyFunctionArgument =
         ]
 
 
-reportUnstableArgumentReferences : Context -> Range -> List (Node Expression) -> List (Rule.Error {})
-reportUnstableArgumentReferences context under arguments =
+reportUnstableArgumentReferences : Context -> List (Node Expression) -> List (Rule.Error {})
+reportUnstableArgumentReferences context arguments =
     if not context.currentFunctionHasNoArguments then
         arguments
             |> List.filter isArgumentANewReference
