@@ -169,6 +169,7 @@ type alias Context =
     , topLevelFunctionNames : Set String
     , currentFunctionHasNoArguments : Bool
     , lazyFunctions : Set ( ModuleName, String )
+    , lazyFunctionReferences : List Range
     }
 
 
@@ -180,6 +181,7 @@ initialContext =
             , topLevelFunctionNames = Set.empty
             , currentFunctionHasNoArguments = False
             , lazyFunctions = Set.empty
+            , lazyFunctionReferences = []
             }
         )
         |> Rule.withModuleNameLookupTable
