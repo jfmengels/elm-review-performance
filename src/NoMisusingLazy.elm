@@ -324,7 +324,7 @@ expressionVisitor lazyModuleNames node context =
             ( [], context )
 
 
-handleCall : Set ModuleName -> Context -> Node Expression -> Node Expression -> List (Node Expression) -> ( List (Rule.Error {}), { lookupTable : ModuleNameLookupTable, topLevelFunctionNames : Set String, currentFunctionHasNoArguments : Bool, lazyFunctions : Set ( ModuleName, String ) } )
+handleCall : Set ModuleName -> Context -> Node Expression -> Node Expression -> List (Node Expression) -> ( List (Rule.Error {}), Context )
 handleCall lazyModuleNames context node firstArg restOfArguments =
     case Node.value node of
         Expression.FunctionOrValue _ functionName ->
