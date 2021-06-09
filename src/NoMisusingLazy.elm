@@ -87,7 +87,12 @@ rule (Configuration { lazyModules }) =
         Err errors ->
             Rule.configurationError "NoMisusingLazy"
                 { message = "I found some problems with the arguments to withLazyModules"
-                , details = List.map (\str -> "  - " ++ str) errors
+                , details =
+                    [ errors
+                        |> List.map (\str -> "  - " ++ str)
+                        |> List.reverse
+                        |> String.join "\n"
+                    ]
                 }
 
 

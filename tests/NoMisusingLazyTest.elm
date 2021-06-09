@@ -436,6 +436,18 @@ helper _ _ _ = text ""
                         { message = "I found some problems with the arguments to withLazyModules"
                         , details = [ "  - One of the module names I received was empty" ]
                         }
+        , test "should put each configuration error on a new line" <|
+            \() ->
+                defaults
+                    |> withLazyModules [ "", "Some.module" ]
+                    |> rule
+                    |> Review.Test.expectConfigurationError
+                        { message = "I found some problems with the arguments to withLazyModules"
+                        , details =
+                            [ """  - One of the module names I received was empty
+  - Some.module is not a valid module name"""
+                            ]
+                        }
         ]
 
 
