@@ -81,7 +81,7 @@ rule (Configuration { lazyModules }) =
             Rule.newModuleRuleSchemaUsingContextCreator "NoMisusingLazy" initialContext
                 |> Rule.withDeclarationListVisitor (declarationListVisitor lazyModuleNames)
                 |> Rule.withDeclarationEnterVisitor declarationVisitor
-                |> Rule.withExpressionEnterVisitor (expressionVisitor lazyModuleNames)
+                |> Rule.withExpressionExitVisitor (expressionVisitor lazyModuleNames)
                 |> Rule.fromModuleRuleSchema
 
         Err errors ->
@@ -169,6 +169,7 @@ type alias Context =
     , topLevelFunctionNames : Set String
     , currentFunctionHasNoArguments : Bool
     , lazyFunctions : Set ( ModuleName, String )
+    , coreLazyFunctionReferences : List Range
     , lazyFunctionReferences : List Range
     }
 
@@ -181,6 +182,7 @@ initialContext =
             , topLevelFunctionNames = Set.empty
             , currentFunctionHasNoArguments = False
             , lazyFunctions = Set.empty
+            , coreLazyFunctionReferences = []
             , lazyFunctionReferences = []
             }
         )
@@ -240,7 +242,7 @@ checkIfIsLazyFunction lazyModuleNames lookupTable node =
 checkIfReturnsLazyFunction : Set ModuleName -> ModuleNameLookupTable -> Node Expression -> Bool
 checkIfReturnsLazyFunction lazyModuleNames lookupTable node =
     case Node.value node of
-        Expression.Application ((Node functionRange (Expression.FunctionOrValue _ functionName)) :: lazyFunctionArgument :: restOfArguments) ->
+        Expression.Application ((Node functionRange (Expression.FunctionOrValue _ functionName)) :: _ :: _) ->
             case ModuleNameLookupTable.moduleNameAt lookupTable functionRange of
                 Just moduleName ->
                     Set.member moduleName lazyModuleNames && Set.member functionName lazyFunctionNames
@@ -262,11 +264,11 @@ checkIfReturnsLazyFunction lazyModuleNames lookupTable node =
             -- ???
             False
 
-        Expression.CaseExpression caseBlock ->
+        Expression.CaseExpression _ ->
             -- ???
             False
 
-        Expression.LambdaExpression lambda ->
+        Expression.LambdaExpression _ ->
             -- ???
             False
 
@@ -297,64 +299,62 @@ declarationVisitor node context =
 expressionVisitor : Set ModuleName -> Node Expression -> Context -> ( List (Rule.Error {}), Context )
 expressionVisitor lazyModuleNames node context =
     case Node.value node of
-        Expression.Application (function :: firstArg :: restOfArguments) ->
-            handleCall lazyModuleNames context function firstArg restOfArguments
-
-        Expression.OperatorApplication "<|" _ leftNode rightNode ->
-            case Node.value leftNode of
-                Expression.FunctionOrValue _ _ ->
-                    handleCall lazyModuleNames context leftNode rightNode []
-
-                Expression.Application (function :: firstArgument :: arguments) ->
-                    handleCall lazyModuleNames context function firstArgument (arguments ++ [ rightNode ])
-
-                _ ->
-                    ( [], context )
-
-        Expression.OperatorApplication "|>" _ leftNode rightNode ->
-            case Node.value rightNode of
-                Expression.FunctionOrValue _ _ ->
-                    handleCall lazyModuleNames context rightNode leftNode []
-
-                Expression.Application (function :: firstArgument :: arguments) ->
-                    handleCall lazyModuleNames context function firstArgument (arguments ++ [ leftNode ])
-
-                _ ->
-                    ( [], context )
-
-        _ ->
-            ( [], context )
-
-
-handleCall : Set ModuleName -> Context -> Node Expression -> Node Expression -> List (Node Expression) -> ( List (Rule.Error {}), Context )
-handleCall lazyModuleNames context node firstArg restOfArguments =
-    case Node.value node of
         Expression.FunctionOrValue _ functionName ->
             case ModuleNameLookupTable.moduleNameFor context.lookupTable node of
                 Just moduleName ->
                     if Set.member moduleName lazyModuleNames && Set.member functionName lazyFunctionNames then
-                        ( reportUnstableFunctionReference context firstArg
-                            ++ reportUnstableArgumentReferences context restOfArguments
-                        , context
+                        ( []
+                        , { context | coreLazyFunctionReferences = Node.range node :: context.coreLazyFunctionReferences }
+                        )
+
+                    else if Set.member ( moduleName, functionName ) context.lazyFunctions then
+                        ( []
+                        , { context | lazyFunctionReferences = Node.range node :: context.lazyFunctionReferences }
                         )
 
                     else
-                        ( if Set.member ( moduleName, functionName ) context.lazyFunctions then
-                            reportUnstableArgumentReferences context (firstArg :: restOfArguments)
-
-                          else
-                            []
-                        , context
-                        )
+                        ( [], context )
 
                 Nothing ->
                     ( [], context )
 
         Expression.ParenthesizedExpression expr ->
-            handleCall lazyModuleNames context expr firstArg restOfArguments
+            if List.member (Node.range expr) context.coreLazyFunctionReferences then
+                ( [], { context | coreLazyFunctionReferences = Node.range node :: context.coreLazyFunctionReferences } )
+
+            else if List.member (Node.range expr) context.lazyFunctionReferences then
+                ( [], { context | lazyFunctionReferences = Node.range node :: context.lazyFunctionReferences } )
+
+            else
+                ( [], context )
+
+        Expression.Application (function :: firstArgument :: restOfArguments) ->
+            handleFunctionCall (Node.range node) function firstArgument restOfArguments context
+
+        Expression.OperatorApplication "<|" _ left right ->
+            handleFunctionCall (Node.range node) left right [] context
+
+        Expression.OperatorApplication "|>" _ left right ->
+            handleFunctionCall (Node.range node) right left [] context
 
         _ ->
             ( [], context )
+
+
+handleFunctionCall : Range -> Node b -> Node Expression -> List (Node Expression) -> Context -> ( List (Rule.Error {}), Context )
+handleFunctionCall range function firstArgument restOfArguments context =
+    if List.member (Node.range function) context.coreLazyFunctionReferences then
+        ( reportUnstableFunctionReference context firstArgument ++ reportUnstableArgumentReferences context restOfArguments
+        , { context | lazyFunctionReferences = range :: context.lazyFunctionReferences }
+        )
+
+    else if List.member (Node.range function) context.lazyFunctionReferences then
+        ( reportUnstableArgumentReferences context (firstArgument :: restOfArguments)
+        , { context | lazyFunctionReferences = range :: context.lazyFunctionReferences }
+        )
+
+    else
+        ( [], context )
 
 
 reportUnstableFunctionReference : Context -> Node Expression -> List (Rule.Error {})

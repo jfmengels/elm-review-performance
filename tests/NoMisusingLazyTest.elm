@@ -562,6 +562,8 @@ view model =
 """
                     |> Review.Test.runWithProjectData project (rule defaults)
                     |> Review.Test.expectNoErrors
+        , test "should report errors when argument to lazy function is a empty record literal" <|
+            \() -> reportWhenArgumentIs "{}"
         , test "should report errors when argument to lazy function is a record literal inside parens" <|
             \() -> reportWhenArgumentIs "({})"
         , test "should report errors when arguments to lazy function is a record update function" <|
@@ -666,23 +668,22 @@ helper = text
                             , under = "{}"
                             }
                         ]
-        , Test.skip <|
-            test "should report errors when arguments to function sprinkled with lazy and wrapped in parens are unstable" <|
-                \() ->
-                    """module A exposing (..)
+        , test "should report errors when arguments to function sprinkled with lazy and wrapped in parens are unstable" <|
+            \() ->
+                """module A exposing (..)
 import Html.Lazy
 lazyView n =
     (Html.Lazy.lazy helper) {}
 helper = text
 """
-                        |> Review.Test.runWithProjectData project (rule defaults)
-                        |> Review.Test.expectErrors
-                            [ Review.Test.error
-                                { message = lazyArgumentMessage
-                                , details = lazyArgumentDetails
-                                , under = "{}"
-                                }
-                            ]
+                    |> Review.Test.runWithProjectData project (rule defaults)
+                    |> Review.Test.expectErrors
+                        [ Review.Test.error
+                            { message = lazyArgumentMessage
+                            , details = lazyArgumentDetails
+                            , under = "{}"
+                            }
+                        ]
         ]
 
 
