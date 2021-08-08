@@ -3,37 +3,15 @@ module NoMisusingLazy exposing
     , Configuration, defaults, withLazyModules
     )
 
-{-|
-
-@docs rule
-
--}
-
-import Elm.Module
-import Elm.Syntax.Declaration as Declaration exposing (Declaration)
-import Elm.Syntax.Expression as Expression exposing (Expression)
-import Elm.Syntax.ModuleName exposing (ModuleName)
-import Elm.Syntax.Node as Node exposing (Node(..))
-import Elm.Syntax.Range exposing (Range)
-import Review.ModuleNameLookupTable as ModuleNameLookupTable exposing (ModuleNameLookupTable)
-import Review.Rule as Rule exposing (Rule)
-import Set exposing (Set)
-
-
-
--- TODO Report lazy being used on its own?
--- TODO Support lazy used with <| and |>
--- TODO Add configuration to specify whether to consider functions as creating new references by default or not, and taking a list of exceptions
--- TODO Make a list of all elm/* functions and mark them as creating new references or not.
--- TODO Consider `Html.Lazy.lazy` created with pipes
--- TODO Report about unnecessary lazy, when view functions are called with data not from the arguments, and can be extracted to a top-level constant. Maybe behind a flag?
-
-
 {-| Reports... REPLACEME
 
     config =
         [ NoMisusingLazy.rule NoMisusingLazy.defaults
         ]
+
+@docs rule
+
+@docs Configuration, defaults, withLazyModules
 
 
 ## Fail
@@ -62,6 +40,29 @@ You can try this rule out by running the following command:
 elm-review --template jfmengels/elm-review-performance/example --rules NoMisusingLazy
 ```
 
+-}
+
+import Elm.Module
+import Elm.Syntax.Declaration as Declaration exposing (Declaration)
+import Elm.Syntax.Expression as Expression exposing (Expression)
+import Elm.Syntax.ModuleName exposing (ModuleName)
+import Elm.Syntax.Node as Node exposing (Node(..))
+import Elm.Syntax.Range exposing (Range)
+import Review.ModuleNameLookupTable as ModuleNameLookupTable exposing (ModuleNameLookupTable)
+import Review.Rule as Rule exposing (Rule)
+import Set exposing (Set)
+
+
+
+-- TODO Report lazy being used on its own?
+-- TODO Support lazy used with <| and |>
+-- TODO Add configuration to specify whether to consider functions as creating new references by default or not, and taking a list of exceptions
+-- TODO Make a list of all elm/* functions and mark them as creating new references or not.
+-- TODO Consider `Html.Lazy.lazy` created with pipes
+-- TODO Report about unnecessary lazy, when view functions are called with data not from the arguments, and can be extracted to a top-level constant. Maybe behind a flag?
+
+
+{-| Reports REPLACEME
 -}
 rule : Configuration -> Rule
 rule (Configuration { lazyModules }) =
@@ -160,6 +161,8 @@ defaults =
     Configuration { lazyModules = [] }
 
 
+{-| REPLACEME
+-}
 withLazyModules : List String -> Configuration -> Configuration
 withLazyModules lazyModules (Configuration config) =
     Configuration { config | lazyModules = lazyModules ++ config.lazyModules }
