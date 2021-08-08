@@ -24,6 +24,7 @@ import Set exposing (Set)
 -- TODO Report lazy being used on its own?
 -- TODO Support lazy used with <| and |>
 -- TODO Add configuration to specify whether to consider functions as creating new references by default or not, and taking a list of exceptions
+-- TODO Make a list of all elm/* functions and mark them as creating new references or not.
 -- TODO Consider `Html.Lazy.lazy` created with pipes
 -- TODO Report about unnecessary lazy, when view functions are called with data not from the arguments, and can be extracted to a top-level constant. Maybe behind a flag?
 
