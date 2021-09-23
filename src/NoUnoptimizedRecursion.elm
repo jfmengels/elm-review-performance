@@ -66,7 +66,7 @@ This function won't be reported because it has not been tagged.
 
     -- With opt-in configuration
     config =
-        [ NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optInWithComment "CHECK TCO")
+        [ NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optInWithComment "ENSURE TCO")
         ]
 
     fun n =
@@ -272,13 +272,13 @@ optOutWithComment comment =
 {-| Reports only the functions tagged with a comment.
 
     config =
-        [ NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optInWithComment "CHECK TCO")
+        [ NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optInWithComment "ENSURE TCO")
         ]
 
 With the configuration above, the following function would be reported.
 
     fun n =
-        -- CHECK TCO
+        -- ENSURE TCO
         if condition n then
             fun n * n
 
