@@ -503,53 +503,7 @@ addAllowedLocation configuration node context =
             }
 
         Expression.LetExpression { declarations, expression } ->
-            let
-                newScopes : List ( Range, String )
-                newScopes =
-                    List.filterMap
-                        (\decl ->
-                            case Node.value decl of
-                                Expression.LetFunction function ->
-                                    let
-                                        functionDeclaration : Expression.FunctionImplementation
-                                        functionDeclaration =
-                                            Node.value function.declaration
-
-                                        hasArguments : Bool
-                                        hasArguments =
-                                            function.declaration
-                                                |> Node.value
-                                                |> .arguments
-                                                |> List.isEmpty
-                                                |> not
-                                    in
-                                    Just
-                                        ( Node.range functionDeclaration.expression
-                                        , if hasArguments && shouldReportFunction configuration context (Node.range function.declaration) then
-                                            Node.value functionDeclaration.name
-
-                                          else
-                                            ""
-                                        )
-
-                                Expression.LetDestructuring _ _ ->
-                                    Nothing
-                        )
-                        declarations
-            in
-            { context
-                | newScopesForLet = newScopes
-
-                {- The following translates to TCO code
-
-                   let
-                       fun x =
-                          fun x
-                   in
-                   fun 1
-                -}
-                , tcoLocations = Node.range expression :: context.tcoLocations
-            }
+            addAllowedLocationForLetExpression configuration context declarations expression
 
         Expression.ParenthesizedExpression expr ->
             {- The following translates to TCO code
@@ -654,6 +608,57 @@ expressionExitVisitor node context =
 
             else
                 ( [], removeDeOptimizationRangeIfNeeded node context )
+
+
+addAllowedLocationForLetExpression : Configuration -> Context -> List (Node Expression.LetDeclaration) -> Node a -> Context
+addAllowedLocationForLetExpression configuration context declarations expression =
+    let
+        newScopes : List ( Range, String )
+        newScopes =
+            List.filterMap
+                (\decl ->
+                    case Node.value decl of
+                        Expression.LetFunction function ->
+                            let
+                                functionDeclaration : Expression.FunctionImplementation
+                                functionDeclaration =
+                                    Node.value function.declaration
+
+                                hasArguments : Bool
+                                hasArguments =
+                                    function.declaration
+                                        |> Node.value
+                                        |> .arguments
+                                        |> List.isEmpty
+                                        |> not
+                            in
+                            Just
+                                ( Node.range functionDeclaration.expression
+                                , if hasArguments && shouldReportFunction configuration context (Node.range function.declaration) then
+                                    Node.value functionDeclaration.name
+
+                                  else
+                                    ""
+                                )
+
+                        Expression.LetDestructuring _ _ ->
+                            Nothing
+                )
+                declarations
+    in
+    { context
+        | newScopesForLet = newScopes
+
+        {- The following translates to TCO code
+
+           let
+               fun x =
+                  fun x
+           in
+           fun 1
+        -}
+        , tcoLocations = Node.range expression :: context.tcoLocations
+    }
 
 
 removeDeOptimizationRangeIfNeeded : Node Expression -> Context -> Context
