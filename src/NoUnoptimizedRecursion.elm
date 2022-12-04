@@ -361,10 +361,16 @@ commentsVisitor configuration comments context =
     ( []
     , { context
         | comments =
-            comments
-                |> List.filter (Node.value >> String.contains commentTag)
-                |> List.map (Node.range >> .start >> .row)
-                |> Set.fromList
+            List.foldl
+                (\(Node range value) acc ->
+                    if String.contains commentTag value then
+                        Set.insert range.start.row acc
+
+                    else
+                        acc
+                )
+                Set.empty
+                comments
       }
     )
 
