@@ -293,9 +293,7 @@ optInWithComment comment =
 
 hasNoArguments : Expression.FunctionImplementation -> Bool
 hasNoArguments declaration =
-    declaration
-        |> .arguments
-        |> List.isEmpty
+    List.isEmpty declaration.arguments
 
 
 shouldReportFunction : Configuration -> Context -> Node Expression.FunctionImplementation -> Bool
