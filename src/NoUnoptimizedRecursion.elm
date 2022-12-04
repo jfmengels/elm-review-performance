@@ -291,6 +291,14 @@ optInWithComment comment =
     OptIn comment
 
 
+hasArguments : Expression.FunctionImplementation -> Bool
+hasArguments declaration =
+    declaration
+        |> .arguments
+        |> List.isEmpty
+        |> not
+
+
 shouldReportFunction : Configuration -> Context -> Range -> Bool
 shouldReportFunction configuration context range =
     let
@@ -381,16 +389,7 @@ declarationVisitor configuration node context =
         Declaration.FunctionDeclaration function ->
             ( []
             , { currentFunctionName =
-                    let
-                        hasArguments : Bool
-                        hasArguments =
-                            function.declaration
-                                |> Node.value
-                                |> .arguments
-                                |> List.isEmpty
-                                |> not
-                    in
-                    if hasArguments && shouldReportFunction configuration context (Node.range function.declaration) then
+                    if hasArguments (Node.value function.declaration) && shouldReportFunction configuration context (Node.range function.declaration) then
                         function.declaration
                             |> Node.value
                             |> .name
@@ -629,18 +628,10 @@ addAllowedLocationForLetExpression configuration context declarations expression
                                 functionDeclaration : Expression.FunctionImplementation
                                 functionDeclaration =
                                     Node.value function.declaration
-
-                                hasArguments : Bool
-                                hasArguments =
-                                    function.declaration
-                                        |> Node.value
-                                        |> .arguments
-                                        |> List.isEmpty
-                                        |> not
                             in
                             Just
                                 ( Node.range functionDeclaration.expression
-                                , if hasArguments && shouldReportFunction configuration context (Node.range function.declaration) then
+                                , if hasArguments functionDeclaration && shouldReportFunction configuration context (Node.range function.declaration) then
                                     Node.value functionDeclaration.name
 
                                   else
