@@ -291,17 +291,16 @@ optInWithComment comment =
     OptIn comment
 
 
-hasArguments : Expression.FunctionImplementation -> Bool
-hasArguments declaration =
+hasNoArguments : Expression.FunctionImplementation -> Bool
+hasNoArguments declaration =
     declaration
         |> .arguments
         |> List.isEmpty
-        |> not
 
 
 shouldReportFunction : Configuration -> Context -> Node Expression.FunctionImplementation -> Bool
 shouldReportFunction configuration context (Node range declaration) =
-    if not (hasArguments declaration) then
+    if hasNoArguments declaration then
         False
 
     else
