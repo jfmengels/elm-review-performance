@@ -5,7 +5,7 @@ Provides [`elm-review`](https://package.elm-lang.org/packages/jfmengels/elm-revi
 
 ## Provided rules
 
-- [`NoUnoptimizedRecursion`](https://package.elm-lang.org/packages/jfmengels/elm-review-performance/1.0.1/NoUnoptimizedRecursion) - Reports recursive functions that are not [tail-call optimized](https://functional-programming-in-elm.netlify.app/recursion/tail-call-elimination.html).
+- [`NoUnoptimizedRecursion`](https://package.elm-lang.org/packages/jfmengels/elm-review-performance/1.0.2/NoUnoptimizedRecursion/) - Reports recursive functions that are not [tail-call optimized](https://functional-programming-in-elm.netlify.app/recursion/tail-call-elimination.html).
 
 
 ## Configuration
