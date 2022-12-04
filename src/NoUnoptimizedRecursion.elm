@@ -299,19 +299,23 @@ hasArguments declaration =
         |> not
 
 
-shouldReportFunction : Configuration -> Context -> Range -> Bool
-shouldReportFunction configuration context range =
-    let
-        foundComment : Bool
-        foundComment =
-            Set.member (range.start.row + 1) context.comments
-    in
-    case configuration of
-        OptOut _ ->
-            not foundComment
+shouldReportFunction : Configuration -> Context -> Node Expression.FunctionImplementation -> Bool
+shouldReportFunction configuration context (Node range declaration) =
+    if not (hasArguments declaration) then
+        False
 
-        OptIn _ ->
-            foundComment
+    else
+        let
+            foundComment : Bool
+            foundComment =
+                Set.member (range.start.row + 1) context.comments
+        in
+        case configuration of
+            OptOut _ ->
+                not foundComment
+
+            OptIn _ ->
+                foundComment
 
 
 
@@ -389,7 +393,7 @@ declarationVisitor configuration node context =
         Declaration.FunctionDeclaration function ->
             ( []
             , { currentFunctionName =
-                    if hasArguments (Node.value function.declaration) && shouldReportFunction configuration context (Node.range function.declaration) then
+                    if shouldReportFunction configuration context function.declaration then
                         function.declaration
                             |> Node.value
                             |> .name
@@ -631,7 +635,7 @@ addAllowedLocationForLetExpression configuration context declarations expression
                             in
                             Just
                                 ( Node.range functionDeclaration.expression
-                                , if hasArguments functionDeclaration && shouldReportFunction configuration context (Node.range function.declaration) then
+                                , if shouldReportFunction configuration context function.declaration then
                                     Node.value functionDeclaration.name
 
                                   else
