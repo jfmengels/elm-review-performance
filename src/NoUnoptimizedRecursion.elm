@@ -521,12 +521,12 @@ addAllowedLocation configuration node context =
 
         Expression.CaseExpression { cases } ->
             let
-                caseBodies : List Range
-                caseBodies =
-                    List.map (Tuple.second >> Node.range) cases
+                tcoLocations : List Range
+                tcoLocations =
+                    List.foldl (\( _, Node range _ ) acc -> range :: acc) context.tcoLocations cases
             in
             { context
-                | tcoLocations = caseBodies ++ context.tcoLocations
+                | tcoLocations = tcoLocations
                 , deOptimizationRange = Just (Node.range node)
                 , deOptimizationReason = [ "Among other possible reasons, the recursive call should not appear in the pattern to evaluate for a case expression." ]
             }
