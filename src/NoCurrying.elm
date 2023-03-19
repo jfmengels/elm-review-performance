@@ -56,37 +56,38 @@ rule =
 
 
 type alias ModuleContext =
-    { functionToExpectedArguments : Dict String Int
+    { functionArity : Dict String Int
     }
 
 
 initialContext : ModuleContext
 initialContext =
-    { functionToExpectedArguments = Dict.fromList [ ( "function", 2 ) ]
+    { functionArity = Dict.fromList [ ( "function", 2 ) ]
     }
 
 
 declarationListVisitor : List (Node Declaration) -> ModuleContext -> ( List (Rule.Error {}), ModuleContext )
 declarationListVisitor declarations context =
     let
-        functionToExpectedArguments =
-            List.foldl inferNumberOfArgumentsForDeclaration context.functionToExpectedArguments declarations
+        functionArity : Dict String Int
+        functionArity =
+            List.foldl inferArityForDeclaration context.functionArity declarations
     in
-    ( [], { context | functionToExpectedArguments = functionToExpectedArguments } )
+    ( [], { context | functionArity = functionArity } )
 
 
-inferNumberOfArgumentsForDeclaration : Node Declaration -> Dict String Int -> Dict String Int
-inferNumberOfArgumentsForDeclaration node dict =
+inferArityForDeclaration : Node Declaration -> Dict String Int -> Dict String Int
+inferArityForDeclaration node dict =
     case Node.value node of
         Declaration.FunctionDeclaration { declaration } ->
-            inferNumberOfArgumentsForFunction declaration dict
+            inferArityForFunction declaration dict
 
         _ ->
             dict
 
 
-inferNumberOfArgumentsForFunction : Node Expression.FunctionImplementation -> Dict String Int -> Dict String Int
-inferNumberOfArgumentsForFunction node dict =
+inferArityForFunction : Node Expression.FunctionImplementation -> Dict String Int -> Dict String Int
+inferArityForFunction node dict =
     dict
 
 
@@ -94,7 +95,7 @@ expressionVisitor : Node Expression -> ModuleContext -> ( List (Rule.Error {}), 
 expressionVisitor node context =
     case Node.value node of
         Expression.Application ((Node functionRange (Expression.FunctionOrValue [] name)) :: arguments) ->
-            case Dict.get name context.functionToExpectedArguments of
+            case Dict.get name context.functionArity of
                 Just expectedNbArguments ->
                     if List.length arguments < expectedNbArguments then
                         ( [ Rule.error
