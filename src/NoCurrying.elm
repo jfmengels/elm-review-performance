@@ -126,23 +126,9 @@ expressionVisitorHelp node context =
         Expression.OperatorApplication "|>" _ left right ->
             case Node.value right of
                 Expression.Application ((Node functionRange (Expression.FunctionOrValue [] name)) :: arguments) ->
-                    case Dict.get name context.functionArity of
-                        Just expectedNbArguments ->
-                            if List.length arguments + 1 < expectedNbArguments then
-                                ( [ Rule.error
-                                        { message = "REPLACEME"
-                                        , details = [ "REPLACEME" ]
-                                        }
-                                        functionRange
-                                  ]
-                                , { context | nodesToIgnore = Node.range right :: context.nodesToIgnore }
-                                )
-
-                            else
-                                ( [], { context | nodesToIgnore = Node.range right :: context.nodesToIgnore } )
-
-                        Nothing ->
-                            ( [], { context | nodesToIgnore = Node.range right :: context.nodesToIgnore } )
+                    ( report context name functionRange (List.length arguments + 1)
+                    , { context | nodesToIgnore = Node.range right :: context.nodesToIgnore }
+                    )
 
                 _ ->
                     ( [], context )
