@@ -10,6 +10,7 @@ import Dict exposing (Dict)
 import Elm.Syntax.Declaration as Declaration exposing (Declaration)
 import Elm.Syntax.Expression as Expression exposing (Expression, Function)
 import Elm.Syntax.Node as Node exposing (Node(..))
+import Elm.Syntax.Range exposing (Range)
 import Review.Rule as Rule exposing (Rule)
 
 
@@ -57,6 +58,7 @@ rule =
 
 type alias ModuleContext =
     { functionArity : FunctionArityDict
+    , nodesToIgnore : List Range
     }
 
 
@@ -67,6 +69,7 @@ type alias FunctionArityDict =
 initialContext : ModuleContext
 initialContext =
     { functionArity = Dict.empty
+    , nodesToIgnore = []
     }
 
 
