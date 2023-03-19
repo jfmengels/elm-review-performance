@@ -121,23 +121,7 @@ expressionVisitorHelp : Node Expression -> ModuleContext -> ( List (Rule.Error {
 expressionVisitorHelp node context =
     case Node.value node of
         Expression.Application ((Node functionRange (Expression.FunctionOrValue [] name)) :: arguments) ->
-            case Dict.get name context.functionArity of
-                Just expectedNbArguments ->
-                    if List.length arguments < expectedNbArguments then
-                        ( [ Rule.error
-                                { message = "REPLACEME"
-                                , details = [ "REPLACEME" ]
-                                }
-                                functionRange
-                          ]
-                        , context
-                        )
-
-                    else
-                        ( [], context )
-
-                Nothing ->
-                    ( [], context )
+            ( report context name functionRange (List.length arguments), context )
 
         Expression.OperatorApplication "|>" _ left right ->
             case Node.value right of
@@ -165,3 +149,22 @@ expressionVisitorHelp node context =
 
         _ ->
             ( [], context )
+
+
+report : ModuleContext -> String -> Range -> Int -> List (Rule.Error {})
+report context name functionRange nbArguments =
+    case Dict.get name context.functionArity of
+        Just expectedNbArguments ->
+            if nbArguments < expectedNbArguments then
+                [ Rule.error
+                    { message = "REPLACEME"
+                    , details = [ "REPLACEME" ]
+                    }
+                    functionRange
+                ]
+
+            else
+                []
+
+        Nothing ->
+            []
