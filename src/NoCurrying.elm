@@ -71,8 +71,19 @@ declarationListVisitor declarations context =
 expressionVisitor : Node Expression -> ModuleContext -> ( List (Rule.Error {}), ModuleContext )
 expressionVisitor node context =
     case Node.value node of
-        Expression.Application ((Node _ (Expression.FunctionOrValue [] name)) :: arguments) ->
-            ( [], context )
+        Expression.Application ((Node functionRange (Expression.FunctionOrValue [] name)) :: arguments) ->
+            if name == "function" then
+                ( [ Rule.error
+                        { message = "REPLACEME"
+                        , details = [ "REPLACEME" ]
+                        }
+                        functionRange
+                  ]
+                , context
+                )
+
+            else
+                ( [], context )
 
         _ ->
             ( [], context )
