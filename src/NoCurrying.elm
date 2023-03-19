@@ -6,7 +6,7 @@ module NoCurrying exposing (rule)
 
 -}
 
-import Dict
+import Dict exposing (Dict)
 import Elm.Syntax.Declaration exposing (Declaration)
 import Elm.Syntax.Expression as Expression exposing (Expression)
 import Elm.Syntax.Node as Node exposing (Node(..))
@@ -56,12 +56,14 @@ rule =
 
 
 type alias ModuleContext =
-    ()
+    { functionToExpectedArguments : Dict String Int
+    }
 
 
 initialContext : ModuleContext
 initialContext =
-    ()
+    { functionToExpectedArguments = Dict.fromList [ ( "function", 2 ) ]
+    }
 
 
 declarationListVisitor : List (Node Declaration) -> ModuleContext -> ( List (Rule.Error {}), ModuleContext )
@@ -73,7 +75,7 @@ expressionVisitor : Node Expression -> ModuleContext -> ( List (Rule.Error {}), 
 expressionVisitor node context =
     case Node.value node of
         Expression.Application ((Node functionRange (Expression.FunctionOrValue [] name)) :: arguments) ->
-            case Dict.get name (Dict.fromList [ ( "function", 2 ) ]) of
+            case Dict.get name context.functionToExpectedArguments of
                 Just expectedNbArguments ->
                     if List.length arguments < expectedNbArguments then
                         ( [ Rule.error
