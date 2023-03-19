@@ -6,6 +6,7 @@ module NoCurrying exposing (rule)
 
 -}
 
+import Dict
 import Elm.Syntax.Declaration exposing (Declaration)
 import Elm.Syntax.Expression as Expression exposing (Expression)
 import Elm.Syntax.Node as Node exposing (Node(..))
@@ -72,18 +73,23 @@ expressionVisitor : Node Expression -> ModuleContext -> ( List (Rule.Error {}), 
 expressionVisitor node context =
     case Node.value node of
         Expression.Application ((Node functionRange (Expression.FunctionOrValue [] name)) :: arguments) ->
-            if name == "function" && List.length arguments < 2 then
-                ( [ Rule.error
-                        { message = "REPLACEME"
-                        , details = [ "REPLACEME" ]
-                        }
-                        functionRange
-                  ]
-                , context
-                )
+            case Dict.get name (Dict.fromList [ ( "function", 2 ) ]) of
+                Just expectedNbArguments ->
+                    if List.length arguments < expectedNbArguments then
+                        ( [ Rule.error
+                                { message = "REPLACEME"
+                                , details = [ "REPLACEME" ]
+                                }
+                                functionRange
+                          ]
+                        , context
+                        )
 
-            else
-                ( [], context )
+                    else
+                        ( [], context )
+
+                Nothing ->
+                    ( [], context )
 
         _ ->
             ( [], context )
