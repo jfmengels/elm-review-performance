@@ -130,6 +130,11 @@ expressionVisitorHelp node context =
                     , { context | nodesToIgnore = Node.range right :: context.nodesToIgnore }
                     )
 
+                Expression.FunctionOrValue [] name ->
+                    ( report context name (Node.range right) 1
+                    , { context | nodesToIgnore = Node.range right :: context.nodesToIgnore }
+                    )
+
                 _ ->
                     ( [], context )
 
