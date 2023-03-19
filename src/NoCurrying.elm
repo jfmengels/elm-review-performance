@@ -123,7 +123,7 @@ expressionVisitorHelp node context =
         Expression.Application ((Node functionRange (Expression.FunctionOrValue [] name)) :: arguments) ->
             ( report context name functionRange (List.length arguments), context )
 
-        Expression.OperatorApplication "|>" _ left right ->
+        Expression.OperatorApplication "|>" _ _ right ->
             case Node.value right of
                 Expression.Application ((Node functionRange (Expression.FunctionOrValue [] name)) :: arguments) ->
                     ( report context name functionRange (List.length arguments + 1)
