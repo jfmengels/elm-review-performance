@@ -16,7 +16,7 @@ function n = n
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectNoErrors
-        , test "should report an error when REPLACEME" <|
+        , test "should report an error when calling a local function with less than the expected number of arguments" <|
             \() ->
                 """module A exposing (..)
 a = function 0
@@ -27,7 +27,8 @@ function b c = b + c
                         [ Review.Test.error
                             { message = "REPLACEME"
                             , details = [ "REPLACEME" ]
-                            , under = "REPLACEME"
+                            , under = "function"
                             }
+                            |> Review.Test.atExactly { start = { row = 2, column = 5 }, end = { row = 2, column = 13 } }
                         ]
         ]
