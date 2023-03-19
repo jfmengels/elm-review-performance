@@ -6,6 +6,8 @@ module NoCurrying exposing (rule)
 
 -}
 
+import Elm.Syntax.Declaration exposing (Declaration)
+import Elm.Syntax.Node exposing (Node)
 import Review.Rule as Rule exposing (Rule)
 
 
@@ -46,5 +48,14 @@ elm-review --template jfmengels/elm-review-performance/example --rules NoCurryin
 rule : Rule
 rule =
     Rule.newModuleRuleSchema "NoCurrying" ()
-        -- Add your visitors
+        |> Rule.withDeclarationListVisitor declarationListVisitor
         |> Rule.fromModuleRuleSchema
+
+
+type alias ModuleContext =
+    ()
+
+
+declarationListVisitor : List (Node Declaration) -> ModuleContext -> ( List (Rule.Error {}), ModuleContext )
+declarationListVisitor declarations context =
+    ( [], context )
