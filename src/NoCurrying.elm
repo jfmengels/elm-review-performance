@@ -91,8 +91,12 @@ inferArityForDeclaration node dict =
 
 
 inferArityForFunction : Expression.FunctionImplementation -> FunctionArityDict -> FunctionArityDict
-inferArityForFunction node dict =
-    dict
+inferArityForFunction function dict =
+    if List.isEmpty function.arguments then
+        dict
+
+    else
+        Dict.insert (Node.value function.name) (List.length function.arguments) dict
 
 
 expressionVisitor : Node Expression -> ModuleContext -> ( List (Rule.Error {}), ModuleContext )
