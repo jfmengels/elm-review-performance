@@ -138,6 +138,21 @@ expressionVisitorHelp node context =
                 _ ->
                     ( [], context )
 
+        Expression.OperatorApplication "<|" _ left _ ->
+            case Node.value left of
+                Expression.Application ((Node functionRange (Expression.FunctionOrValue [] name)) :: arguments) ->
+                    ( report context name functionRange (List.length arguments + 1)
+                    , { context | nodesToIgnore = Node.range left :: context.nodesToIgnore }
+                    )
+
+                Expression.FunctionOrValue [] name ->
+                    ( report context name (Node.range left) 1
+                    , { context | nodesToIgnore = Node.range left :: context.nodesToIgnore }
+                    )
+
+                _ ->
+                    ( [], context )
+
         _ ->
             ( [], context )
 
