@@ -84,13 +84,13 @@ inferArityForDeclaration : Node Declaration -> FunctionArityDict -> FunctionArit
 inferArityForDeclaration node dict =
     case Node.value node of
         Declaration.FunctionDeclaration { declaration } ->
-            inferArityForFunction declaration dict
+            inferArityForFunction (Node.value declaration) dict
 
         _ ->
             dict
 
 
-inferArityForFunction : Node Expression.FunctionImplementation -> FunctionArityDict -> FunctionArityDict
+inferArityForFunction : Expression.FunctionImplementation -> FunctionArityDict -> FunctionArityDict
 inferArityForFunction node dict =
     dict
 
