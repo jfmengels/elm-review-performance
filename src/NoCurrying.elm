@@ -110,6 +110,15 @@ declarationVisitor _ context =
 
 expressionVisitor : Node Expression -> ModuleContext -> ( List (Rule.Error {}), ModuleContext )
 expressionVisitor node context =
+    if List.member (Node.range node) context.nodesToIgnore then
+        ( [], context )
+
+    else
+        expressionVisitorHelp node context
+
+
+expressionVisitorHelp : Node Expression -> ModuleContext -> ( List (Rule.Error {}), ModuleContext )
+expressionVisitorHelp node context =
     case Node.value node of
         Expression.Application ((Node functionRange (Expression.FunctionOrValue [] name)) :: arguments) ->
             case Dict.get name context.functionArity of
