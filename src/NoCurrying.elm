@@ -52,6 +52,7 @@ rule : Rule
 rule =
     Rule.newModuleRuleSchema "NoCurrying" initialContext
         |> Rule.withDeclarationListVisitor declarationListVisitor
+        |> Rule.withDeclarationEnterVisitor declarationVisitor
         |> Rule.withExpressionEnterVisitor expressionVisitor
         |> Rule.fromModuleRuleSchema
 
@@ -100,6 +101,11 @@ inferArityForFunction function dict =
 
     else
         Dict.insert (Node.value function.name) (List.length function.arguments) dict
+
+
+declarationVisitor : Node Declaration -> ModuleContext -> ( List (Rule.Error {}), ModuleContext )
+declarationVisitor _ context =
+    ( [], { context | nodesToIgnore = [] } )
 
 
 expressionVisitor : Node Expression -> ModuleContext -> ( List (Rule.Error {}), ModuleContext )
