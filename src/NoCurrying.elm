@@ -7,7 +7,8 @@ module NoCurrying exposing (rule)
 -}
 
 import Elm.Syntax.Declaration exposing (Declaration)
-import Elm.Syntax.Node exposing (Node)
+import Elm.Syntax.Expression as Expression exposing (Expression)
+import Elm.Syntax.Node as Node exposing (Node(..))
 import Review.Rule as Rule exposing (Rule)
 
 
@@ -49,6 +50,7 @@ rule : Rule
 rule =
     Rule.newModuleRuleSchema "NoCurrying" initialContext
         |> Rule.withDeclarationListVisitor declarationListVisitor
+        |> Rule.withExpressionEnterVisitor expressionVisitor
         |> Rule.fromModuleRuleSchema
 
 
@@ -64,3 +66,13 @@ initialContext =
 declarationListVisitor : List (Node Declaration) -> ModuleContext -> ( List (Rule.Error {}), ModuleContext )
 declarationListVisitor declarations context =
     ( [], context )
+
+
+expressionVisitor : Node Expression -> ModuleContext -> ( List (Rule.Error {}), ModuleContext )
+expressionVisitor node context =
+    case Node.value node of
+        Expression.Application ((Node _ (Expression.FunctionOrValue [] name)) :: arguments) ->
+            ( [], context )
+
+        _ ->
+            ( [], context )
