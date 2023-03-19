@@ -1,4 +1,4 @@
-module NoCurrying exposing (rule)
+module NoPartialApplication exposing (rule)
 
 {-|
 
@@ -17,7 +17,7 @@ import Review.Rule as Rule exposing (Rule)
 {-| Reports... REPLACEME
 
     config =
-        [ NoCurrying.rule
+        [ NoPartialApplication.rule
         ]
 
 
@@ -44,13 +44,13 @@ This rule is not useful when REPLACEME.
 You can try this rule out by running the following command:
 
 ```bash
-elm-review --template jfmengels/elm-review-performance/example --rules NoCurrying
+elm-review --template jfmengels/elm-review-performance/example --rules NoPartialApplication
 ```
 
 -}
 rule : Rule
 rule =
-    Rule.newModuleRuleSchema "NoCurrying" initialContext
+    Rule.newModuleRuleSchema "NoPartialApplication" initialContext
         |> Rule.withDeclarationListVisitor declarationListVisitor
         |> Rule.withDeclarationEnterVisitor declarationVisitor
         |> Rule.withExpressionEnterVisitor expressionVisitor

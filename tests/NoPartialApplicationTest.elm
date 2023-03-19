@@ -1,13 +1,13 @@
-module NoCurryingTest exposing (all)
+module NoPartialApplicationTest exposing (all)
 
-import NoCurrying exposing (rule)
+import NoPartialApplication exposing (rule)
 import Review.Test
 import Test exposing (Test, describe, test)
 
 
 all : Test
 all =
-    describe "NoCurrying"
+    describe "NoPartialApplication"
         [ test "should not report an error when using functions with all the correct arguments" <|
             \() ->
                 """module A exposing (..)

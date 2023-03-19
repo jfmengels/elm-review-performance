@@ -11,7 +11,7 @@ when inside the directory containing this file.
 
 -}
 
-import NoCurrying
+import NoPartialApplication
 import NoUnoptimizedRecursion
 import Review.Rule exposing (Rule)
 
@@ -19,5 +19,5 @@ import Review.Rule exposing (Rule)
 config : List Rule
 config =
     [ NoUnoptimizedRecursion.rule (NoUnoptimizedRecursion.optOutWithComment "IGNORE TCO")
-    , NoCurrying.rule
+    , NoPartialApplication.rule
     ]
