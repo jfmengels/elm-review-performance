@@ -39,4 +39,12 @@ function b c = b + c
 """
                     |> Review.Test.run rule
                     |> Review.Test.expectNoErrors
+        , test "should not report an error when calling a local function with more than the expected number of arguments" <|
+            \() ->
+                """module A exposing (..)
+a = function 0 1 2
+function b c = something b c
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
         ]
