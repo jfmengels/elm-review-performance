@@ -47,12 +47,17 @@ elm-review --template jfmengels/elm-review-performance/example --rules NoCurryin
 -}
 rule : Rule
 rule =
-    Rule.newModuleRuleSchema "NoCurrying" ()
+    Rule.newModuleRuleSchema "NoCurrying" initialContext
         |> Rule.withDeclarationListVisitor declarationListVisitor
         |> Rule.fromModuleRuleSchema
 
 
 type alias ModuleContext =
+    ()
+
+
+initialContext : ModuleContext
+initialContext =
     ()
 
 
