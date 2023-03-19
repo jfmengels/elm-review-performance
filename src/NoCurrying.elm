@@ -7,8 +7,8 @@ module NoCurrying exposing (rule)
 -}
 
 import Dict exposing (Dict)
-import Elm.Syntax.Declaration exposing (Declaration)
-import Elm.Syntax.Expression as Expression exposing (Expression)
+import Elm.Syntax.Declaration as Declaration exposing (Declaration)
+import Elm.Syntax.Expression as Expression exposing (Expression, Function)
 import Elm.Syntax.Node as Node exposing (Node(..))
 import Review.Rule as Rule exposing (Rule)
 
@@ -68,7 +68,26 @@ initialContext =
 
 declarationListVisitor : List (Node Declaration) -> ModuleContext -> ( List (Rule.Error {}), ModuleContext )
 declarationListVisitor declarations context =
-    ( [], context )
+    let
+        functionToExpectedArguments =
+            List.foldl inferNumberOfArgumentsForDeclaration context.functionToExpectedArguments declarations
+    in
+    ( [], { context | functionToExpectedArguments = functionToExpectedArguments } )
+
+
+inferNumberOfArgumentsForDeclaration : Node Declaration -> Dict String Int -> Dict String Int
+inferNumberOfArgumentsForDeclaration node dict =
+    case Node.value node of
+        Declaration.FunctionDeclaration { declaration } ->
+            inferNumberOfArgumentsForFunction declaration dict
+
+        _ ->
+            dict
+
+
+inferNumberOfArgumentsForFunction : Node Expression.FunctionImplementation -> Dict String Int -> Dict String Int
+inferNumberOfArgumentsForFunction node dict =
+    dict
 
 
 expressionVisitor : Node Expression -> ModuleContext -> ( List (Rule.Error {}), ModuleContext )
