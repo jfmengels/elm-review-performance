@@ -66,7 +66,7 @@ type alias FunctionArityDict =
 
 initialContext : ModuleContext
 initialContext =
-    { functionArity = Dict.fromList [ ( "function", 2 ) ]
+    { functionArity = Dict.empty
     }
 
 
