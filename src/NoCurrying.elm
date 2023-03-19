@@ -72,7 +72,7 @@ expressionVisitor : Node Expression -> ModuleContext -> ( List (Rule.Error {}), 
 expressionVisitor node context =
     case Node.value node of
         Expression.Application ((Node functionRange (Expression.FunctionOrValue [] name)) :: arguments) ->
-            if name == "function" then
+            if name == "function" && List.length arguments < 2 then
                 ( [ Rule.error
                         { message = "REPLACEME"
                         , details = [ "REPLACEME" ]
