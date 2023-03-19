@@ -31,4 +31,12 @@ function b c = b + c
                             }
                             |> Review.Test.atExactly { start = { row = 2, column = 5 }, end = { row = 2, column = 13 } }
                         ]
+        , test "should not report an error when calling a local function with the expected number of arguments" <|
+            \() ->
+                """module A exposing (..)
+a = function 0 1
+function b c = b + c
+"""
+                    |> Review.Test.run rule
+                    |> Review.Test.expectNoErrors
         ]
