@@ -56,8 +56,12 @@ rule =
 
 
 type alias ModuleContext =
-    { functionArity : Dict String Int
+    { functionArity : FunctionArityDict
     }
+
+
+type alias FunctionArityDict =
+    Dict String Int
 
 
 initialContext : ModuleContext
@@ -69,14 +73,14 @@ initialContext =
 declarationListVisitor : List (Node Declaration) -> ModuleContext -> ( List (Rule.Error {}), ModuleContext )
 declarationListVisitor declarations context =
     let
-        functionArity : Dict String Int
+        functionArity : FunctionArityDict
         functionArity =
             List.foldl inferArityForDeclaration context.functionArity declarations
     in
     ( [], { context | functionArity = functionArity } )
 
 
-inferArityForDeclaration : Node Declaration -> Dict String Int -> Dict String Int
+inferArityForDeclaration : Node Declaration -> FunctionArityDict -> FunctionArityDict
 inferArityForDeclaration node dict =
     case Node.value node of
         Declaration.FunctionDeclaration { declaration } ->
@@ -86,7 +90,7 @@ inferArityForDeclaration node dict =
             dict
 
 
-inferArityForFunction : Node Expression.FunctionImplementation -> Dict String Int -> Dict String Int
+inferArityForFunction : Node Expression.FunctionImplementation -> FunctionArityDict -> FunctionArityDict
 inferArityForFunction node dict =
     dict
 
