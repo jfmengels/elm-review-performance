@@ -11,7 +11,7 @@ import Elm.Syntax.Declaration as Declaration exposing (Declaration)
 import Elm.Syntax.Expression as Expression exposing (Expression, Function)
 import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Range exposing (Range)
-import Review.ModuleNameLookupTable exposing (ModuleNameLookupTable)
+import Review.ModuleNameLookupTable as ModuleNameLookupTable exposing (ModuleNameLookupTable)
 import Review.Rule as Rule exposing (Rule)
 
 
@@ -190,7 +190,7 @@ handlePipeline context node =
 
 report : ModuleContext -> String -> Range -> Int -> List (Rule.Error {})
 report context name functionRange nbArguments =
-    case Dict.get name context.functionArity of
+    case getArity context name functionRange of
         Just expectedNbArguments ->
             if nbArguments < expectedNbArguments then
                 [ Rule.error
@@ -205,3 +205,8 @@ report context name functionRange nbArguments =
 
         Nothing ->
             []
+
+
+getArity : ModuleContext -> String -> Range -> Maybe Int
+getArity context name functionRange =
+    Dict.get name context.functionArity
