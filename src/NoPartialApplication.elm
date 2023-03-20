@@ -124,34 +124,27 @@ expressionVisitorHelp node context =
             ( report context name functionRange (List.length arguments), context )
 
         Expression.OperatorApplication "|>" _ _ right ->
-            case Node.value right of
-                Expression.Application ((Node functionRange (Expression.FunctionOrValue [] name)) :: arguments) ->
-                    ( report context name functionRange (List.length arguments + 1)
-                    , { context | nodesToIgnore = Node.range right :: context.nodesToIgnore }
-                    )
-
-                Expression.FunctionOrValue [] name ->
-                    ( report context name (Node.range right) 1
-                    , { context | nodesToIgnore = Node.range right :: context.nodesToIgnore }
-                    )
-
-                _ ->
-                    ( [], context )
+            handlePipeline context right
 
         Expression.OperatorApplication "<|" _ left _ ->
-            case Node.value left of
-                Expression.Application ((Node functionRange (Expression.FunctionOrValue [] name)) :: arguments) ->
-                    ( report context name functionRange (List.length arguments + 1)
-                    , { context | nodesToIgnore = Node.range left :: context.nodesToIgnore }
-                    )
+            handlePipeline context left
 
-                Expression.FunctionOrValue [] name ->
-                    ( report context name (Node.range left) 1
-                    , { context | nodesToIgnore = Node.range left :: context.nodesToIgnore }
-                    )
+        _ ->
+            ( [], context )
 
-                _ ->
-                    ( [], context )
+
+handlePipeline : ModuleContext -> Node Expression -> ( List (Rule.Error {}), ModuleContext )
+handlePipeline context node =
+    case Node.value node of
+        Expression.Application ((Node functionRange (Expression.FunctionOrValue [] name)) :: arguments) ->
+            ( report context name functionRange (List.length arguments + 1)
+            , { context | nodesToIgnore = Node.range node :: context.nodesToIgnore }
+            )
+
+        Expression.FunctionOrValue [] name ->
+            ( report context name (Node.range node) 1
+            , { context | nodesToIgnore = Node.range node :: context.nodesToIgnore }
+            )
 
         _ ->
             ( [], context )
