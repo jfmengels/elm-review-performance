@@ -123,4 +123,23 @@ function b c d = b + c + d
                             }
                             |> Review.Test.atExactly { start = { row = 2, column = 5 }, end = { row = 2, column = 13 } }
                         ]
+        , test "should report an error when calling a other module's function with insufficient arity" <|
+            \() ->
+                [ """module A exposing (..)
+import B
+a = B.function 0
+""", """module B exposing (function)
+function b c = b + c
+""" ]
+                    |> Review.Test.runOnModules rule
+                    |> Review.Test.expectErrorsForModules
+                        [ ( "A"
+                          , [ Review.Test.error
+                                { message = "REPLACEME"
+                                , details = [ "REPLACEME" ]
+                                , under = "B.function"
+                                }
+                            ]
+                          )
+                        ]
         ]
