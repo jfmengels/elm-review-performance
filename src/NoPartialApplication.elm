@@ -50,11 +50,26 @@ elm-review --template jfmengels/elm-review-performance/example --rules NoPartial
 -}
 rule : Rule
 rule =
-    Rule.newModuleRuleSchema "NoPartialApplication" initialContext
+    Rule.newProjectRuleSchema "NoPartialApplication" initialProjectContext
+        |> Rule.withModuleVisitor moduleVisitor
+        |> Rule.withModuleContextUsingContextCreator
+            { fromProjectToModule = fromProjectToModule
+            , fromModuleToProject = fromModuleToProject
+            , foldProjectContexts = foldProjectContexts
+            }
+        |> Rule.fromProjectRuleSchema
+
+
+moduleVisitor : Rule.ModuleRuleSchema schemaState ModuleContext -> Rule.ModuleRuleSchema { schemaState | hasAtLeastOneVisitor : () } ModuleContext
+moduleVisitor schema =
+    schema
         |> Rule.withDeclarationListVisitor declarationListVisitor
         |> Rule.withDeclarationEnterVisitor declarationVisitor
         |> Rule.withExpressionEnterVisitor expressionVisitor
-        |> Rule.fromModuleRuleSchema
+
+
+type alias ProjectContext =
+    {}
 
 
 type alias ModuleContext =
@@ -67,11 +82,30 @@ type alias FunctionArityDict =
     Dict String Int
 
 
-initialContext : ModuleContext
-initialContext =
-    { functionArity = Dict.empty
-    , nodesToIgnore = []
-    }
+initialProjectContext : {}
+initialProjectContext =
+    {}
+
+
+fromProjectToModule : Rule.ContextCreator ProjectContext ModuleContext
+fromProjectToModule =
+    Rule.initContextCreator
+        (\_ ->
+            { functionArity = Dict.empty
+            , nodesToIgnore = []
+            }
+        )
+
+
+fromModuleToProject : Rule.ContextCreator ModuleContext ProjectContext
+fromModuleToProject =
+    Rule.initContextCreator
+        (\_ -> {})
+
+
+foldProjectContexts : ProjectContext -> ProjectContext -> ProjectContext
+foldProjectContexts _ previousContext =
+    previousContext
 
 
 declarationListVisitor : List (Node Declaration) -> ModuleContext -> ( List (Rule.Error {}), ModuleContext )
