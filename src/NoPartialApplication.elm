@@ -59,6 +59,7 @@ rule =
             , fromModuleToProject = fromModuleToProject
             , foldProjectContexts = foldProjectContexts
             }
+        |> Rule.withContextFromImportedModules
         |> Rule.fromProjectRuleSchema
 
 
@@ -71,7 +72,7 @@ moduleVisitor schema =
 
 
 type alias ProjectContext =
-    {}
+    FunctionArityDict
 
 
 type alias ModuleContext =
@@ -85,17 +86,17 @@ type alias FunctionArityDict =
     Dict ModuleName (Dict String Int)
 
 
-initialProjectContext : {}
+initialProjectContext : ProjectContext
 initialProjectContext =
-    {}
+    Dict.empty
 
 
 fromProjectToModule : Rule.ContextCreator ProjectContext ModuleContext
 fromProjectToModule =
     Rule.initContextCreator
-        (\lookupTable _ ->
+        (\lookupTable functionArity ->
             { lookupTable = lookupTable
-            , functionArity = Dict.empty
+            , functionArity = functionArity
             , nodesToIgnore = []
             }
         )
@@ -105,12 +106,20 @@ fromProjectToModule =
 fromModuleToProject : Rule.ContextCreator ModuleContext ProjectContext
 fromModuleToProject =
     Rule.initContextCreator
-        (\_ -> {})
+        (\moduleName moduleContext ->
+            case Dict.get [] moduleContext.functionArity of
+                Just functionArity ->
+                    Dict.singleton moduleName functionArity
+
+                Nothing ->
+                    Dict.empty
+        )
+        |> Rule.withModuleName
 
 
 foldProjectContexts : ProjectContext -> ProjectContext -> ProjectContext
-foldProjectContexts _ previousContext =
-    previousContext
+foldProjectContexts =
+    Dict.union
 
 
 declarationListVisitor : List (Node Declaration) -> ModuleContext -> ( List (Rule.Error {}), ModuleContext )
