@@ -168,7 +168,7 @@ expressionVisitor node context =
 expressionVisitorHelp : Node Expression -> ModuleContext -> ( List (Rule.Error {}), ModuleContext )
 expressionVisitorHelp node context =
     case Node.value node of
-        Expression.Application ((Node functionRange (Expression.FunctionOrValue [] name)) :: arguments) ->
+        Expression.Application ((Node functionRange (Expression.FunctionOrValue _ name)) :: arguments) ->
             ( report context name functionRange (List.length arguments), context )
 
         Expression.OperatorApplication "|>" _ _ right ->
@@ -184,12 +184,12 @@ expressionVisitorHelp node context =
 handlePipeline : ModuleContext -> Node Expression -> ( List (Rule.Error {}), ModuleContext )
 handlePipeline context node =
     case Node.value node of
-        Expression.Application ((Node functionRange (Expression.FunctionOrValue [] name)) :: arguments) ->
+        Expression.Application ((Node functionRange (Expression.FunctionOrValue _ name)) :: arguments) ->
             ( report context name functionRange (List.length arguments + 1)
             , { context | nodesToIgnore = Node.range node :: context.nodesToIgnore }
             )
 
-        Expression.FunctionOrValue [] name ->
+        Expression.FunctionOrValue _ name ->
             ( report context name (Node.range node) 1
             , { context | nodesToIgnore = Node.range node :: context.nodesToIgnore }
             )
