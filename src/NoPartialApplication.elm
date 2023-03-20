@@ -115,14 +115,14 @@ foldProjectContexts _ previousContext =
 declarationListVisitor : List (Node Declaration) -> ModuleContext -> ( List (Rule.Error {}), ModuleContext )
 declarationListVisitor declarations context =
     let
-        functionArity : FunctionArityDict
+        functionArity : Dict String Int
         functionArity =
             List.foldl inferArityForDeclaration context.functionArity declarations
     in
     ( [], { context | functionArity = functionArity } )
 
 
-inferArityForDeclaration : Node Declaration -> FunctionArityDict -> FunctionArityDict
+inferArityForDeclaration : Node Declaration -> Dict String Int -> Dict String Int
 inferArityForDeclaration node dict =
     case Node.value node of
         Declaration.FunctionDeclaration { declaration } ->
@@ -132,7 +132,7 @@ inferArityForDeclaration node dict =
             dict
 
 
-inferArityForFunction : Expression.FunctionImplementation -> FunctionArityDict -> FunctionArityDict
+inferArityForFunction : Expression.FunctionImplementation -> Dict String Int -> Dict String Int
 inferArityForFunction function dict =
     if List.isEmpty function.arguments then
         dict
