@@ -9,6 +9,7 @@ module NoPartialApplication exposing (rule)
 import Dict exposing (Dict)
 import Elm.Syntax.Declaration as Declaration exposing (Declaration)
 import Elm.Syntax.Expression as Expression exposing (Expression, Function)
+import Elm.Syntax.ModuleName exposing (ModuleName)
 import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Range exposing (Range)
 import Review.ModuleNameLookupTable as ModuleNameLookupTable exposing (ModuleNameLookupTable)
@@ -81,7 +82,7 @@ type alias ModuleContext =
 
 
 type alias FunctionArityDict =
-    Dict String Int
+    Dict ModuleName (Dict String Int)
 
 
 initialProjectContext : {}
@@ -117,9 +118,9 @@ declarationListVisitor declarations context =
     let
         functionArity : Dict String Int
         functionArity =
-            List.foldl inferArityForDeclaration context.functionArity declarations
+            List.foldl inferArityForDeclaration Dict.empty declarations
     in
-    ( [], { context | functionArity = functionArity } )
+    ( [], { context | functionArity = Dict.insert [] functionArity context.functionArity } )
 
 
 inferArityForDeclaration : Node Declaration -> Dict String Int -> Dict String Int
@@ -209,4 +210,6 @@ report context name functionRange nbArguments =
 
 getArity : ModuleContext -> String -> Range -> Maybe Int
 getArity context name functionRange =
-    Dict.get name context.functionArity
+    ModuleNameLookupTable.moduleNameAt context.lookupTable functionRange
+        |> Maybe.andThen (\moduleName -> Dict.get moduleName context.functionArity)
+        |> Maybe.andThen (\dict -> Dict.get name dict)
