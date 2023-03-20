@@ -204,7 +204,7 @@ report context name functionRange nbArguments =
         Just expectedNbArguments ->
             if nbArguments < expectedNbArguments then
                 [ Rule.error
-                    { message = "REPLACEME"
+                    { message = "Function was partially applied"
                     , details = [ "REPLACEME" ]
                     }
                     functionRange

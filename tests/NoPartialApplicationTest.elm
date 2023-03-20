@@ -25,7 +25,7 @@ function b c = b + c
                     |> Review.Test.run rule
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = "REPLACEME"
+                            { message = "Function was partially applied"
                             , details = [ "REPLACEME" ]
                             , under = "function"
                             }
@@ -64,7 +64,7 @@ function b c = b + c
                     |> Review.Test.run rule
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = "REPLACEME"
+                            { message = "Function was partially applied"
                             , details = [ "REPLACEME" ]
                             , under = "function"
                             }
@@ -79,7 +79,7 @@ function b c d = b + c + d
                     |> Review.Test.run rule
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = "REPLACEME"
+                            { message = "Function was partially applied"
                             , details = [ "REPLACEME" ]
                             , under = "function"
                             }
@@ -102,7 +102,7 @@ function b c = b + c
                     |> Review.Test.run rule
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = "REPLACEME"
+                            { message = "Function was partially applied"
                             , details = [ "REPLACEME" ]
                             , under = "function"
                             }
@@ -117,7 +117,7 @@ function b c d = b + c + d
                     |> Review.Test.run rule
                     |> Review.Test.expectErrors
                         [ Review.Test.error
-                            { message = "REPLACEME"
+                            { message = "Function was partially applied"
                             , details = [ "REPLACEME" ]
                             , under = "function"
                             }
@@ -135,7 +135,7 @@ function b c = b + c
                     |> Review.Test.expectErrorsForModules
                         [ ( "A"
                           , [ Review.Test.error
-                                { message = "REPLACEME"
+                                { message = "Function was partially applied"
                                 , details = [ "REPLACEME" ]
                                 , under = "B.function"
                                 }
