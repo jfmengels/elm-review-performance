@@ -11,6 +11,7 @@ import Elm.Syntax.Declaration as Declaration exposing (Declaration)
 import Elm.Syntax.Expression as Expression exposing (Expression, Function)
 import Elm.Syntax.Node as Node exposing (Node(..))
 import Elm.Syntax.Range exposing (Range)
+import Review.ModuleNameLookupTable exposing (ModuleNameLookupTable)
 import Review.Rule as Rule exposing (Rule)
 
 
@@ -73,7 +74,8 @@ type alias ProjectContext =
 
 
 type alias ModuleContext =
-    { functionArity : FunctionArityDict
+    { lookupTable : ModuleNameLookupTable
+    , functionArity : FunctionArityDict
     , nodesToIgnore : List Range
     }
 
@@ -90,11 +92,13 @@ initialProjectContext =
 fromProjectToModule : Rule.ContextCreator ProjectContext ModuleContext
 fromProjectToModule =
     Rule.initContextCreator
-        (\_ ->
-            { functionArity = Dict.empty
+        (\lookupTable _ ->
+            { lookupTable = lookupTable
+            , functionArity = Dict.empty
             , nodesToIgnore = []
             }
         )
+        |> Rule.withModuleNameLookupTable
 
 
 fromModuleToProject : Rule.ContextCreator ModuleContext ProjectContext
